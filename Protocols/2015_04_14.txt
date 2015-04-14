@@ -1,0 +1,53 @@
+Meeting Protocol Example
+
+Date: 14.04.15
+Time: 11:00 - 12:30
+
+Participants:
+
+    Annika
+    Simon
+    Benedikt
+    Philipp
+
+Discussed Topics:
+
+Vorstellungsrunde: Wer kann was?
+
+General Setup:
+
+    Dropbox (Benedikt)
+    Github
+        https://github.com Anmelden und Programm installieren
+        http://git-scm.com/docs/gittutorial (Git Tutorial sehr ausführlich)
+        https://github.com/Laetus/realtime-optimization Link zum Repo
+
+Whatsapp: http://beste-apps.chip.de/android/app/whatsapp-messenger-apk-android-app,cxo.58151052/
+
+Skype
+
+    Interne Sprache Deutsch - nach außen hin englisch
+
+Elevator Pitch
+Gliederung:
+
+    Intro people 15sHey we are the Quadrocopters, this is Annika, Benedikt, Philipp and me Simon.
+
+    Intro project 50s
+    Optimal control of a quadrocopter, for instance battery saving, fast, stable flight, ...
+    Goal: Simulate the quadrocopter for various circumstances
+
+    challenges 50s
+    correct modelling of the problem
+    stochastic parameters like wind
+    limited computational power
+    it's realtime
+
+Spannende Fragen
+
+    Welchen Einfluss haben wir auf die Wahl von x?
+    Ist die Trajektorie gegebe?
+
+TODOs:
+
+    Paper lesen
