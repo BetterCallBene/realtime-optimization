@@ -1,53 +1,82 @@
-Meeting Protocol Example
+Protokoll 1
 
-Date: 14.04.15
-Time: 11:00 - 12:30
+Datum: 14.04.15
+Zeit: 11:00 - 12:45
 
-Participants:
+Teilnehmer:
+    	Annika
+    	Simon
+    	Benedikt
+    	Philipp
 
-    Annika
-    Simon
-    Benedikt
-    Philipp
+Protokollant: Philipp
 
-Discussed Topics:
+Besprochene Themen:
+	Vorstellungsrunde: Wer kann was?
+		* Philipp:
+		  * 3. Mastersemester (Science and Engineering), Nebenfach: Informatik
+		  * Motivation: Projektarbeit kennen lernen und praktische Erfahrung sammeln
+		  * Stärken: Programmieren: Java, Matlab, Python, etwas C
+		* Benedikt:
+		  * 3. Mastersemester, Nebenfach: Maschinenwesen
+		  * Motivation: nteresse an Multikoptern, Teamarbeit und Modellierung/Simulation
+		  * Stärken: 
+    		     * Programmierung,
+    		     * Technische Physik und Roboterdynamik
+		* Simon:
+		  * 4. Mastersemester, M.Sc, Nebenfach: Robotik/Medizintechnik
+    		  * Motivation: Interesse an Optimierung und Anwendung auf Maschinen und Modellierung
+		  * Stärken:
+        	     * Matlab
+        	     * Grundlagen der Optimierung
+		* Annika:
+		  * 2. Mastersemester (Mathmatik)
+		  * Motivation: Interesse an Optimierung, "echtes" Problem lösen
+		  * Stärken:
+		     * Organisation
+		     * Theorie
 
-Vorstellungsrunde: Wer kann was?
+	General Setup:
+		* zu benuzende Programme:
+			* Dropbox (eingerichtet von Benedikt)
+    			* Github
+        			https://github.com Anmelden und Programm installieren
+        			http://git-scm.com/docs/gittutorial (Git Tutorial sehr ausführlich)
+        			https://github.com/Laetus/realtime-optimization Link zum Repo
+			* Whatsapp:
+				http://beste-apps.chip.de/android/app/whatsapp-messenger-apk-android-app,cxo.58151052/
+			* Skype
 
-General Setup:
+		* Interne Sprache deutsch - nach außen hin englisch
 
-    Dropbox (Benedikt)
-    Github
-        https://github.com Anmelden und Programm installieren
-        http://git-scm.com/docs/gittutorial (Git Tutorial sehr ausfÃ¼hrlich)
-        https://github.com/Laetus/realtime-optimization Link zum Repo
+	Elevator Pitch
+		* grobe Gliederung:
+			Intro people (15s)
+			Hey we are the Quadrocopters, this is Annika,
+			Benedikt, Philipp and me: Simon.
 
-Whatsapp: http://beste-apps.chip.de/android/app/whatsapp-messenger-apk-android-app,cxo.58151052/
+    			Intro project (50s)
+    			Optimal control of a quadrocopter, for instance battery saving,
+			fast, stable flight, ...
+    			Goal: Simulate the quadrocopter for various circumstances
 
-Skype
+			Challenges (50s)
+    			correct modelling of the problem
+    			stochastic parameters like wind
+    			limited computational power
+    			it's realtime
+		* Simon soll vortragen
 
-    Interne Sprache Deutsch - nach auÃŸen hin englisch
+	Spannende Fragen (evtl. an Betreuer)
+		* Welchen Einfluss haben wir auf die Wahl von x?
+		* Ist die Trajektorie gegeben?
 
-Elevator Pitch
-Gliederung:
+Aufgaben:
+	* alle: Paper lesen
+	* Simon: bis Mittwoch zu Vorlesung Elevator Pitch ausarbeiten
 
-    Intro people 15sHey we are the Quadrocopters, this is Annika, Benedikt, Philipp and me Simon.
+Nächstes Treffen:
+	* Mi. 15.04. in der Vorlesung
 
-    Intro project 50s
-    Optimal control of a quadrocopter, for instance battery saving, fast, stable flight, ...
-    Goal: Simulate the quadrocopter for various circumstances
 
-    challenges 50s
-    correct modelling of the problem
-    stochastic parameters like wind
-    limited computational power
-    it's realtime
 
-Spannende Fragen
-
-    Welchen Einfluss haben wir auf die Wahl von x?
-    Ist die Trajektorie gegebe?
-
-TODOs:
-
-    Paper lesen
