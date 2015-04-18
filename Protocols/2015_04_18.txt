@@ -1,0 +1,56 @@
+Protokoll 3
+
+Datum: 18.04.2015, Zeit: 11:00 - 12:20
+
+Teilnehmer: Annika, Simon, Benedikt, Philipp
+
+Protokollant: Annika
+
+Besprochene Themen:
+
+	* Organisatorisches
+ 		* Feste Aufgaben
+   		* Benedikt: Pflege des Excel-Sheets
+ 		* gemeinsame Regeln aufstellen
+  		* Workload-Tabellen werden von jedem einzeln für sich geführt und können bei Bedarf zeitnah an Benedikt geschickt werden
+  		* Allgemeines zu Treffen -> Anfang jeden Treffens
+    		* Aufgaben von Protokoll durchgehen
+    		* Wissen aller Teilnehmer synchronisieren -> was hat jeder in der Woche gemacht/herausgefunden
+	* Ziel des Projekts
+  		* es wurden zwei Mögliche Ziele aufgestellt
+  		* diese sollen Montag dem Betreuer vorgestellt werden
+  	* Ziele:
+    		1. Quatrocpter soll einem Ski-Fahrer folgen -> Zielfunktion: energieeffizientes Verfolgen
+    		2. Geländeaufklärung, z.B. im Gebirge bei schwierigen Witterungsbedingungen -> Zielfunktion: stabiler Flug (Kamera, Bildaufnahmen)
+	* Meilensteine definieren
+  		1. M1 Quadrocopter schwebt
+  		2. M2 Quadrocopter folgt einer Kurve
+  		3. M3 Quadrocopter folgt einer Kurve mit externen Einflüssen (z.B. Wind)
+  		4. M4 Quadrocopter folgt dem Skifahrer unter externen Einflüssen
+  	   * zu jedem Meilenstein gibt es (grob) die Zwischenziele: 
+    		1. Modellierung des Quadrocopters (theoretisch) DAE System aufstellen, ohne Wind, keine Regelung
+    		2. Verständnis der Optimierungstheorie
+    		3. Festlegung der Nebenbedingungen
+    		4. Implementierung
+    		5. Visualisierung, Analyse und Erarbeiten von Verbesserungsmöglichkeiten
+  	   * Meilensteine sollen in den Google-Kalender eingetragen werden
+  	   * für die Optimierung wird sich fürs erste an die Doktorarbeit gehalten
+	* zum Poster
+  		* grundsätzlich bunt, viele Bilder, evtl. Explosionszeichnung, eher weniger Text
+  		* Ziel auf Plakat darstellen
+  		* Postergruppe soll nach der "Poster-Vorlesung" Ideen sammeln und diese dann dem Team vorstellen
+	* Aufteilung der Gruppen:
+  		* Poster: Annika, Philipp
+  		* Modellierung: Benedikt, Simon
+
+Aufgaben
+
+	* Benedikt: Präsentation zur Dynamik und Regelung eines Quadcopters
+	* Philipp: Einführung in Git
+	* Simon: Paper "diehl2005real" lesen
+	* Annika: Paper "diehl2002real" lesen
+	* alle: Dienstag Computer mit installiertem Programm für Git mitbringen
+
+Nächste Treffen
+	* Mo. 20.04., 9:00, MI 03.08.061 Betreuertreffen
+	* Di. 21.04., 10:30 MI-Bibliothek
