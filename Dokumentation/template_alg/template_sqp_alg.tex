@@ -1,0 +1,141 @@
+% Vorlage fuer Handouts
+% zum Seminar "Diskrete Geometrie und Kombinatorik -- ein topologischer Zugang"
+% im WS 2008/09
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Allgemeine Hinweise
+% - Halten Sie den LaTeX-Code so uebersichtlich wie moeglich;
+%   (La)TeX-Fehlermeldungen sind oft kryptisch -- in einem ordentlich 
+%   strukturierten Quellcode lassen sich Fehler leichter finden und 
+%   beseitigen
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Jedes LaTeX-Dokument muss eine \documentclass-Deklaration enthalten
+%   Diese sorgt fuer das allgemeine Seiten-Layout, das Aussehen der 
+%   Ueberschriften etc.
+\documentclass[a4paper,oneside,DIV8,10pt]{scrartcl}
+  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Einbinden weiterer Pakete
+  \usepackage[ngerman]{babel} 
+  \usepackage[T1]{fontenc}                    
+  \usepackage[utf8]{inputenc} 
+  \usepackage{mathrsfs}
+  \usepackage{amssymb}
+  %\usepackage{unicode-math}
+
+  \usepackage{amsmath}   % enthaelt nuetzliche Makros fuer Mathematik
+  \usepackage{amsthm}    % fuer Saetze, Definitionen, Beweise, etc.
+  \usepackage{relsize}   % fuer \smaller
+  \usepackage[left=3cm,right=3cm,top=1.5cm,bottom=1.5cm]{geometry} 
+
+  \usepackage{paralist}
+  \usepackage[shortlabels]{enumitem}
+
+  \newcounter{alg}
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Deklaration eigener Mathematik-Makros
+  \newcommand{\N}{\ensuremath{\mathbb{N}}}   % natuerliche Zahlen
+  \newcommand{\Z}{\ensuremath{\mathbb{Z}}}   % ganze Zahlen
+  \newcommand{\Q}{\ensuremath{\mathbb{Q}}}   % rationale Zahlen
+  \newcommand{\R}{\ensuremath{\mathbb{R}}}   % reelle Zahlen
+  \newcommand{\hN}[1]{\ensuremath{^{[#1]}}}
+  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Deklaration eigener Satz-/Definitions-/Beweisumgebungen mit amsthm
+  \newtheorem{satz}{Satz}[section]
+  \newtheorem{lemma}[satz]{Lemma}
+  \newtheorem{korollar}[satz]{Korollar}
+  \theoremstyle{definition}
+  \newtheorem{definition}[satz]{Definition}
+  \newtheorem{bemerkung}[satz]{Bemerkung}
+  \newtheorem{aufgabe}[satz]{Aufgabe}
+  \newenvironment{beweis}%
+    {\begin{proof}[Beweis]}
+    {\end{proof}}
+  \newtheorem{beispiel}[satz]{Beispiel}
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Deklaration weiterer Makros
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Anfang des eigentlichen Dokuments
+\begin{document}
+
+  % Titel fuer das Handout -- Sie koennen natuerlich auch selbst etwas entwerfen!
+  %\handouttitle{V.~Ortragender}
+  %             {mail@turbospam.org}
+  %             {30.~Februar~2009}
+  %             {Gruppenoperationen}
+
+  
+  
+
+  
+  Problemstellung:
+  \begin{align*}
+     \min_{u(\cdot), x(\cdot)} \int_{t_0}^{t_f} L(x(\tau), u(\tau)) \mathrm{d}\tau + E(\cdot)\\\\
+     B(\cdot) \dot x = f(x(t), u(t)) \\
+     0 = g(x(t), u(t))
+  \end{align*}
+
+  {Algorithmus} \\
+  SQP mit Multiple Shooting: \\
+  \begin{align}
+      \min_{w} \nabla F(w)^T d + \frac{1}{2} d^T A_k d& \text{ mit } A_k = \nabla^2_{w w} \mathscr{L}(w\hN{k}, \lambda\hN{k}, \mu\hN{k})\label{gl:qp}\\\nonumber\\
+      \text{u.d.N } G(w\hN{k})+ \nabla G(w\hN{k})^T d \leq 0 \nonumber& \\
+      H(w\hN{k})+ \nabla G(w\hN{k})^T d \leq 0 \nonumber&
+  \end{align}
+  \begin{enumerate}[{(1)}]
+    \item Diskretisierung des Control Signales mit $q_j := u(t)$ für $t \in [t_j, t_{j+1})$, $ j = 0, 1, \hdots N-1, $
+    \item Wähle Startschätzung: $w^{[0]} = (q_0, q_1, \hdots q_{N-1}, s_0^{[0]}, s_1^{[0]}, \hdots, s_{N}^{[0]})^T \in \R^{N \cdot n_q + (N-1) n_s}$, $\lambda\hN{0} \in \R^m, \mu\hN{0} \in \R^p$
+    \setcounter{alg}{\value{enumi}}
+  \end{enumerate}
+  Für $k = 0, 1, 2, \hdots $
+  \begin{enumerate}[(1)]
+    \setcounter{enumi}{\value{alg}}
+    \item STOP, falls $(w\hN{k}, \lambda\hN{k}, \mu\hN{k})$ ein KKT - Paar von 
+          \begin{align*}
+            \min_{w\hN{k} \in \R^{n_w}} &F(w\hN{k})\\
+            G(w\hN{k}) &\leq 0 \\
+            H(w\hN{k}) &= 0\\
+            &\text{mit } F(w\hN{k}) = \sum_{j=0}^{N-1} L_i(s_j\hN{k}, q_j\hN{k}) + E(\cdot)  \\
+            &\text{und } w\hN{k} = \left[\begin{matrix} q_0\hN{k}, & \hdots, & q_{N-1}\hN{k}, & s_0\hN{k}, & \hdots, & s_N\hN{k} \end{matrix} \right]^T, \\
+            &H(w) = \left[\begin{matrix} x_j\hN{k}(t_{j+1}) - s_{j+1}\hN{k}) \\ 
+                                         h_j\hN{s_j\hN{k}, q_j\hN{k}}
+                          \end{matrix}
+                    \right] = 0,\\
+            &G(w) = \left[\begin{matrix}  \\ 
+                                         g\hN{s_j\hN{k}, q_j\hN{k}}
+                          \end{matrix}
+                    \right] \leq 0
+          \end{align*}
+    \setcounter{alg}{\value{enumi}}
+    \hspace{-0.65cm} Für $j = 0, \hdots, N-1:$ 
+    \begin{enumerate}[(3.1)]
+      %\setcounter{enumi}{\value{alg}}
+      \item Löse die Differential-algebraische Gleichungen (DAE) im Zeitintervall $[t_j, t_{j+1}]$
+          \begin{align}
+            B(\cdot) \dot x_j(t) &= f(t, x_j(t), q_j(t)), \hspace{5mm} \nonumber \\
+            x_j(t_j) &= s_j^{[k]} \nonumber
+          \end{align}
+      \item
+        Berechne das Integral:
+        \begin{eqnarray}
+          L_j(s^{[k]}_j, q_j) = \int_{t_{j}}^{t_{j+1}} L(x_j(\theta), q_j(\theta)) \mathrm{d\theta} \nonumber
+        \end{eqnarray}
+    \end{enumerate}
+    \item Berechne die Lösung von (\ref{gl:qp}) und die Multiplikatoren $\lambda\hN{k}_{qp}, \mu\hN{k}_{qp}$
+    \item Setze $w\hN{k+1} = w\hN{k} + d\hN{k}$, $\lambda\hN{k+1} = \lambda\hN{k}_{qp}$, $\mu\hN{k+1} = \mu\hN{k}_{qp}$
+  \end{enumerate}
+  
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Ende des Dokuments -- alles, was nach dieser Zeile steht, wird 
+% von LaTeX ignoriert!
+\end{document}
