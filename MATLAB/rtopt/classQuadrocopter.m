@@ -1004,7 +1004,7 @@ classdef classQuadrocopter < classModell
             res(6, 4:7)  = TD_val(15:18, ind)';
         end
         
-        %ToDo:Anfg Ableitungsreihenfolge ist falsch ordnen
+       
         function res = getTDD(obj, ind)
             res         = cell(7, 7);
             
@@ -1138,7 +1138,7 @@ classdef classQuadrocopter < classModell
             
 
         end
-        %ToDo:Ende
+        
         function res = getRv(obj, ind)
             v   = obj.state(8:10, ind);
             res = obj.Rges{ind} * v;
@@ -1158,9 +1158,6 @@ classdef classQuadrocopter < classModell
         end
         
         function res = getRvDD(obj, ind)
-            %Matrix(3, 7,  , , , , , ,  ,  , , , , , , )
-            q   = obj.state(4:7, ind);      %[r, q, v, w] in R^(13xn)
-            v   = obj.state(8:10, ind);
             
             res = cell(7, 7);
             %Matrix(7, 7, {(1, 1) = 0, (1, 2) = 0, (1, 3) = 2*v3, (1, 4) = -2*v2, (1, 5) = 0, (1, 6) = -2*q[4], (1, 7) = 2*q[3], (2, 1) = 0, (2, 2) = 0, (2, 3) = 2*v2, (2, 4) = 2*v3, (2, 5) = 0, (2, 6) = 2*q[3], (2, 7) = 2*q[4], (3, 1) = 2*v3, (3, 2) = 2*v2, (3, 3) = -4*v1, (3, 4) = 0, (3, 5) = -4*q[3], (3, 6) = 2*q[2], (3, 7) = 2*q[1], (4, 1) = -2*v2, (4, 2) = 2*v3, (4, 3) = 0, (4, 4) = -4*v1, (4, 5) = -4*q[4], (4, 6) = -2*q[1], (4, 7) = 2*q[2], (5, 1) = 0, (5, 2) = 0, (5, 3) = -4*q[3], (5, 4) = -4*q[4], (5, 5) = 0, (5, 6) = 0, (5, 7) = 0, (6, 1) = -2*q[4], (6, 2) = 2*q[3], (6, 3) = 2*q[2], (6, 4) = -2*q[1], (6, 5) = 0, (6, 6) = 0, (6, 7) = 0, (7, 1) = 2*q[3], (7, 2) = 2*q[4], (7, 3) = 2*q[1], (7, 4) = 2*q[2], (7, 5) = 0, (7, 6) = 0, (7, 7) = 0})
