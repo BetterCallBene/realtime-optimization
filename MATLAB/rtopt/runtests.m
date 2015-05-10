@@ -8,8 +8,11 @@ import matlab.unittest.TestSuite
 %Create Suite from SolverTest Class
 %The fromClass method creates a suite from all Test methods in the SolverTest class.
 
-suiteClass = TestSuite.fromClass(?classQuadrocopter);
-result = run(suiteClass);
+suiteClassQuadrocopter = TestSuite.fromClass(?classQuadrocopter);
+result = run(suiteClassQuadrocopter);
+
+suiteClassQuadrocopterDyn = TestSuite.fromClass(?classQuadrocopterDyn);
+resultDyn = run(suiteClassQuadrocopterDyn);
 
 %Create Suite from SolverTest Class Definition File
 %The fromFile method creates a suite using the name of the file to identify the class.

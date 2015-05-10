@@ -3,39 +3,39 @@ classdef classTestEnv < matlab.unittest.TestCase
     %   Detailed explanation goes here
     
     properties(Constant)
-        eps = 1e-6;
+        eps = 1e-2;
     end
     
     methods
         %numDiffObj 
-        function numDiffObj(obj, func)   
-            %ToDo: Implementierung der umerischen Differentation
-            % numerical differentiation for objects of classes
-            
-%             n   = length(vec);
-% 
-%             % first order
-%             %g   = obj.get_jac();
-%             
-%             for i=1:n
-%                 % plus epsilon shift
-%                 vecn    = vec;
-%                 vecn(i) = vecn(i) + obj.eps;
-%                 vec = vecn;
-%                 hp      = obj.get_func();
-%     
-%                 % minus epsilon shift
-%                 vecn    = vec;
-%                 vecn(i) = vecn(i) - obj.eps;
-%                 obj.vec = vecn;
-%                 hm      = obj.get_func();
-%     
-%                 % central difference
-%                 gnum    = (hp - hm)/2/obj.eps;
-%     
-%                 % comparison numerical to analytical derivative
-%                 
-%             end
+        function numdObj = numDiffObj(obj, func)   
+%             %ToDo: Implementierung der numerischen Differentation
+%                         
+%               n   = length(obj.vec);
+%               vec = obj.vec;
+%  
+%               for i=1:n
+%                  % plus epsilon shift
+%                   vecn    = vec;
+%                   vecn(i) = vecn(i) + obj.eps;
+%                   obj.vec = vecn;
+%                   hp      = func();
+% %     
+% %                 % minus epsilon shift
+%                   vecn    = vec;
+%                   vecn(i) = vecn(i) - obj.eps;
+%                   obj.vec = vecn;
+%                   hm      = func();
+% %     
+% %                 % central difference
+%                   numdObj    = (hp - hm)/2/obj.eps;
+%                   max(numdObj)
+%                   disp(numdObj);
+%                   
+%                   
+% %                 % comparison numerical to analytical derivative
+% %                 
+%              end
         end
             % display result
     end
