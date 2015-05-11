@@ -281,15 +281,15 @@ classdef classQuadrocopter < classModell
                 %state = [r, q, v, w]^T in R^13
                 
                 q   = cq.state(4:7    , :);
-                r_g = cq.R3(q) * cq.env.g; %
+                R_g = cq.R3(q) * cq.env.g; %
                 v   = cq.state(8:10   , :);
                 w   = cq.state(11:13  , :);
                 
                 
                 cq.theta = zeros(6, cq.n_int);
-                cq.theta(1, :) = cq.m * (w(2, :) .* v(3, :) - w(3, :) .* v(2, :) + r_g(1, :));
-                cq.theta(2, :) = cq.m * (w(3, :) .* v(1, :) - w(1, :) .* v(3, :) + r_g(2, :));
-                cq.theta(3, :) = cq.m * (w(1, :) .* v(2, :) - w(2, :) .* v(1, :) + r_g(3, :));
+                cq.theta(1, :) = cq.m * (w(2, :) .* v(3, :) - w(3, :) .* v(2, :) + R_g(1, :));
+                cq.theta(2, :) = cq.m * (w(3, :) .* v(1, :) - w(1, :) .* v(3, :) + R_g(2, :));
+                cq.theta(3, :) = cq.m * (w(1, :) .* v(2, :) - w(2, :) .* v(1, :) + R_g(3, :));
                 cq.theta(4, :) = cq.I(3) *  w(2, :) .* v(3, :) - cq.I(2) * w(3, :) .* v(2, :);
                 cq.theta(5, :) = cq.I(1) * w(3, :) .* v(1, :)  - cq.I(3) * w(1, :) .* v(3, :);
                 cq.theta(6, :) = cq.I(2) *  w(1, :) .* v(2, :) - cq.I(1) * w(2, :) .* v(1, :);
@@ -1670,6 +1670,23 @@ classdef classQuadrocopter < classModell
             res{7, 4}(1) = QDD_val(obj.startIndexHesseQDD1 + iQD1, ind);
             %iQD1 = iQD1 + 1; %iQD1 = 7
         end
+        
+        function ret = getJ(obj)
+            
+            omega   = obj.state(11:13, :);
+            IM = obj.I_M;
+            u   = obj.contr;
+            t1 = 2 * obj.kT;
+            t2 = t1 * u(1, :);
+            t3 = t1 * u(2, :);
+            t4 = t1 * u(3, :);
+            t1 = t1 * u(4, :);
+            t5 = -u(1, :) + u(2, :) - u(3, :) + u(4, :);
+            t6 = (IM * omega(2, :));
+            t7 = (IM * omega(1, :));
+            t8 = 2 * obj.kQ;
+            ret = [3 4 t2; 3 5 t3; 3 6 t4; 3 7 t1; 4 2 IM * t5; 4 4 -t6; 4 5 t3 * obj.d + t6; 4 6 -t6; 4 7 -t1 * obj.d + t6; 5 1 -IM * t5; 5 4 -t2 * obj.d + t7; 5 5 -t7; 5 6 t4 * obj.d+ t7; 5 7 -t7; 6 4 -t8 * u(1, :); 6 5 t8 * u(2, :); 6 6 -t8 * u(3, :); 6 7 t8 * u(4, :);];
+        end
     end
     
     methods(Test)
@@ -1940,6 +1957,8 @@ classdef classQuadrocopter < classModell
             obj.verifySize(QD_, [4, 7]);
             
         end
+        
+        
                 
         function testQDD(obj)
              
@@ -1957,6 +1976,18 @@ classdef classQuadrocopter < classModell
             QDD_ = obj.getQDD(1);
             obj.verifyEqual(obj.isEmptyQDD, false);
             obj.verifySize(QDD_, [7, 7]);
+        end
+        
+        function testJD(obj)
+            n_int_ = 50;
+            n_state_ = obj.n_var;
+            n_contr_ = obj.n_contr;
+            
+            obj.state = rand(n_state_, n_int_+1);
+            obj.contr = rand(n_contr_, n_int_+1);
+            
+            obj.getJ();
+            
         end
 
         

@@ -74,7 +74,7 @@ classdef classQuadrocopterDyn < classDyn & classTestEnv
             if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
                 
                 M           = obj.robot.getM(ind);
-                theta       = obj.robot.getTheta(ind);
+                Theta       = obj.robot.getTheta(ind);
                 T           = obj.robot.getT(ind);
                 Rv          = obj.robot.getRv(ind);
                 Q           = obj.robot.getQ(ind);
@@ -83,7 +83,7 @@ classdef classQuadrocopterDyn < classDyn & classTestEnv
                 val          = zeros(13,1);
                 val(1:3,1)   = Rv;
                 val(4:7,1)   = Q;
-                val(8:13,1)  = M\(T-theta);
+                val(8:13,1)  = M\(T-Theta);
             else
                 error('wrong state and control lengths wrt index.');
             end
