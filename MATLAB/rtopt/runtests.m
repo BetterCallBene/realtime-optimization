@@ -14,6 +14,9 @@ result = run(suiteClassQuadrocopter);
 suiteClassQuadrocopterDyn = TestSuite.fromClass(?classQuadrocopterDyn);
 resultDyn = run(suiteClassQuadrocopterDyn);
 
+suiteClassQuadrocopterBasisDyn = TestSuite.fromClass(?classQuadrocopterBasisDyn);
+resultBasisDyn = run(classQuadrocopterBasisDyn);
+
 %Create Suite from SolverTest Class Definition File
 %The fromFile method creates a suite using the name of the file to identify the class.
 

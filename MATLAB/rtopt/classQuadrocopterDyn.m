@@ -68,7 +68,8 @@ classdef classQuadrocopterDyn < classDyn & classTestEnv
         end
         
         % other functions
-        function val = dot(obj,ind)
+        % TODO: Mapleskript einpflegen, Dynamik 
+        function val = dot(obj,ind) % Rechte Seite der ODE aus (Quadrocoptermodell.pdf: (1.46))
             % compute the right hand side of the ode for a given time
             % instance ind
             if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
@@ -123,9 +124,28 @@ classdef classQuadrocopterDyn < classDyn & classTestEnv
             error('dotDD: muss noch implementiert werden')
             if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
             end    
-        end    
+        end  
         
-        
+        function res = getJ(obj, ind)
+            J_ = obj.J;
+            res = zeros(6, 7);
+            for i = 1:length(J_)
+                res(J_(i, 1), J_(i, 2)) = J_(i, ind + 2);
+            end
+        end
+
+        function res = getH(obj, ind)
+            res = cell(1, 6);
+
+            H_ = obj.H;
+            for i = 1:length(H_)
+                if isempty(res{H_(i, 1)})
+                    res{H_(i, 1)} = zeros(7, 7);
+                end
+                res{H_(i, 1)}(H_(i, 2), H_(i, 3)) = H_(i, 4);
+            end
+        end 
+  
     end
     
     methods(Test)

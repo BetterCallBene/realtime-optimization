@@ -1671,21 +1671,31 @@ classdef classQuadrocopter < classModell
             %iQD1 = iQD1 + 1; %iQD1 = 7
         end
         
-        function ret = getJ(obj)
+        function cg = getJ(obj)
             
-            omega   = obj.state(11:13, :);
-            IM = obj.I_M;
+            q   = obj.state(4:7    , :);
+            v   = obj.state(8:10   , :);
+            omega   = obj.state(11:12  , :);
             u   = obj.contr;
-            t1 = 2 * obj.kT;
-            t2 = t1 * u(1, :);
-            t3 = t1 * u(2, :);
-            t4 = t1 * u(3, :);
-            t1 = t1 * u(4, :);
+            
+            I = obj.I;
+            IM = obj.I_M;
+            m = obj.m;
+            
+            kT  = obj.kT;
+            kQ  = obj.kQ;
+        	d   = obj.d;
+            
+            t1 = 2 .* kT;
+            t2 = t1 .* u(1, :);
+            t3 = t1 .* u(2, :);
+            t4 = t1 .* u(3, :);
+            t1 = t1 .* u(4, :);
             t5 = -u(1, :) + u(2, :) - u(3, :) + u(4, :);
-            t6 = (IM * omega(2, :));
-            t7 = (IM * omega(1, :));
-            t8 = 2 * obj.kQ;
-            ret = [3 4 t2; 3 5 t3; 3 6 t4; 3 7 t1; 4 2 IM * t5; 4 4 -t6; 4 5 t3 * obj.d + t6; 4 6 -t6; 4 7 -t1 * obj.d + t6; 5 1 -IM * t5; 5 4 -t2 * obj.d + t7; 5 5 -t7; 5 6 t4 * obj.d+ t7; 5 7 -t7; 6 4 -t8 * u(1, :); 6 5 t8 * u(2, :); 6 6 -t8 * u(3, :); 6 7 t8 * u(4, :);];
+            t6 = IM .* omega(2, :);
+            t7 = IM .* omega(1, :);
+            t8 = 2 .* kQ;
+            cg = [3 4 t2; 3 5 t3; 3 6 t4; 3 7 t1; 4 2 IM .* t5; 4 4 -t6; 4 5 t3 .* d + t6; 4 6 -t6; 4 7 -t1 .* d + t6; 5 1 -IM .* t5; 5 4 -t2 .* d + t7; 5 5 -t7; 5 6 t4 .* d + t7; 5 7 -t7; 6 4 -t8 .* u(1, :); 6 5 t8 .* u(2, :); 6 6 -t8 .* u(3, :); 6 7 t8 .* u(4, :);];
         end
     end
     
@@ -1979,14 +1989,14 @@ classdef classQuadrocopter < classModell
         end
         
         function testJD(obj)
-            n_int_ = 50;
+            n_int_ = 3;
             n_state_ = obj.n_var;
             n_contr_ = obj.n_contr;
             
             obj.state = rand(n_state_, n_int_+1);
             obj.contr = rand(n_contr_, n_int_+1);
             
-            obj.getJ();
+            J = obj.getJ();
             
         end
 
