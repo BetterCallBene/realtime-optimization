@@ -105,7 +105,7 @@ classdef classQuadrocopterDyn < classQuadrocopterBasisDyn & classTestEnv
                     if isempty(res{H_(i, 1)})
                         res{H_(i, 1)} = zeros(17, 17);
                     end
-                    res{H_(i, 1)}(H_(i, 2), H_(i, 3)) = H_(i, 4);
+                    res{H_(i, 1)}(H_(i, 2), H_(i, 3)) = H_(i, ind + 3);
                 end
             end    
         end  
@@ -144,7 +144,7 @@ classdef classQuadrocopterDyn < classQuadrocopterBasisDyn & classTestEnv
         
         function testdotDDs(obj)
             n_int_ = 50;
-            ind = 2;
+            ind = 10;
             
             n_var_ = obj.n_var;
             n_contr_ = obj.n_contr;
