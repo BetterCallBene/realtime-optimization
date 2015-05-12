@@ -105,10 +105,10 @@ classdef classQuadrocopterBasisDyn < handle & classTestEnv
                 
                 q   = obj.state(4:7    , :);
                 v   = obj.state(8:10   , :);
-                omega   = obj.state(11:12  , :);
+                omega   = obj.state(11:13  , :);
                 u   = obj.contr;
             
-                I = obj.I;
+                Iges = obj.I;
                 IM = obj.I_M;
                 m = obj.m;
             
@@ -129,10 +129,10 @@ classdef classQuadrocopterBasisDyn < handle & classTestEnv
             if obj.isEmptyJ
                 q   = obj.state(4:7    , :);
                 v   = obj.state(8:10   , :);
-                omega   = obj.state(11:12  , :);
+                omega   = obj.state(11:13  , :);
                 u   = obj.contr;
             
-                I = obj.I;
+                Iges = obj.I;
                 IM = obj.I_M;
                 m = obj.m;
             
@@ -143,7 +143,7 @@ classdef classQuadrocopterBasisDyn < handle & classTestEnv
                 
                 {1}
                 
-                obj.J = cg0;
+                obj.J = t1;
                 obj.isEmptyJ = false;
             end
             res = obj.J;
@@ -153,10 +153,12 @@ classdef classQuadrocopterBasisDyn < handle & classTestEnv
             if obj.isEmptyH
                 q   = obj.state(4:7    , :);
                 v   = obj.state(8:10   , :);
-                omega   = obj.state(11:12  , :);
+                omega   = obj.state(11:13  , :);
                 u   = obj.contr;
+                
+             
+                Iges = obj.I;
             
-                I = obj.I;
                 IM = obj.I_M;
                 m = obj.m;
             
@@ -164,10 +166,12 @@ classdef classQuadrocopterBasisDyn < handle & classTestEnv
                 kQ  = obj.kQ;
                 d   = obj.d;
                 g   = obj.g;
+                
+                onesV = ones(1, obj.n_int); %Korregiere die Matrix Dimension
 
                 {2}
                 
-                obj.H = cg1;
+                obj.H = t1;
                 obj.isEmptyH = false;
             end
             res = obj.H;

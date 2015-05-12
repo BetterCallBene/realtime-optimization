@@ -10,7 +10,7 @@ filename1 = 'tmpRTOptFunction'
 filename2 = 'tmpRTOptJacobi'
 filename3 = 'tmpRTOptHesse'
 template = 'template_classQuadrocopterBasisDyn.m'
-file_to = 'classQuadrocopterBasis.m'
+file_to = 'classQuadrocopterBasisDyn.m'
 
 string_to_replace = [
 					['q(1)', 'q(1, :)'],
@@ -28,7 +28,9 @@ string_to_replace = [
 					['u(3)', 'u(3, :)'],
 					['u(4)', 'u(4, :)'],
 					['*', '.*'],
-					['^', u'.^']
+					['/', './'],
+					['^', u'.^'],
+					['ones', 'onesV']
 					]
 
 path1 = pathTmp % filename1
