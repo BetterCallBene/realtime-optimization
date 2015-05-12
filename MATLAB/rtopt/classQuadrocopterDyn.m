@@ -69,83 +69,47 @@ classdef classQuadrocopterDyn < classDyn & classTestEnv
         
         % other functions
         % TODO: Mapleskript einpflegen, Dynamik 
-        function val = dot(obj,ind) % Rechte Seite der ODE aus (Quadrocoptermodell.pdf: (1.46))
+        function res = dot(obj,ind) % Rechte Seite der ODE aus (Quadrocoptermodell.pdf: (1.46))
             % compute the right hand side of the ode for a given time
             % instance ind
             if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
-                
-                M           = obj.robot.getM(ind);
-                Theta       = obj.robot.getTheta(ind);
-                T           = obj.robot.getT(ind);
-                Rv          = obj.robot.getRv(ind);
-                Q           = obj.robot.getQ(ind);
-                
-                
-                val          = zeros(13,1);
-                val(1:3,1)   = Rv;
-                val(4:7,1)   = Q;
-                val(8:13,1)  = M\(T-Theta);
+                F_ = obj.F;
+                % ToDo Funktionsausgabe
             else
                 error('wrong state and control lengths wrt index.');
             end
         end
         % Testen
         
-        function val = dotD(obj,ind)
+        function res = dotD(obj,ind)
             % compute the Jacobian of the right hand side of the ode for 
             % a given time instance ind            
             if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
                 
-                M           = obj.robot.getM(ind);
-                RvD         = obj.robot.getRvD(ind);
-                QD          = obj.robot.getQD(ind);
-                TD           = obj.robot.getTD(ind);
-                %MD          = obj.robot.getMD(ind);
-                %theta       = obj.robot.getTheta(ind);
-                thetaD      = obj.robot.getThetaD(ind);
-                
-                val         = zeros(13,17);
-                
-                val(1:3, 4:10) = RvD;
-                val(4:7, 4:7) = QD(:, 1:4);
-                val(4:7, 11:13) = QD(:, 5:7);
-                val(8:13, 4:10) = -M\thetaD(:, 1:7);
-                val(8:13, 11:13) = M\(TD(:, 1:3) - thetaD(:, 8:end));
-                val(8:13, 14:17) = M\TD(:, 4:end);
+                J_ = obj.J;
+                res = zeros(6, 7);
+                for i = 1:length(J_)
+                    res(J_(i, 1), J_(i, 2)) = J_(i, ind + 2);
+                end
             else
                 error('wrong state and control lengths wrt index.');
             end
         end
         
-        function val = dotDD(obj,ind)
+        function res = dotDD(obj,ind)
             % compute the Hessian of the right hand side of the ode for 
             % a given time instance ind                
-            val = cell(6, 6);
-            error('dotDD: muss noch implementiert werden')
             if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
+                res = cell(1, 6);
+                H_ = obj.H;
+                for i = 1:length(H_)
+                    if isempty(res{H_(i, 1)})
+                        res{H_(i, 1)} = zeros(7, 7);
+                    end
+                    res{H_(i, 1)}(H_(i, 2), H_(i, 3)) = H_(i, 4);
+                end
             end    
         end  
-        
-        function res = getJ(obj, ind)
-            J_ = obj.J;
-            res = zeros(6, 7);
-            for i = 1:length(J_)
-                res(J_(i, 1), J_(i, 2)) = J_(i, ind + 2);
-            end
-        end
-
-        function res = getH(obj, ind)
-            res = cell(1, 6);
-
-            H_ = obj.H;
-            for i = 1:length(H_)
-                if isempty(res{H_(i, 1)})
-                    res{H_(i, 1)} = zeros(7, 7);
-                end
-                res{H_(i, 1)}(H_(i, 2), H_(i, 3)) = H_(i, 4);
-            end
-        end 
-  
     end
     
     methods(Test)
