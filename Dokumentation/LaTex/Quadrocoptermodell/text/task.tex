@@ -1,0 +1,21 @@
+\chapter{Aufgabenstellung}\label{task}
+\section{Hintergrund}\label{sec:backgr}
+Die elektrochemische Impedanzspektroskopie (EIS) ist ein Messverfahren zur Bestimmung der komplexen Impedanz $Z(\omega)$ eines elektrochemischen Speichers. Sie dient als wesentliches Hilfsmittel zur Untersuchung, genauer zur Charakterisierung, Modellierung, sowie Zustandsdiagnostik in Batteriespeichersystemen. Jedoch sind für gültige (valide) Messdaten spezifische Systemvoraussetzungen zu erfüllen, die der Speicher a priori nicht hat. Eine näherungsweise Erfüllung der Systemvoraussetzungen kann durch eine optimierte Versuchsplanung hergestellt werden. Da dies in der Praxis sich als schwierig herausgestellt hat, ist es ein intrinsisches Anliegen, eine automatisierte Validitätskontrolle zur Verfügung zu haben, die also entscheidet, ob die gemessenen Impedanzdaten valide sind oder nicht. Ein wesentliches Hilfsmittel dazu ist die Kramers-Kronig Transformation (KKT).
+Die KKT
+\[
+	F(\omega_0) = \frac{-2}{\pi} P \int_0^{\infty} \frac{\omega G(\omega)}{\omega^2-\omega_0^2} d\omega 
+	 \longleftrightarrow{\text{KKT-Paar}} 
+	\frac{2}{\pi} P \int_0^{\infty} \frac{\omega_0 G(\omega)}{\omega^2-\omega_0^2} d\omega = G(\omega_0)
+\]
+vermittelt zwischen Real- $F(\omega_0)$ und Imaginärteil $G(\omega_0)$ einer komplexwertigen Funktion $H(\omega) = F(\omega) + iG(\omega)$ der reellen Variablen $\omega$. Seit einigen Jahren wird die KKT zur Validierung von Impedanzmessdaten verwendet. Jedoch sind die Voraussetzungen für die Anwendbarkeit bis heute umstritten und die numerische Implementierung bis heute eine Herausforderung.
+\section{Aufgabenstellung}\label{sec:task}
+In der vorliegenen BA sollen Verfahren zur numerischen Implementierung der KKT systematisch 
+\begin{enumerate}
+\item recherchiert
+\item hinsichtlich geeigneter Klassifikatoren
+\item ggf. optimiert 
+\item implementiert (z.B. Matlab, Maple)
+\end{enumerate}
+werden. Neben den theoretischen Aspekten der numerischen Implementierbarkeit, die es zu erörtern gilt, soll die Arbeit schließlich funktionsfähige Skripten zur Verfügung stellen, mit geeigneter Schnittstelle für Eingabedaten, wie Real- und Imaginärteil der EIS-Messdaten, Fehlerschranken, Auswahl des numerischen Verfahrens zur KKT.
+\section{Anforderungen}\label{sec:requirem}
+Grundlagen elektrochemischer Speicher und deren Modellierung; Funktionsweise und Anwendung der EIS, Systemtheorie

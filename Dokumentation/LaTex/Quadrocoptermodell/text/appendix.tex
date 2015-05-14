@@ -1,0 +1,303 @@
+\section{Rationale Funktionen}
+\begin{satz}(Partialbruchzerlegung)\label{a:par}
+Sei $p(\xi), q(\xi) \in \mathbb{R}$ und deg $q(\xi) = m \leq n =$ deg $p(\xi)$. Voraussetzung $p(\xi) = \prod_{i=1}^N{(\xi -\lambda_i)^{n_i}}$ mit $\lambda_i \neq \lambda_j$ für $i \neq j$. Dann existiert ein $a_0$ und $a_{ij} \in \mathbb{C}$, so dass 
+\begin{align}
+	\frac{q(\xi)}{p(\xi)} = a_0 + \sum_{i=1}^{N}{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(\xi - \lambda_i)^j}}}
+\end{align}
+\end{satz}
+\cite[S.417]{Polderman1997}
+\begin{satz}\label{s:makeerational}
+Sei $p(\xi) \in \mathbb{R}[\xi]$, $q(\xi) \in \mathbb{R}[\xi]$, und $p(\xi)^{-1}q(\xi)$ gebrochen rational und $p(\xi) \neq 0$. Man betrachte das input/output Batteriesystem $p(\xi) y = q(\xi) u$. Dann existiert ein $\tilde{p} \in \mathbb{C}$, so dass die Beziehung zwischen $u$ und $y'=y+\tilde{p}u$ eine echt gebrochene Eingabe / Ausgabe Beziehung ist.
+\begin{proof}
+Ist $p(\xi)^{-1}q(\xi)$ echt gebrochen rational, so ist nichts zu beweisen. Annahme $p(\xi)^{-1}q(\xi)$ ist gebrochen rational, aber nicht echt gebrochen rational. Dann existiert nach Satz \ref{a:par} eine Partialbruchzerlegung 
+	\begin{align}
+		p(\xi)^{-1}q(\xi) &= a_0 +  \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\frac{a_{ij}}{(\xi - \lambda_i)^j}}}\\
+		q(\xi) &= p(\xi)a_0 + \tilde{q}(\xi) \label{gl:gbR}
+	\end{align} 
+Betrachtet man das System  
+	\begin{align}
+		p(\xi)y &= q(\xi) u \\
+		\text{ aus \ref{gl:gbR} }  \Rightarrow p(\xi) y &= (p(\xi)a_0 + \tilde{q}(\xi))u\\
+		p(\xi) (y-a_0u) &= \tilde{q}(\xi)u
+	\end{align}
+	Definiert man $\tilde{p}:=a_0$ und da
+	\begin{align}
+		p(\xi)^{-1}\tilde{q}(\xi) = p(\xi)^{-1}q(\xi) - a_0 = \sum_{i=1}^{N}{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(\xi - \lambda_i)^j}}}
+	\end{align}
+	folgt, dass $p^{-1}(\xi)\tilde{q}(\xi)$ echt gebrochen rational ist und $p(\xi) y' = \tilde{q}(\xi)u$.
+\end{proof}
+\end{satz}
+\begin{lemma}\label{lem:absch}
+Sei $p, q \in \mathbb{R}[\xi]$ und $p(\xi)^{-1}q(\xi)$ eine reelle rationale Funktion vom Grad $n$. Dann gibt es reelle Zahlen $R > 0$ und $c > 0$, so dass 
+\begin{align}
+	\abs{f(z)} \leq c \cdot \abs{z}^n
+\end{align}
+für alle $\xi \in \mathbb{R}$ mit $\abs{\xi} > R$ gilt.
+\begin{proof}
+\begin{align}
+	p(\xi)^{-1}q(\xi) &=  \frac{\alpha_m \xi^m + \alpha_{m-1} \xi^{m-1} + \hdots +  \alpha_1 \xi + \alpha_0}
+		{\beta_n \xi^n + \beta_{n-1} \xi^{n-1} + \hdots +  \beta_1 \xi + \beta_0}\\
+\end{align}
+wobei für alle $a_m$, $b_n \neq 0$, so dass also $k=m-n$ gilt. Dann ist
+\begin{align}
+	\abs{p(\xi)^{-1}q(\xi)} &= \abs{\frac{\alpha_m \xi^m + \alpha_{m-1} \xi^{m-1} + \hdots +  \alpha_1 \xi + \alpha_0}
+		{\beta_n \xi^n + \beta_{n-1} \xi^{n-1} + \hdots +  \beta_1 \xi + \beta_0}} \\
+		&= \abs{\frac{ \xi^m(\alpha_m  + \alpha_{m-1} \xi^{-1} + \hdots +  \alpha_1 \xi^{-m+1} + \alpha_0 \xi^{-m})}
+		{\xi^n (\beta_n  + \beta_{n-1} \xi^{-1} + \hdots +  \beta_1 \xi^{-n+1} + \beta_0 \xi^{-n})}}\\
+		&= \abs{\xi}^n \cdot \underbrace{\abs{\frac{\alpha_m  + \alpha_{m-1} \xi^{-1} + \hdots +  \alpha_1 \xi^{-m+1} + \alpha_0 \xi^{-m}}{\beta_n  + \beta_{n-1} \xi^{-1} + \hdots +  \beta_1 \xi^{-n+1} + \beta_0 \xi^{-n}}}}_{(*)}
+\end{align}
+Der Ausdruck $(*)$ konvergiert für $\xi \rightarrow \infty$ gegen $\abs{\frac{a_m}{a_n}}$. Setze man $c:=\abs{\frac{a_m}{a_n}} + 1$, so gibt es ein $R > 0$, so dass $\abs{p(\xi)^{-1}q(\xi)} \leq c \cdot \abs{\xi}^k$ ist für alle $\mathbb{R}$ mit $\abs{\xi} \leq \mathbb{R}$.
+\end{proof}
+\end{lemma}
+\begin{lemma}\label{lem:deg2}
+Es sei $f: \mathbb{R} \rightarrow \mathbb{R}$ ist eine stetige Funktion, für die es eine Konstante $k \in \mathbb{Z}$ mit $k \leq -2$ sowie $c, R \in \mathbb{R}_{\geq 0}$ gibt mit $\abs{f(x)} \leq c \abs{x}^k$ für alle $x \in \mathbb{R}$ mit $\abs{x} \geq R$ dann gilt:
+\begin{align}
+	\abs{\int_{-\infty}^{\infty} f(x) \mathrm{dx}} < \infty 
+\end{align} 
+\end{lemma}
+\begin{proof}
+	Das uneigentliche Integral $\int_{-\infty}^{\infty} f(x) \mathrm{dx}$ lässt sich per Definition aufspalten in 
+	\begin{align}
+		\abs{\int_{-\infty}^{\infty} f(x)\mathrm{dx}} \leq \underbrace{\abs{\int_{-\infty}^{-R}f(x) \mathrm{dx}}}_{(1)} + \underbrace{\abs{\int_{-R}^{R} f(x) \mathrm{dx}}}_{(2)} + \underbrace{\abs{\int_{R}^{\infty} f(x) \mathrm{dx}}}_{(3)}
+	\end{align}
+	Der Ausdruck ist $(2)$ ist klar: Das Integral stetiger Funktionen auf einem Kompaktum ist beschränkt, d.h. $\abs{\int_{-R}^{R} f(x) \mathrm{dx}} < \infty$ \\ 
+	Sei $g:=c \cdot \abs{x}^k$ und $k \leq -2$ 
+	\begin{align}
+	\int_{\abs{R}}^{\pm \infty} g(x)\mathrm{dx} &= \int_{\abs{R}}^{\pm \infty} c \cdot \abs{x}^k \mathrm{dx} \\
+	&= c \left. \frac{\abs{x}^{k+1}}{k+1}\right\rvert_{\abs{R}}^{\pm \infty} = c \frac{R^{k+1}}{k+1} < \infty
+	\end{align}
+	und es gilt $\abs{f(x)} < g$ im Integralbereich für $(1)$, $(3)$, dann folgt nachdem Majorantenkriterium, dass $\int_{\abs{R}}^{\pm \infty} f(x)\mathrm{dx}$ konvergent ist, d.h. $\int_{\abs{R}}^{\pm \infty} f(x)\mathrm{dx} < \infty$. Somit folgt die Behauptung.
+\end{proof}
+\section{Integralsätze}
+\begin{satz}(Satz von Fubini)\label{a:fubini}
+Falls die Maßräume $(S_1, \mathscr{A}_1, \mu_1)$ und $(S_2, \mathscr{A}_2, \mu_2)$ $\sigma$ - endlich sind, die Funktion $f: S_1 \times S_2 \rightarrow [-\infty, \infty]$ $\mathscr{A}_1 \otimes \mathscr{A}_1$ - messbar ist und eines der iterierten Integrale $\int_{S_1} \left( \int_{S_2} \abs{f} \mathrm{d\mu_2} \right) \mathrm{d\mu_1}$ oder $\int_{S_2} \left( \int_{S_1} \abs{f} \mathrm{d\mu_1} \right) \mathrm{d\mu_2}$ endlich ist, gilt die Integralvertauschungsformel
+\begin{align}
+	\int_{S_2} \left( \int_{S_1} \abs{f} \mathrm{d\mu_1} \right) \mathrm{d\mu_2} = \int_{S_2} \left( \int_{S_1} \abs{f} \mathrm{d\mu_1} \right) \mathrm{d\mu_2} 
+\end{align}
+\end{satz} \cite[Seite 258]{Werner2006}
+\begin{satz}(Grenzwert und Integral vertauschen) \label{a:change}
+Seien $f_n: S \rightarrow \mathbb{R}$ messbare Funktionen, und für $s \in S$ existiere $f(s) := \lim_{n \rightarrow \infty }{f_n(s)}$. Falls eine integrierbare Funktion $g: S \rightarrow [0, \infty]$ mit $\abs{f_n} \leq g$ für alle $n$ existiert, so gelten:
+\begin{itemize}
+	\item Die $f_n$ und $f$ sind integrierbar,
+	\item $\int_S \abs{f_n - f} \mathrm{d\mu}$,
+	\item $\lim_{n \rightarrow \infty}{ \int_S f_n \mathrm{d\mu}} = \int_S f \mathrm{d\mu}$.	
+\end{itemize}
+\end{satz} \cite[Seite 241]{Werner2006}
+\section{Einige Sätze der Funktionalanalysis}
+\begin{satz}(Höldersche Ungleichung)\label{a:hoelder}
+Sei $1 < p < \infty$  und $q = \frac{p}{p-1}$, also $\frac{1}{p} + \frac{1}{q} = 1$. Für $f \in \mathscr{L}^p(\mu)$ und $g \in \mathscr{L}^q(\mu)$ ist $f \cdot g \in \mathscr{L}^1(\mu)$, und es gilt
+\begin{align}
+	\norm{f \cdot g}_1 \leq \norm{f}_p \norm{g}_q
+\end{align} \cite[Seite 247]{Werner2006}
+\end{satz}
+%\begin{lemma}\label{a:hoelder:lem}
+%Sei $\Omega \subset \mathbb{R}^n$ eine messbare Menge mit endlichem Maß $\mu(\Omega) < \infty$. Dann gilt für $1 \leq p < \tilde{p	} \leq \infty$, dass $L^{\tilde{p}}(\Omega) \subset L^p(\Omega)$. Insbesondere gilt für $f \in  L^{\tilde{p}}(\Omega)$:
+%\begin{align}
+%	\norm{f}_{L^{p}(\Omega)} \leq \mu(\Omega)^{\frac{1}{p} - \frac{1}{\tilde{p}}} \norm{f}_{L^{\tilde{p}}(\Omega)}
+%\end{align}
+%Für $\tilde{p} = \infty$ sei hierbei $\frac{1}{\tilde{p}} = 0$ zu verstehen
+%\begin{proof}
+%Im Fall $\tilde{p} = \infty$ ergibt sich die Aussage unmittelbar
+%\begin{align}
+%	\norm{f}^p_{L^{p}(\Omega)} = \int_\Omega \abs{f}^p \mathrm{d\mu(\Omega)} \leq \mu(\Omega) \norm{f}^p_{L^{\infty}(\Omega)}
+%\end{align}
+%Für $1 < \tilde{p} < \infty$ erhalten wir aus der Hölder - Ungleichung für $q:= \frac{\tilde{p}}{\tilde{p} - p}$ Ausnutzung von $\frac{1}{p}+\frac{p}{\tilde{p}} = \frac{\tilde{p} - p}{\tilde{p}} + \frac{p}{\tilde{p}} = 1$:
+%\begin{align}
+%	\norm{f}	_{L^{p}(\Omega)}^p = \int_\Omega 1 \cdot \abs{f}^p \mathrm{d\mathrm{\mu(\Omega)}} = \norm{1 \cdot \abs{f}^p}_{L^{1}(\Omega)} \leq \norm{1}_{L^{q}(\Omega)} \norm{f^p}_{L^{\tilde{p}/{p}}(\Omega)}
+%\end{align}
+%Nun folgt wegen $\norm{1}_{L^{q}(\Omega)} = \mu(\Omega)^{\frac{1}{q}}$ und $\norm{f^p}_{L^{\tilde{p}/{p}}(\Omega)} = \norm{f}^p_{L^{\tilde{p}}(\Omega)}$:
+%\begin{align}
+%\norm{f}^p_{L^{\tilde{p}}(\Omega)} \leq \mu(\Omega)^{\frac{1}{q}} \cdot \norm{f}^p_{L^{\tilde{p}}(\Omega)}
+%\end{align}
+%Hieraus folgt nun die Behauptung durch Ziehen der $p$-ten Wurzel und Beachtung von $\frac{1}{q \cdot p} = \frac{1}{p} - \frac{1}{\tilde{p}}$
+%\end{proof} \cite{Braack2013}
+%\end{lemma}
+\begin{satz}(Riemann - Lebesgue)\label{a:RLebesgue} Sei $I:=[a, b] \subset \mathbb{R}$ ein kompaktes Intervall. Ist $g \in L^1(I)$ eine integrierbare Funktion, so gilt:
+\begin{align}
+	\lim_{\abs{x}\rightarrow \infty}{\int_a^b g(t) e^{ixt} \mathrm{dt} = 0}
+\end{align}
+Insbesondere, wegen $e^{it} = \cos(t) + i\cdot\sin(t)$ ist
+\begin{align}
+	\lim_{\abs{x}\rightarrow \infty}{\int_a^b g(t) \cos(i x t) \mathrm{dt}} = \lim_{\abs{x}\rightarrow \infty}{\int_a^b g(t) \sin(i x t) \mathrm{dt}} = 0
+\end{align}
+\begin{proof}
+Da $\mathscr{C}^{\infty}(I)$ dicht in $L^1(I)$ liegt, können wir o.E. $g \in \mathscr{C}^1(I)$ annehmen. Für festes $x \in \mathbb{R}^*$ folgt mittels partieller Integration
+\begin{align}
+	\int_a^b g(t) e^{ixt} \mathrm{dt}  \stackrel{P.I}{=} \left. g(t)\frac{1}{i x} e^{i x t} \right\vert - \frac{1}{i x}{\int_a^b g'(t) e^{i x t}}  \text{, }
+\end{align},
+so dass die rechte Seite wegen $\frac{1}{x}$ gegen Null strebt, für $\abs{x} \rightarrow \infty$.
+\end{proof}
+\end{satz}\cite[Seite 69]{Dambrowski2000}
+\section{Sätze aus der Funktionentheorie}
+\begin{satz}\label{a:res}(Residuensatz)
+Es sei $f$ holomorph in dem Gebiet $G \subset \mathbb{C}$ mit Ausnahme isolierter Singularitäten und $\gamma$ eine stückweise stetig differentizierbare geschlossene nullhomotope Jordankurve in $G$. Falls $f$ auf $T(\gamma)$ holomorph ist, gilt
+\begin{align}
+	\frac{1}{2 \pi} \int_{\gamma} f(s) \mathrm{ds} = \sum_{k=1}^{n} \res{f}{s_i} \quad \text{, }
+\end{align}
+wobei $s_k$, $k=1,..., n$, genau die isolierten Singularitäten von $f$ in $\mathrm{Int(\gamma)}$ sind.
+\end{satz} \cite[Seite 76]{Lauf2006}
+\begin{satz}\label{a:respol}(Residuen in Polstellen)
+Hat die holomorphe Funktion $f$ in $s_0$ eine Polstelle der Ordnung $n$, so gilt:
+\begin{align}
+	\res{f}{s_0} = \frac{1}{(n-1)!} \left. \left(\frac{\mathrm{d^{(n-1)}}}{\mathrm{ds^{(n-1)}}}\left[(s-s_0)^n f(s) \right] \right) \right|_{s = s_0}
+\end{align}
+\end{satz}\cite[Seite 77]{Lauf2006}
+\section{Numerische Verfahren}
+\subsection{Lineare Ausgleichsproblem}
+%Das lineare Ausgleichsproblem ist nach \cite{Dahmen2008} definiert als
+Für lineare Modelle gilt:
+\begin{align}
+	y(t_i; x_1, \cdots, x_n) = a_{i, 1} x_1 + \cdots + a_{i, n} x_n \text{, } i = 1 \cdots m \quad \text{, }
+\end{align}
+wobei die Koeffizienten $a_{i, k}$ gegeben sind, führt dies zu einem Minimierungsproblem, d.h.
+\begin{align}
+	\sum_{i=1}^m (y(t_i; x_1, \cdots, x_n) - b_i)^2 = \sum_{i=1}^m (a_{i, 1} x_1 + \cdots + a_{i, n} x_n - b_i)^2 \label{a:resp:gl}
+\end{align}
+Es ist hilfreicher, dies in Matrixform zu schreiben. Man setzt
+\begin{align}
+	A=(a_{ij})^{m, n}_{i, j = 1} \in \mathbb{R}^{m \times n} \quad \text{, } b \in \mathbb{R}^m \text{, }
+\end{align}
+so ist 
+\begin{align} 
+	\norm{Ax^* - b}^2_2 = \min{x \in \mathbb{R}^n}\label{a:resp:alternativ}
+\end{align}
+die äquivalente Form wie \ref{a:resp:gl}.\\
+
+Das lineare Ausgleichsproblem lässt sich demnach wie folgt formulieren: \\
+Zu gegebenem $A \in \mathbb{R}^{m \times n}$ und $b \in \mathbb{R}^n$ bestimmt man $x^* \in \mathbb{R}^n$, für das
+\begin{align}
+	\norm{Ax^* - b}_2 = \min{x \in \mathbb{R}} \norm{A x - b}_2 \label{a:resp}
+\end{align} gilt.
+\begin{satz}
+	$x^* \in \mathbb{R}^n$ ist genau dann die Lösung des linearen Ausgleichsproblems \ref{a:resp}, wenn $x^*$  die Lösung der Normalgleichungen 
+	\begin{align}
+		A^T A x = A^T b
+	\end{align} ist.
+	Das System der Normalgleichungen hat stets mindestens eine Lösung. Sie ist genau dann eindeutig, wenn der $\rang{A} = n$ gilt.
+\end{satz}\cite[Seite 122]{Dahmen2008}
+\subsubsection{Numerische Lösung}\label{a:resp:num}
+Für die numerische Lösung wird in dieser Arbeit die QR Zerlegung verwendet. Für die Minimierung von $\norm{Ax - b}_2$ ist also jede orthogonale Matrix $Q \in \mathbb{R}^{m \times m}$ äquivalent zur Aufgabe
+\begin{align}
+	\norm{Q(A x - b)}_2 = \norm{Q A x - Q b}_2  = min
+\end{align}  
+Die Idee ist nun eine geeignete, orthogonale Matrix $Q \in \mathbb{R}^{m \times m}$ zu finden, die letztere Aufgabe leicht lösbar macht. Dies ergibt sich aus: 
+\begin{satz}
+	Sei $A \in \mathbb{R}^{m \times n}$ mit $\rang{A} \in n$ und $b \in \mathbb{R}^m$. Sei $Q \in  \mathbb{R}^{m \times m}$ eine orthogonale Matrix und $\tilde{R} \in \mathbb{R}^{n \times n}$ eine obere Dreiecksmatrix, so dass 
+	\begin{align}
+		Q A = R:= \begin{tabu}{cl}
+			\multirow{2}{*}{$\left(
+			\begin{array}{c}
+			\tilde{R} \\ 
+			\emptyset
+			\end{array}\right)$} & \big\} n \\ 
+ 			&\big\} m -n \\ 
+		\end{tabu}
+	\end{align}
+	So ist die Matrix $\tilde{R}$ regulär. Schreibt man 
+	\begin{align}
+	 	Q b = \begin{tabu}{cl}
+				\multirow{2}{*}{$\left(
+				\begin{array}{c}
+				b_1 \\ 
+				b_2
+			  \end{array}\right)$} & \big\} n \\ 
+ 			&\big\} m -n \\ 
+		\end{tabu}
+	\end{align}
+	ist $x^* = \tilde{R}^{-1} b_1$ die Lösung des linearen Ausgleichsproblems \ref{a:resp:gl}.
+	Die Norm des Residuums $\norm{A x^* - b}_2$ ist gerade durch $\norm{b_2}_2$ gegeben.
+\end{satz}
+\cite[Seite 129]{Dahmen2008}\\
+Praktisch geht man nun so vor:
+\begin{itemize}
+\item Man bestimme von $A$ die QR - Zerlegung 
+\begin{align}
+	QA = \left(\begin{array}{c}
+	\tilde{R} \\ 
+	\emptyset
+	\end{array} 
+	\right) (\tilde{R} \in \mathbb{R}^{n \times n}),
+\end{align}
+z.B. mittels Givens - Rotationen oder Householder - Spiegelungen und berechne \small{$Qb= \left(\begin{array}{c}
+b_1 \\ 
+b_2
+\end{array} \right)$} \normalsize
+\item
+	Löse \begin{align}
+		\tilde{R} x = b_1
+	\end{align}
+	mittels Rückwärtseinsetzen.
+\end{itemize}
+Dabei ist der Aufwand im Gegensatz zur Lösung durch Normalgleichungen höher aber man gewinnt aufgrund der günstigen Kondition des ergebenden Dreieckssystems, an Stabilität \cite[Seite 129 - 130]{Dahmen2008}.\\
+Wir verwenden das Verfahren der Householder - Transformation, welches auf den Seiten 101 bis 103 in \cite{Dahmen2008} zu finden ist, in Kapitel \ref{num} an.
+\subsection{Kubischen Spline - Interpolation}\label{a:spline}
+Für Konstruktion des natürlichen Spline wird ein Polynom dritten Grades bestimmt, d.h.
+\begin{align}
+S(x) = P_i(x) = a_i(x-x_i)^3 + b_i(x-x_i)^2 + c_i(x-x_i) +d_i \quad \text{für } x\in [x_i, x_{i+1}], i=1...n-1
+\end{align}
+Dabei werden die Ableitungen des Randes auf null gesetzt: $S'(x_1) = S'(x_n) = S''(x_1) = S''(x_n) = 0$ \label{spline:bed}
+\subsubsection{Bestimmung der Koeffizienten}
+In \cite[Seite 157]{Mauracher1996} wird die Bestimmung der Koeffizienten $a_i$, $b_i$, $c_i$ und $d_i$ für die kubische Spline - Interpolation beschrieben. Dabei setzt Mauracher zur Vereinfachung der Schreibweise fest, dass die Werte der ersten Ableitung $y'$ und die Werte der zweiten Ableitung von $S$ in $x_i$ mit $y''$ bezeichnet werden. Zudem definiert er $\Delta x_i = x_{i+1} - x_{i}$ und $\Delta y_i = y_{i+1} - y_{i}$. \\
+Neben den Bedingungen \ref{spline:bed} gelten zusätzlich noch folgende Nebenbedingungen
+\begin{align}
+\begin{split}
+P_i(x_i) &= y_i \text{, } \quad i =1...n-1 \\ 
+P_{n-1}(x_n) &= y_n 
+\end{split}  \bigg\} \text{ Interpolationsbedingungen}\\\notag\\
+\begin{split}
+P_i(x_i) &= P_{i+1}(x_i) \text{, } \quad i =1...n-2 \\
+P'_i(x_i) &= P'_{i+1}(x_i) \text{, } \quad i =1...n-2  \\
+P''_i(x_i) &= P''_{i+1}(x_i) \text{, } \quad i =1...n-2  
+\end{split}\bigg\}\text{ Anschlussbedingungen der Polynome } P_i \label{spline:bed:intp}
+\end{align}
+Mauracher schlägt vor, die Koeffizienten in Abhängigkeit von den Funktionswerten und zweiter Ableitung zu ermitteln. Dann folgt aus \ref{spline:bed:1} und \ref{spline:bed:3}
+\begin{align}
+\begin{split}
+	  y_i &= P_i(x_i) = d_i  \\
+	 y_{i+1} &= P_i(x_{i+1}) = a_i \Delta x_i^3 + b_i \Delta x_i^2 + c_i \Delta x_i  + d_i 
+\end{split} \label{spline:bed:1}  \\\notag\\
+\begin{split}
+	y_i' &= P_i'(x_i) = c_i\\
+	y_{i+1}' &= P_i'(x_{i+1}) = 3 a_i \Delta x_i^2 + 2 b_i \Delta x_i + c_i 
+\end{split} \label{spline:bed:2} \\\notag\\
+\begin{split}
+	y_i'' &= P_i''(x_i) = 2 b_i\\
+	y_{i+1}'' &= P_i''(x_{i+1}) = 6 a_i \Delta x_i + 2 b_i  
+\end{split} \label{spline:bed:3}
+\end{align}
+\begin{align}
+	a_i &= \frac{1}{6 \Delta x_i} (y''_{i+1} - y''_i)\\
+	b_i &= \frac{1}{2} y_i''\\
+	c_i &= \frac{\Delta y_i}{\Delta x_i} - \frac{1}{6} \Delta x_i (y''_{i+1} + 2 y_i'')\\
+	d_i &= y_i \quad \quad \text{i = 1...n-1}
+\end{align}\label{spline:konstant}Aus \ref{spline:bed:2} und der Forderung nach Stetigkeit der ersten Ableitung ergibt sich die Kopplungsbedingung:
+\begin{align}
+	\Delta x_{i-1} y''_{i-1} + 2(\Delta x_{i-1} + \Delta x_{i}) y''_i  + \Delta x_i y''_{i+1} = 6 \left(
+	\frac{\Delta y_i}{\Delta x_i} - \frac{\Delta y_{i-1}}{\Delta x_{i-1}} \right) \quad \text{ mit } i = 2...n-1
+\end{align}
+Daraus erhält man das folgende lineare Gleichungssystem mit $n-2$ Gleichungen, für die zu bestimmende Unbekannte $y''$.
+\small \begin{align}A&= \left[\begin{array}{ccccc}
+2(\Delta x_1 + \Delta x_2) & \Delta x_2 & 0 & 0 & 0 \\ 
+\Delta x_2 & 2(\Delta x_2 + \Delta x_3) & \Delta x_3 & 0 & 0 \\ 
+0 & \Delta x_3 & 2(\Delta x_3 + \Delta x_4) & \Delta  x_4 & 0 \\ 
+0 & 0 & \cdots & \cdots & \cdots \\ 
+0 & 0 & 0 & \Delta x_{n-2} & 2(\Delta x_{n-2} + \Delta x_{n-1})
+\end{array} \right]\\
+D&= \left[
+\begin{array}{c}
+6\left(\frac{\Delta y_2}{\Delta x_2} - \frac{\Delta y_1}{\Delta x_1}\right) \\ 
+6\left(\frac{\Delta y_3}{\Delta x_3} - \frac{\Delta y_2}{\Delta x_2}\right) \\ 
+6\left(\frac{\Delta y_4}{\Delta x_4} - \frac{\Delta y_3}{\Delta x_2}\right) \\ 
+\vdots\\
+6\left(\frac{\Delta y_{n-1}}{\Delta x_{n-1}} - \frac{\Delta y_{n-2}}{\Delta x_{n-2}}\right)
+\end{array}\right]\\
+Y''&=\left[\begin{array}{c}
+y_2'' \\ 
+y_3'' \\ 
+y_4'' \\ 
+\vdots \\ 
+y''_{n-1}
+\end{array} \right] \\\\
+A \cdot Y'' = D \label{spline:gl}
+\end{align}\normalsize
+Man kann erkennen, dass die Matrix $A$ tridiagonal, symmetrisch, diagonal dominant ist und positive Diagonalelemente besitzt. Sie ist also positiv definit. Damit ist die Existenz und die Eindeutigkeit des interpolierenden kubischen Splines gesichert. Um die Lösung des Gleichungssystems zu gewinnen, kann man sich verschiedenste Verfahren aus der Literatur \cite{Dahmen2008} bedienen.  Diese werden hier aber nicht weiter behandelt. Mit den nun gewonnenen $y''$ können die Konstanten \ref{spline:konstant} berechnet werden.

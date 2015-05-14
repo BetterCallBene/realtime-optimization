@@ -1,0 +1,65 @@
+% main document
+% Benedikt Buckl, Deutronic 2013/9/26
+\documentclass[a4paper,onecolumn,oneside,11pt]{scrreprt}
+%bibtotocnumbered,listsleft
+
+\usepackage{main}
+\usepackage{pstricks}
+%\setlength{\unitlength}{1.0cm}
+%
+%\parindent 0pt
+%\newsavebox{\IBox}
+%
+\begin{document}
+
+%\pagenumbering{roman}
+
+%\setlength{\topmargin}     {-30.0mm}
+
+%\input{text/titlepage} %Input title page
+%\cleardoublepage
+%\setlength{\topmargin}     {-21.0mm}
+
+%\fancyfoot{}
+%\exmfoot
+
+%\vspace*{2.0cm}
+%\noindent 
+
+
+% Impressum
+%\input{text/impressum}
+
+%\tabchangerec
+
+\tableofcontents
+\listoffigures
+%input{text/introduction.tex}
+%\fancyfoot{}
+%\exmfoot
+
+
+%\input{text/task}
+%\input{text/abstract}
+\pagenumbering{arabic}
+\input{text/simpleModel.tex}
+%\input{text/einleitung}
+%\input{text/motivation}
+%\input{text/systemtheorie}
+%\input{text/eis}
+%\input{text/HT}
+%\input{text/modelle}
+%\input{text/num}
+%\input{text/fazit}
+%\input{text/eis}
+%\input{text/num}
+%\input{text/askn}
+%\input{text/thanks}
+\bibliography{library}
+\addcontentsline{toc}{chapter}{Literaturverzeichnis}
+\bibliographystyle{plaindin}
+%\input{text/LT}
+%\input{text/FT}
+%\input{text/HT2}
+%\input{text/appendix}
+\end{document}

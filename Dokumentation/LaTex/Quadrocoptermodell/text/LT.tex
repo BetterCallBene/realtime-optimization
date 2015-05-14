@@ -1,0 +1,167 @@
+\appendix %Anhang
+\chapter{Anhang}
+\section{Laplace-Transformation}\label{lt}
+
+\begin{defi}(Laplace-Transformation) Sei $s \in \mathbb{C}$, $f: \mathbb{R} \rightarrow \mathbb{C}$ und betrachtet man die Formel
+\begin{align}
+	\tilde{f}(s) = \int_{-\infty}^{\infty}{f(t) \exp{-st}} \mathrm{dt} \text{, } \label{lt_int}
+\end{align}
+Das Integral \ref{lt_int} konvergiert, falls ein $s \in \mathbb{C}$ existiert, so dass $f \cdot \exp{st}$ in $L^1$ liegt, dann nennt man $f$ Laplace - transformierbar. 
+\end{defi}
+\cite{Polderman1997}
+\begin{defi}(einseitige Laplace-Transformation) \label{def:eLT} Sei $\sigma \geq 0$, $\{s \in \mathbb{C}\vert \Re{s} \geq \sigma\}$, $f: \mathbb{R}_{\geq 0} \rightarrow \mathbb{C}$ und betrachtet man die Formel
+\begin{align}
+	\tilde{f}(s) = \int_{0}^{\infty}{f(t) \exp{-st}} \mathrm{dt} \text{, } \label{lt_int}
+\end{align}
+Das Integral \ref{lt_int} konvergiert, falls ein $\{s \in \mathbb{C}\vert \Re{s} \geq \sigma\}$ existiert, so dass $f \cdot \exp{st}$ in $L^1$ liegt, dann nennt man $f$ einseitig Laplace - transformierbar. 
+\end{defi}
+\cite{Polderman1997}
+\begin{satz}\label{s:expTyp}
+	Sei $s \in \mathbb{C}$ und $f:[0, \infty) \rightarrow \mathbb{C}$ auf jedem kompakten Intervall integrierbar und vom \textbf{exponentiellen Typ} ist, d.h es gibt eine Konstante $M, t_0 \geq 0$, für alle $t \geq t_0$ 
+	\begin{align}
+		\abs{f(t)} \leq M e^{at}
+	\end{align}
+	und $Re(s) > a$, 
+	dann existiert für die Funktion $f$ eine Laplacetransformierte.
+	\begin{proof}
+	Es ist zu zeigen, dass $f\exp{-st} \in \lint{1}{\mathbb{R}_{\geq 0}}$ ist
+	\begin{align}
+		&\int_0^{\infty} \abs{f\exp{-st}} \mathrm{dt} \leq \int_0^{\infty} \abs{c\exp{-t(s-a)}} \mathrm{dt} \\
+		&=  \int_0^{\infty} {c\exp{-t(\Re{s}-a)}} \mathrm{dt} = \frac{c}{\Re{s}-a}
+	\end{align}
+	\end{proof}
+\end{satz}
+\cite{Lauf2006}
+Schreibweise:
+\begin{itemize}
+\item $\ltr{\alpha}= \{f:[0, \infty) \rightarrow \mathbb{C} \left. \right| f \text{ stückweise stetig und von exponentieller\label{a:L_stetig} Ordnung } \alpha\}$
+\item $RH_{\alpha}:= \{ s \in \mathbb{C} \left. \right| \Re{s} > \alpha\}$
+\end{itemize}
+\begin{satz}\label{lt:umkehr}(Fourier-Mellin-Umkehrformel)
+Es sei $f \in \ltr{\alpha}$, $f'$ stückweise stetig auf $[0, \infty)$ und $F \in H(RH_{\alpha})$ die zugehörige Laplace - Transformation von $f$. Dann gilt für jedes $x > \alpha$
+\begin{align}
+	\frac{f(t+) - f(-t)}{2} = \frac{1}{2 \pi i } \lim_{R \rightarrow \infty} \int_{\gamma - i R}^{\gamma+ i R} \exp{st} F(s) ds \text{,} \quad t > 0 \label{lt:umkehr:gl}
+\end{align}
+\end{satz}
+\textbf{Bemerkung:}
+\begin{enumerate}
+\item Das Integral \ref{lt:umkehr:gl} existiert nur als \textit{Cauchy - Hauptwert}
+\item Der Integralweg $(\gamma - i \infty, \gamma + i \infty)$ heißt Bromwich - Gerade.
+\item In jedem Stetigkeitspunkt von $f$ gilt $\frac{f(t+)+f(t-)}{2} = f(t)$.
+\item Gleichung \ref{lt:umkehr:gl} heißt auch die Laplace Integraldarstellung von $f$.
+\end{enumerate}
+Der Residuensatz ist ein probates Mittel, um die Inverse der Laplace - Transformierten zu bestimmen. Dazu wird folgender Satz benötigt.\cite{Lauf2006}\\
+
+
+
+\begin{satz}(Residuenformel für die inverse Laplace-Transformation)\label{lt:res}
+Es sei $f \in \ltr{\alpha}$ und $f'$ stückweise stetig auf $[0, \infty)$. Falls $\lt{f} \in H(RH_{\alpha})$ bis auf endliche viele isolierte Polstellen $s_k$ in ganz $\mathbb{C}$  holomorph ist und die Wachstumsbedingung 
+\begin{align}
+	\lim_{R \rightarrow \infty} \sup_{\abs{s} = R} \abs{F(s)} = \lim_{R \rightarrow \infty} \epsilon_R \leq 0
+\end{align}
+erfüllt ist, gilt für jedes $\gamma > \alpha$
+\begin{align}
+	\frac{f(t+) - f(-t)}{2} &= \frac{1}{2 \pi i } \lim_{R \rightarrow \infty} \int_{\gamma - i R}^{\gamma+ i R} \exp{st} F(s) ds \\
+	&= \sum_{k=1}^{n} \res{\exp{st} F(s)}{s_k} \text{,} \quad t > 0 
+\end{align}
+\begin{proof} 
+Nach dem Residuensatz (Satz \ref{a:res}) gilt für $R$ groß genug
+\begin{align}
+	\frac{1}{2 \pi i}  \int_{\Gamma_R + B_R} \exp{st} F(s) \mathrm{ds} = \sum_{k=1}^n \res{\exp{st} F(s)}{s_k}
+\end{align}
+Mit Vertauschen des Grenzwertes mit dem Integral (Lemma \ref{a:change}) sowie mit der Parameterisierung von $\Gamma_R(\theta) = x + R \exp{i\theta}$ mit $\theta \in [\frac{\pi}{2}, \frac{3}{2} \pi]$ folgt für das Integral über der Kurve $\Gamma_R$\\
+\begin{minipage}{0.69\textwidth}
+\begin{align}
+ \lim_{R \rightarrow \infty}{\abs{\frac{1}{2\pi i} \int_{\Gamma} \exp{st}F(s)\mathrm{ds}}} &\leq \lim_{R \rightarrow \infty}{ \frac{1}{2\pi}\sup_{\abs{s} = R}{\abs{F(s)}} \int_{\Gamma} \abs{\exp{st}} \mathrm{ds}}\\
+ &=  \frac{1}{2\pi} \lim_{R \rightarrow \infty} \epsilon_R \int_{\frac{\pi}{2}}^{\frac{3}{2}\pi} \abs{\exp{t (x+R  \exp{i \theta })} } \abs{R \exp{i \theta}} \mathrm{d\theta}\\
+&=  \frac{1}{2\pi} \lim_{R \rightarrow \infty} \epsilon_R \underbrace{\int_{\frac{\pi}{2}}^{\frac{3}{2}\pi} \abs{R \exp{t (x+R  \exp{i \theta })} } \mathrm{d\theta}}_{(*)}
+\end{align} 
+Dabei gilt $\abs{\exp{t (x + R \exp{i \theta})}} = \exp{tx} \cdot \exp{t R \cos{\theta}}$ und mit $\theta = \sigma + \frac{\pi}{2}$ folgt für $(*)$:
+\end{minipage}
+\begin{minipage}{0.36\textwidth}
+\begin{flushright}
+		\includegraphics[width=0.9\textwidth]{images/integral_weg_3.pdf}
+		\captionof{figure}[Integrationsweg für die Residuenformel für die inverse Laplace-Transformation]{Integrationsweg für die Residuenformel für die inverse Laplace-Transformation}
+\end{flushright}
+\end{minipage}
+\begin{align}
+	\int_{\frac{\pi}{2}}^{\frac{3}{2}\pi} \abs{R \exp{t (x+R  \exp{i \theta })} } \mathrm{d\theta} 
+	&= \int_{\frac{\pi}{2}}^{\frac{3}{2}\pi} R \exp{tx} \cdot \exp{t R \cos{\theta}} \mathrm{d\theta} \\
+	&= R \exp{tx} \cdot \int_{0}^{{\pi}} \exp{-t R \sin{\sigma}}	\mathrm{d\sigma}\\
+	&= 2 R \exp{tx} \cdot \int_{0}^{\frac{\pi}{2}} \exp{-t R \sin{\sigma}}	\mathrm{d\sigma}\\
+\end{align} 
+wobei die letzte Gleichheit aus der Tatsache erfolgt, dass $\exp{-R t \sin{\sigma}}$ symmetrisch bezüglich $\sigma = \frac{\pi}{2}$ ist. Da $\sin{\sigma} \geq \frac{2 \sigma}{\pi}$ für $\sigma \in [0, \frac{\pi}{2}]$ ist, ergibt sich
+\begin{align}
+	2 R \exp{tx} \cdot \int_{0}^{\frac{\pi}{2}} \exp{-t R \sin{\sigma}}\mathrm{d\sigma} &\leq 2 R \exp{tx} \cdot \int_{0}^{\frac{\pi}{2}} \exp{-t R \frac{2}{\pi} \sigma}\mathrm{d\sigma}\\
+	&= 2 R \exp{tx} \frac{\pi}{R t} (1 - \exp{-Rt})
+\end{align}
+Zusammen mit $t> 0$ gilt
+\begin{align}
+	 \lim_{R \rightarrow \infty}{\abs{\frac{1}{2\pi i} \int_{\Gamma} \exp{st}F(s)\mathrm{ds}}} 
+	 &\leq 	\frac{1}{\pi} \lim_{R \rightarrow \infty} \epsilon_R R \exp{tx} \frac{\pi}{R t} (1 - \exp{-Rt})
+	 \xlongrightarrow{R \rightarrow \infty} 0
+\end{align}
+Damit folgt schließlich nach Satz \ref{lt:umkehr} 
+\begin{align}
+\frac{f(t+) - f(-t)}{2} &= \frac{1}{2 \pi i } \lim_{R \rightarrow \infty} \int_{\gamma - i R}^{\gamma+ i R} \exp{st} F(s) ds \\
+	&= \sum_{k=1}^{n} \res{\exp{st} F(s)}{s_k} \text{,} \quad t > 0
+\end{align}
+die Behauptung.
+\end{proof}
+\end{satz}\cite{Lauf2006}
+\section{Einige Laplace-Transformationen}
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\rule[-1ex]{0pt}{2.5ex} Funktion & Laplace \\  
+\rule[-1ex]{0pt}{2.5ex} $f(t)$ & $\lt{f(t)}$ \\
+\hline
+\rule[-1ex]{0pt}{2.5ex} $t^n$ & $\frac{n!}{s^{n+1}}$\label{lt:t_n}\\
+\hline
+\rule[-1ex]{0pt}{2.5ex} $t^n e^{zt}$ & $\frac{n!}{(s-z)^{n+1}}$, $n\in \mathbb{N}$, $z, s \in \mathbb{C}$, $Re(z) < 0$, $Re(s) > Re(z)$  \\  
+\hline 
+\rule[-1ex]{0pt}{2.5ex} $\frac{t^{n-1}}{(n-1)!} e^{zt}$ & $\frac{1}{(s-z)^{n}}$, $n\in \mathbb{N}$, $z, s \in \mathbb{C}$, $Re(z) < 0$, $Re(s) > Re(z)$  \label{lt:exp} \\  
+\hline
+\end{tabular} 
+\end{center}
+\begin{satz}\label{LT:texp}Sei $n \in \mathbb{N}_0$ und $f_n: \mathbb{R}_{\geq {0}} \rightarrow \mathbb{C}$ die Funktion $f_n(t) := t^n e^{zt}$, dann folgt für ein festes $z \in \mathbb{C}$ mit $Re(s) > Re(z)$, dass $\lt{f_n} = \frac{n!}{(s-z)^{n+1}}$ die Laplacetransformierte von $f_n$ ist.
+\begin{proof}
+Man betrachte die Hilfsfunktion $g_n: \mathbb{R}_{\geq 0} \rightarrow \mathbb{R}_{\geq 0}$, mit $g_n(x):=t^n \exp{-bt}, b \in \mathbb{R}$, $b >0$, sie besitzt bei $t_{max}=\frac{n}{s-b}$ ein Maximum. Weiter folgt das $t^n \leq c \exp{bt}$ mit $c:=g_n(t_{max})$. Dann ist für 
+\begin{align}
+	\abs{f_n} = \abs{t^n \exp{zt}} \leq \abs{c e^{bt}} e^{Re(z)t} = c e^{(Re(z)+b)t} = c e^{at} \text{ für } a = Re(z) + b \text{, }
+\end{align}
+ somit schließt sich nach Satz \ref{s:expTyp}, die Existenz des Laplacetransformierten von $f_n$ an.\\
+Man betrachte nun den Grenzwert des Ausdruckes $\abs{t^{n+1}e^{-t(s-z)}}$ für $Re(s) > Re(z)$
+	\begin{align}
+		\lim_{t \rightarrow \infty} \abs{t^{n+1} e^{-t(s-z)}} = \lim_{t \rightarrow \infty} \abs{\frac{t^{n+1}}{e^{t(s-z)}}}
+	\end{align}
+$n+1$ fache Anwendung der Regel von L'Hospital führt zu
+	\begin{align}
+		& \lim_{t\rightarrow \infty} \abs{\frac{(n+1)!}{(s-z)^{n+1}\cdot e^{t(s-z)}}} \\
+		&=\lim_{t\rightarrow \infty} \frac{(n+1)!}{\abs{(s-z)}^{n+1}\cdot e^{t Re(s-z)}}		
+		= 0 \text{ für } Re(s) > Re(z) \label{gl:lim}
+	\end{align}
+Sei nun $n=0$, dann ist die Laplacetransformierte von $f(t)$ gleich
+\begin{align}
+	\lt{f_0(t)} &= \int_0^{\infty} e^{-t(s-z)} \mathrm{dt} = - \left. \frac{1}{s-z} e^{-t(s-z)} \right\vert_0^{\infty} \\
+					  &= \frac{1}{s-z} \text{ für } Re(s) > Re(z) 
+\end{align}
+Für $n > 0$, folgt
+\begin{align}
+	\lt{f(t)_{n+1}} &= \int_0^{\infty} t^{n+1} e^{-t(s-z)} \mathrm{dt} \\
+	&= -\left.\frac{1}{s-z} t^{n+1} e^{-t(s-z)} \right\vert_0^{\infty} + \frac{n+1}{s-z} \underbrace{\int_0^{\infty} t^{n} e^{-t(s-z)}\mathrm{dt}}_{\lt{f_n(t)}} \text{Aus \ref{gl:lim} folgt } \\
+	&= \frac{(n+1)}{s-z} \frac{n!}{(s-z)^{n+1}} = \frac{(n+1)!}{(s-z)^{n+1}}
+\end{align}
+Damit folgt für $Re(z) < 0$ die Behauptung.
+\end{proof}
+\end{satz}
+\begin{satz}
+\label{LT:texpn}Sei $n \in \mathbb{N}$ und $f: \mathbb{R} \rightarrow \mathbb{C}$ die Funktion $f_n(t) := \frac{t^{n-1}}{(n-1)!} e^{zt}$, dann folgt für ein festes $z \in \mathbb{C}$ mit $Re(s) > Re(z)$, dass $\lt{f_n} = \frac{1}{(s-z)^{n}}$ die Laplacetransformierte von $f$ ist.
+\begin{proof}
+Aus Satz \ref{LT:texp} folgt $\lt{t^{n-1} e^{zt}} = \frac{(n-1)!}{(s-z)^n}$ für alle $n \in \mathbb{N}$ und $Re(s) > Re(z)$  aus der Linearität der Laplace-Transformation folgt:
+\begin{align}
+	\lt{t^{n-1} e^{zt}} &= \frac{(n-1)!}{(s-z)^n} \\
+	\Leftrightarrow \lt{\frac{t^{n-1}}{(n-1)!} e^{zt}} &= \frac{1}{(s-z)^n}
+\end{align}
+\end{proof}
+\end{satz}

@@ -1,0 +1,727 @@
+\chapter{Einführung in die Systemtheorie}\label{systheo}
+
+In diesem Kapitel der Bachelorarbeit wird sich vornehmlich an \cite{Dambrowski2013} und \cite{Polderman1997} orientiert und bedient, da sie auf dem Gebiet der Systemtheorie vortreffliche Arbeit geleistet haben. 
+
+\section{System}\label{sys:einleitung}
+
+Ein System stellt eine Anordnung aus allen Bereichen des Lebens dar, welche auf äußere Anregungen oder Einflüsse in bestimmter Art und Weise Reaktionen zeigt. 
+Beispielweise reagiert das System Auto auf Anregungen wie Lenkeinschlag und Gaspedalstellung sowie auf äußere Einflüsse wie oder Störungen wie Fahrbahnunebenheiten mit einem zeitabhängigen Orts - und Geschwindigkeitsverlauf. Die Anregungen oder Einflüße werden als Eingangssignale, die Reaktionen als Ausgangssignale bezeichnet. \\
+\begin{wrapfigure}{r}{0.5\textwidth}
+  \def\svgwidth{0.40\columnwidth}
+  \begin{center}
+	\input{images/io_beispiel.pdf_tex}
+  \end{center}
+  \caption{Der Aufhängepunkt $A$ des Pendels durch läuft eine Kreisbahn mit Radius $R$. Der Winkel $\beta$ wird durch die Regelung des Elektromotors festgelegt \cite{Kuypers2008}}
+  \label{fig:Extender}
+\end{wrapfigure}
+
+Systeme können auf verschiedene Art und Weise betrachtet werden. Das zu betrachtende System ist durch, beispielsweise physikalischen Gegebenheiten, bekannt (Abb. \ref{fig:Extender}). Ein Beispiel ist der freie Fall. Mit Versuchen konnte Galileo Galilei feststellen, dass die Beschleunigung eines Objekts senkrecht zum Erdmittelpunkt, abhängig von einer Konstante ist, egal welche Masse sie besitzt. Oft ist es aber so, dass ein System zunächst unbekannt ist. Um Aussagen über dieses neue System treffen zu können, muss das System von außen angeregt werden. Ein Beispiel für eine Anregung von außen ist die elektrochemischen Impedanzspektroskopie in der Batterietechnik.
+
+\section{Funktionsweise der \eis (EIS)}\label{sys:eis}
+Die \eis ist ein beliebtes Mittel zur Charakterisierung und Modellierung von elektrochemischen Speichersystemen. Dazu wird das System durch verschiedene Frequenzen $\omega = [\omega_{min}, \omega_{max}]$ angeregt, um die komplexe (frequenzabhängige) Impedanz $Z(\omega)$ zu bestimmen.
+\begin{align}
+	Z(\omega)&:= \Re{Z(\omega)} + i \Im{Z(\omega)} = \abs{Z(\omega)} \exp{i \phi(\omega)} \in \mathbb{C}
+\end{align}  
+Dabei bezeichnen $\Re{Z(\omega)}$, $\Im{Z(\omega)}$, $\abs{Z(\omega)}$, $\phi(\omega)$ Real -, Imaginärteil, Betrag und Phasenverschiebung von $Z(\omega)$, die alle allesamt Funktionen der Frequenz $\omega$ sind. Graphisch lässt sich dies durch die allgemein bekannten Bode - ($\abs{Z(\omega)}$, $\phi(\omega$) und Nyquistdiagramme ($\Re{Z(\omega)}, \Im{Z(\omega)}$  veranschaulichen. Man unterscheidet bei der EIS zwischen galvanostatischer und potentiostatischer Anregung. In der Batterientechnik wird meist der erste Fall verwendet: Dazu wird die Batterie mit einem sinusförmigen Stromsignal $i(t) = \tilde{i} \sin(\omega t)$ angeregt, um deren Spannungsantwort $u(t)$ zu bestimmen \cite{DambrowskiLade}.\\\\
+\begin{figure}
+	\centering
+	\def\svgwidth{0.90\columnwidth}
+	\input{images/eis.pdf_tex}
+	\caption{Anregung eines elektrochemischen Systemes mit einem sinusförmigen Strom}
+	\label{fig:eis}
+\end{figure}
+Einerseits lassen sich mit Hilfe von Impedanzspektren elektrische Ersatzschaubilder (ESB) modellieren und interpretieren (siehe Kapitel \ref{mod}) anderseits  Alterungsprozesse ermitteln.\\
+Für die Anwendung der EIS werden einige Voraussetzungen an das System gestellt: Es muss ein lineares, zeitinvariantes, kausales und stabiles System sein. Die genannten Begrifflichkeiten werden nun im Sinne der Systemtheorie eingeführt. Zudem werden wir eine Methode zur Überprüfung der Voraussetzungen kennenlernen.
+
+\section{Systemtheorie}\label{sys}
+Im folgenden Abschnitt übernehme ich weitestgehend die Struktur aus \cite{Dambrowski2013}. Eigene Ergebnisse werden hervorgehoben. 
+\subsection{Definitionen} \label{sys:defi}
+Die Definition eines Systemes ist nicht so trivial. Wir werden folgendermaßen Bezug dazu nach \cite{Dambrowski2013} nehmen.
+\begin{defi}
+	Seien $\mathscr{X}, \mathscr{N}$ komplexwertige Räume. $u(t) \in \mathscr{X}$ ist ein Eingabesignal und ist $y(t) \in \mathscr{N}$ ein Ausgabesignal, dann verbindet der Operator $T: \mathscr{X} \rightarrow \mathscr{N}$  die beiden Signale wie folgt:
+	\begin{align}
+		y(t) := T\{u(t)\}	
+	\end{align}
+	Dabei wird der Operator $T\{\}$ als System $\mathscr{S}$ bezeichnet. 
+\end{defi}
+\begin{figure}[h]
+	\centering
+	\def\svgwidth{0.75\columnwidth}
+	\input{images/io.pdf_tex}
+	\caption{Das System verbindet das Eingangsignal mit dem Ausgangssignal}
+	\label{fig:io}
+\end{figure}
+\begin{bem}
+Die Elemente von den Signalräumen sind oft reell -oder komplexwertig Funktionen von der Zeit $t$ oder der (Kreis-)Frequenz $\omega$. Zudem gilt ein System $\mathscr{S}$ als reell, wenn $u(t) \in \mathbb{R} \Rightarrow y(t):= T\{u(t)\} \in \mathbb{R}$.  
+\end{bem}
+Die wichtigen Eigenschaften von Systemen sind die Beschränktheit und die Linearität:
+\begin{defi}(Beschränktheit eines Systems) Ein System$\mathscr{S}$ mit Operator $T: \mathscr{X} \rightarrow \mathscr{N}$ heißt beschränkt, wenn es eine konstante $K > 0$ gibt, so dass gilt 
+\begin{align}
+ \norm{Tx} \leq K \norm{x} \text{, für } \forall x \in \mathscr{N}
+\end{align}
+\end{defi}
+\cite{Dambrowski2000}
+\begin{defi}
+Sei $u_1$, $u_2 \in \mathscr{X}$, $T\{u_1(t)\}$ und $T\{u_2(t)\}$, so heißt ein System $\mathscr{S}$ linear, wenn für alle $\lambda, \mu \in \mathbb{R}$ gilt
+\begin{align}
+	T \{ \lambda u_1(t) + \mu u_2(t) \} = \lambda T \{ u_1(t) \} + \mu T \{ u_2(t) \}
+\end{align}
+\end{defi}
+Linearität wird auch als Überlagerungssatz bzw. Superpositionsprinzip bezeichnet (Abb. \ref{fig:superpos}).
+\begin{figure}[ht]
+	\centering
+	\def\svgwidth{0.75\columnwidth}
+	\input{images/superpositionsprinzip.pdf_tex}
+	\caption{Superpositionsprinzip bei linearem System $\mathscr{S}$ \cite{Frey2009}}
+	\label{fig:superpos}
+\end{figure}
+Die zweite wichtige Systemeigenschaft ist die Zeitinvarianz
+\begin{defi}\label{sys:timeinvarianz}
+Das System $\mathscr{S}$ heißt zeitinvariant, wenn für eine Verschiebung von $u(t-t_0)$ für alle $t_0$ gilt:
+\begin{align}
+	y(t-t_0) = T\{u(t-t_0)\}
+\end{align}
+\end{defi}
+Die Eigenschaft der Zeitinvarianz besagt, dass die Antwort eines Systems auf ein bestimmtes Eingangssignal unabhängig vom Anregungszeitpunkt ist, d.h. dass sich die Systemeigenschaften zeitlich nicht ändern. Im Bezug auf elektrochemische Systeme bedeutet dies, dass Batterien im Allgemeinen nicht zeitinvariant sind, da sich durch einen stets ablaufenden chemischen Prozess das System ändert. Deshalb betrachtet man chemische Speicher in einem Zeitbereich, in dem sich das System nicht ändert. Eine Batterie ist \textit{temporär zeitinvariant}.\\
+
+Diese beiden Eigenschaften spielen bei der Systemtheorie eine zentrale Rolle, daher werden sie in der Literatur auch eigens benannt \cite{Frey2009}:
+\begin{defi}
+Ein System $\mathscr{S}$, das sowohl linear als auch zeitinvariant ist, heißt \textit{LTI} - System (Linear Time Invariant System).
+\end{defi}
+
+\subsection{LTI - Systeme}
+\subsubsection{Faltungssysteme}
+Da für diese Arbeit das LTI - System eine große Bedeutung hat, werden nun zwei relevante Klassen angesprochen: Die erste Klasse beruft sich auf die Beschreibung des Systems durch das Faltungsintegral. Zuvor werden wir aber noch die Impulsantwort definieren:
+\begin{defi}\label{sys:impuls}
+	Sei $\delta_a(t)$ der Diracimpuls, so ist die Impulsantwort $h(t)$ eines Systems $\mathscr{S}$ definiert durch 
+	\begin{align}
+		h(t) := T\{\delta(t)\}
+	\end{align}
+\end{defi}
+Dabei wird $\delta(t) $ als Dirac - Impuls bezeichnet (Abb. \ref{fig:dirac}). 
+\begin{figure}[ht]
+	\includegraphics[width=0.8\columnwidth]{dirac_impuls.eps}
+	\caption{Beispiel einer Dirac - Folge, Dichte einer zentrierten Normalverteilung}
+	\label{fig:dirac}
+\end{figure}
+Bei der Faltung ist das Eingangssignal $u(t)$ mit dem Ausgangssignal $y(t)$ durch folgendes Integral verbunden:
+\begin{satz}(Faltungsdarstellung eines LTI - Systems)\label{sys:faltung}
+Sei $u(t) \in \lint{1}{\mathbb{\mathbb{R}}}$ sowie wie das System $\mathscr{S}$ mit $y(t) = T\{u(t)\}$ linear, zeitinvariant und beschränkt, so gilt:
+\begin{align}
+	y(t) = T\{u(t)\} = u(t) * h(t):= \int_{-\infty}^{\infty} u(\theta) h(t-\theta) \mathrm{d\theta} \text{, mit } h(t) \in \lint{1}{\mathbb{R}} \text{, }
+\end{align}
+wobei $h(t)$ die Impulsantwort des Systems darstellt. 
+\begin{proof}
+Ein Beweis wird mit Hilfe der Distribution durchgeführt und wird hier nicht erwähnt. Aber wohlbekannt in \cite{Rubin1991}.
+\end{proof}
+\end{satz}
+\begin{bem}
+Regt man das System $\mathscr{S}$ mit einem Diracimpuls $\delta$ an, bekommt man die Impulsantwort $h(t)$ (Def. \ref{sys:impuls}). Kennt man die Impulsantwort kennt man nach Satz \ref{sys:faltung} das ganze System. Die Herangehensweise mit dem Faltungsintegral ist für Systeme gedacht, die zunächst unbekannt sind (Siehe Einleitung \ref{sys:einleitung}). 
+\end{bem}
+\begin{bem}
+Für ein Batteriesystem werden wir (wie oben kurz erwähnt) eine andere Möglichkeit finden das System kennenzulernen. 
+\end{bem}
+\subsection{Lineare gewöhnliche Differentialgleichungssystem 1. Ordnung mit konstanten Koeffizienten}\label{sys:diff}
+Dies ist die Klasse von Systemen, bei der das System schon bekannt ist und es mit Hilfe von Differentialgleichungen beschrieben wird. Wir werden folgende Notation einführen. 
+\begin{align}
+	R(\frac{d}{dt}) w = 0 \label{sys:GDL} \text{, mit } w: \mathbb{R} \rightarrow \mathbb{R}^q \text{ und }q \in \mathbb{N}
+\end{align}
+oder expliziter
+\begin{align}
+	R_0 w + R_1 \frac{d}{dt} w + \cdots + R_L \frac{d^L}{dt^L} w = 0
+\end{align} 
+mit gegebenen Koeffizientenmatrizen $R_0$, $R_1$ ... $R_L \in \mathbb{R}^{g \times p}$ und $g, p \in \mathbb{N}$
+Geschrieben als Polynommatrix: 
+\begin{align}
+	R(\xi) = R_0  + R_1 \xi  + \cdots + R_L \xi^L \in \mathbb{R}^{g \times p}[\xi]\text{.}
+\end{align}
+Mit Ersetzen von $\xi$ mit $\frac{d}{\mathrm{dt}}$ führt uns dies zu \ref{sys:GDL}
+\begin{bem}
+Dabei entspricht in diesem Falle der Operator $T\{\}$ $R(\xi)$
+\end{bem}
+\begin{bem}
+Für ein eindimensionales System gilt dann folgender Ausdruck
+\begin{align}
+	r(\xi) = \alpha_1  + \alpha_2 \xi  + \cdots +  \alpha_{n-1} \xi^{n-1} + \alpha_n \xi^n \in \mathbb{R}[\xi] \text{, }
+\end{align}
+mit $\alpha_0$, $\alpha_2$ ... , $\alpha_{n-1}$, $\alpha_n \in \mathbb{R}$
+\end{bem}
+\ref{sys:GDL} war der allgemeine Fall von linearen gewöhnliche Differentialgleichungssystemen mit konstanten Koeffizienten. Wir werden nun die Eingabe / Ausgabeform dieser Variante ableiten. Dazu benötigen wir zunächst die Definition.
+\begin{defi}
+Eine Matrix von rationalen Funktionen wird rational gebrochen genannt, wenn der Grad jedes Eintrages des Zählers den Grad des Nenners nicht überschreitet. Ist der Grad der Einträge des Zählers echt kleiner als Grad der Einträge des Nenners, so wird dies als echt rational bezeichnet. 
+\end{defi}
+Wir werden nun die Begrifflichkeiten schwache und starke Lösung nach \cite{Polderman1997} einführen.
+\subsubsection{Starke und schwache Lösung}
+\begin{defi}(Starke Lösung) Eine Funktion $w : \mathbb{R} \rightarrow \mathbb{R}^q$ wird \textit{starke Lösung} von \ref{sys:GDL} genannt, wenn die Komponente von $w$ genügend oft differenzierbar und es gilt: 
+\begin{align}
+	(R(\frac{d}{\mathrm{dt}}))(t) = 0 \quad \forall t \in \mathbb{R}
+\end{align}
+\end{defi}
+\begin{defi}(Schwache Lösung) Sei $R(\xi) \in \mathbb{R}^{g \times q}[\xi]$ und betrachte man
+\begin{align}
+	R(\frac{d}{\mathrm{dt}}) w = 0 \label{sys:weak}
+\end{align} 
+Wir definieren den Integraloperator, welcher im Raum $L^1$ liegt, durch
+\begin{align}
+	(\int w )(t) := \int_0^t w(\theta) \mathrm{d\theta} \text{, } \quad  (\int^{k+1} w )(t) := \int_0^t (\int^k w )(\theta) \mathrm{d\theta} \text{, } k \geq 1 \text{.}
+\end{align}
+Sei $R(\xi) \in \mathbb{R}^{g \times q}[\xi]$ gegeben. Wir stellen eine Verbindung zwischen $R(\xi)$ und $R^*(\xi)$ her. Sei $L$ der höchste Grad von $R(\xi)$, d.h.
+\begin{align}
+	R(\xi) := R_0 + R_1 \xi + ... + R_L \xi^L \text{, } R_L \neq 0 \text{ .}
+\end{align}
+dann ist $R^*$ folgendermaßen definiert
+\begin{align}
+	R^*(\xi) := \xi^L R(\frac{1}{\xi}) =R_L + R_{L-1} \xi + ... + R_0 \xi^L
+\end{align}
+Betrachtet man die Integralgleichung
+\begin{align}
+	(R^*(\int) w ) (t) = c_0 + c_1 t + ... + c_{L-1} t ^{L-1} \text{, } c_i \in \mathbb{R}^g \text{.} \label{sys:weak1}
+\end{align}
+$w \in L^1$ ist eine schwache Lösung von \ref{sys:weak}, wenn es konstante Vektoren $c_i \in \mathbb{R}^g$, so dass \ref{sys:weak1} für alle $t \in \mathbb{R}$ erfüllt ist. 
+\end{defi}
+
+Im Folgenden nimmt $R(\xi)$ die Form 
+\begin{align}
+	R(\xi) = [-Q(\xi), P(\xi)] \text{, } \label{sys:io1}
+\end{align}
+mit $P(\xi) \in \mathbb{R}^{p \times p}[\xi]$ und $Q \in \mathbb{R}^{p \times m}[\xi]$ an.
+Wobei $P(\xi)$, $Q(\xi)$ folgende Bedingungen erfüllen müssen:
+\begin{itemize}
+\item $\det P(\xi) \neq 0$
+\item $P^{-1} (\xi) Q(\xi)$ ist eine Matrix von gebrochen rationalen Funktionen. Bei der Cramerschen Regel sind aber die Einträge von $P^{-1}(\xi) Q(\xi)$ immer rationale Funktionen. 
+\end{itemize}
+$w$ lässt sich folgendermaßen schreiben 
+\begin{align}
+	w = \left(\begin{array}{c}
+	u \\ 
+	y
+	\end{array} \right)
+\end{align}
+so lässt sich das System $R(\xi) = 0$ umformen in
+\begin{align}
+	P(\frac{d}{dt}) y = Q(\frac{d}{dt}) u
+\end{align}
+Daraus lässt sich der Satz formulieren:
+\begin{satz}(Eingabe - Ausgabe System)\label{sys:io}
+Sei $u \in \lint{1}{\mathbb{R}}$ dann existiert genau ein $y \in \lint{1}{\mathbb{R}}$, das folgende Bedingung erfüllt
+\begin{align}
+	P(\frac{d}{dt}) y = Q(\frac{d}{dt}) u \label{sys:io:behav}
+\end{align}
+und repräsentiert ein Eingabe / Ausgabe System.
+\end{satz}
+Der Beweis kann in \cite{Polderman1997} gefunden werden.
+\begin{bem}
+Die Matrix $P^{-1}(\xi) Q(\xi)$ wird oft als Transfermatrix des Verhaltens von \ref{sys:io:behav} bezeichnet und spielt beim Beschreiben von Systemen eine große Rolle, wie später gezeigt wird.
+\end{bem} 
+\begin{bem}
+
+Im Folgenden betrachten wir nur den skalaren Fall von Eingabe / Ausgabe - Systemen, d.h. $p(\xi) := P(\xi) \in \mathbb{R}[\xi]$,  $q(\xi) := Q(\xi) \in \mathbb{R}[\xi]$. Dies ist für diese Arbeit vollkommen ausreichend.
+\end{bem}
+\subsection{Zusammenhang zwischen einem Faltungssystem und einem Eingabe / Ausgabe System}
+Es wird nun gezeigt, dass jedes Eingabe / Ausgabe System und somit auch ein System mit dem Verhalten
+\begin{align}
+	R(\xi) = 0
+\end{align}
+in ein Faltungssystem überführt werden kann. Dazu wird die Impulsantwort von $P^{-1}(\xi) Q(\xi)$ bestimmt. Um dies zu zeigen ist aber einiges an Vorarbeit nötig. Starten wir mit folgendem Korollar:
+\begin{lemma}\label{sys:kor:part}
+Sei die Partialbruchzerlegung von $p^{-1}(\xi)q(\xi)$ gegeben durch (Satz \ref{a:par}), dann folgt
+\begin{align}
+	q(\xi) = a_0 \cdot p(\xi) + \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{a_{ij}\left[\prod_{\substack{k= 1\\k \neq i}}^N (\xi -\lambda_k)^{n_{k}}\right] (\xi -\lambda_i)^{n_{i}-j}}}
+\end{align}
+\begin{proof}
+	Nach Voraussetzung gilt 
+	\begin{align}
+		\frac{q(\xi)}{p(\xi)} = a_0 + \sum_{i=1}^{N}{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(\xi - \lambda_i)^j}}}
+	\end{align}
+	Beidseitiges multiplizieren mit $p(\xi):= \prod_{k=1}^N{(\xi -\lambda_k)^{n_k}}$ ergibt
+	\begin{align}
+		q(\xi) &= p(\xi) a_0 + \sum_{i=1}^{N}{\sum_{j=1}^{n_i}{\frac{a_{ij} \cdot \left[\prod_{k=1}^N{(\xi -\lambda_k)^{n_k}}\right]}{(\xi - \lambda_i)^j}}}\\
+		&=p(\xi) a_0 + \sum_{i=1}^{N}{\sum_{j=1}^{n_i}{ a_{ij} \cdot \left[\prod_{\stackrel{k=1}{k \neq i} }^N{(\xi -\lambda_k)^{n_k}}\right]}{(\xi - \lambda_i)^{n_i- j}}}
+	\end{align}
+\end{proof}
+\end{lemma}
+\begin{lemma}\label{l:H1}
+Sei  $u \in \lint{1}{\mathbb{R}}$ und $k \geq 1.$ Definiere 
+\begin{align}
+	y_k(t):= \int_{0}^t {\frac{(t-\theta)^{k-1}}{(k-1)!}\exp{\lambda (t-\theta)}} u(\theta) \mathrm{d\theta}\label{l:gl1}
+\end{align}
+Dann erfüllen $\begin{bmatrix}
+u \\ 
+y_k
+\end{bmatrix}$ 
+die Gleichung 
+\begin{align}
+	(\frac{d}{dt	}-\lambda)^k y_k = u 
+\end{align}
+schwach.
+\begin{proof}
+	Der Beweis umfasst zwei Teile. Im ersten Teil wird die Annahme gemacht, dass $u$ unendlich oft differenzierbar ist, so dass $(u, y_k)$ eine starke Lösung ist. Im zweiten Teil wird gezeigt, dass $(u, y_k)$ eine schwache Lösung ist, indem $u$ durch eine Sequenz von $\diff{\infty}{\mathbb{R}}$ Funktionen approximiert wird.
+	\begin{itemize}
+	\item Annahme $u \in \diff{\infty}{\mathbb{R}}$ \\
+	Induktion: Der Fall $k=1$ ist trivial. Wir nehmen an, dass $n > 1$ und für alle $k \leq n$ eine Lösung für \ref{l:gl1} definiert ist.   
+	\begin{align}
+		y_{n+1}(t)= \int_{0}^t {\frac{(t-\theta)^{n}}{(n)!}\exp{\lambda (t-\theta)}} u(\theta) \mathrm{d \theta}
+	\end{align} mit $n \leq k$. 
+	Da $u$ glatt ist, so auch $y_{n+1}$. Damit existiert die Ableitung von $y_{n+1}$
+	\begin{align}
+	\frac{d}{dt} y_{n+1} &= \int_{0}^t {\frac{(t-\theta)^{n-1}}{(n-1)!}\exp{\lambda (t-\theta)}} u(\theta)  \mathrm{d \theta} + \lambda\int_{0}^t {\frac{(t-\theta)^{n}}{(n)!}\exp{\lambda (t-\theta)}} u(\theta) \mathrm{d \theta}\\
+						&=y_{n} + \lambda \cdot y_{n+1} 
+	\end{align}	
+	Daraus folgt 
+	\begin{align}
+		(\frac{d}{dt} -\lambda)y_{n+1} = y_{n}
+	\end{align}		
+	Aus der Annahme $(\frac{d}{dt} -\lambda)^{k}y_{n} = u$ erfolgt für die Induktion
+	\begin{align}
+		(\frac{d}{dt} -\lambda)^{n+1}y_{n+1} = (\frac{d}{dt} -\lambda)^{n}y_{n} = u
+	\end{align}
+	\item Man betrachte $y_{k, n}$, welches definiert wird durch  
+	\begin{align}
+		y_{k, n}(t) := \int_{0}^t {\frac{(t-\theta)^{k-1}}{(k-1)!}\exp{\lambda\cdot (t-\theta)}} u_n(\theta) \mathrm{d\theta}
+	\end{align} ist 
+	und man kann zeigen \cite{Polderman1997}, dass $y_{k, n}$ im $\lint{1}{\mathbb{R}}$ - Sinne gegen $y_k$ konvergiert.
+	\end{itemize}
+\end{proof}
+\end{lemma}
+Mit folgendem Satz wird der Zusammenhang zwischen dem Eingabe / Ausgabe - und dem Faltungssystem aufgezeigt.
+\begin{satz} \label{s:Impuls} Sei $p(\xi), q(\xi) \in \mathbb{R}[\xi]$, so dass $p(\xi) \neq 0$ und $p^{-1}(\xi)q(\xi)$ echt gebrochen rational ist und man setze voraus, dass die Partialbruchzerlegung (Satz \ref{a:par}) von $p^{-1}(\xi)q(\xi)$ gegeben ist durch
+\begin{align}
+	p(\xi)^{-1}q(\xi) &= \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\frac{a_{ij}}{(\xi - \lambda_i)^j}}}
+\end{align}
+Dann wird das Verhalten von dem System durch $p(\frac{d}{dt})y = q(\frac{d}{dt})u$, sowie durch das Faltungssystem in der Form \ref{sys:faltung} mit 
+\begin{align}
+	h(t):=
+	\begin{cases}
+		\sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\frac{a_{ij}\cdot t^{j-1}}{(j-1)!}\exp{\lambda_i\cdot t}}} & t\geq 0 \\
+		0 & \text{sonst}
+	\end{cases}  
+\end{align}
+beschrieben. 
+\begin{proof}
+Definiere 
+\begin{align}
+	h(t):=
+	\begin{cases}
+		\sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\frac{a_{ij}\cdot t^{j-1}}{(j-1)!}\exp{\lambda_i\cdot t}}} & t\geq 0 \\
+		0 & \text{sonst}
+	\end{cases}   
+\end{align}
+Dann folgt nach Satz \ref{sys:faltung}
+\begin{align}
+	\Rightarrow y(t)=& \int_{-\infty}^t \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\frac{a_{ij}\cdot (t-\theta)^{j-1}}{(j-1)!}\exp{\lambda_i\cdot (t-\theta)}}} u(\theta) \mathrm{d\theta}
+\end{align} mit $u \in \lint{1}{\mathbb{R}}$.  
+Sei nun zuerst $u \in \diff{\infty}{\mathbb{R}}$ 
+\begin{align}
+	y_{ij}(t):= a_{ij} \int_{-\infty}^t {\frac{(t-\theta)^{j-1}}{(j-1)!}\exp{\lambda_i\cdot (t-\theta)}} u(\theta) \mathrm{d\theta}
+\end{align} 
+weiter folgt:
+\begin{align}
+	y(t) = \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{y_{ij}}}
+\end{align}
+Berechne $p(\frac{d}{dt})y(t)$:
+\begin{align}
+	p(\frac{d}{dt})y(t) &= \prod_{k=1}^N (\frac{d}{dt} -\lambda_k)^{n_{k}}\left(\sum_{i=1}^{N}{\sum^{n_i}_{j=1}{y_{ij}}}\right)\\
+					    &= \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\prod_{k=1}^N (\frac{d}{dt} -\lambda_k)^{n_{k}} \cdot y_{ij}}}\\
+					    &= \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\left[\prod_{\substack{k= 1\\k \neq i}}^N (\frac{d}{dt} -\lambda_k)^{n_{k}}\right] (\frac{d}{dt} -\lambda_i)^{n_{i}} \cdot y_{ij}}}\\
+					    &= \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\left[\prod_{\substack{k= 1\\k \neq i}}^N (\frac{d}{dt} -\lambda_k)^{n_{k}}\right] (\frac{d}{dt} -\lambda_i)^{n_{i}-j}}a_{ij}u(t)}\\
+					    &=q(\frac{d}{dt})u(t)
+\end{align}
+Die vierte Gleichung folgt aus Lemma \ref{l:H1} und die letzte Gleichung aus Korollar \ref{sys:kor:part}.
+Der Fall, $u \in \lint{1}{\mathbb{R}}$ geht genauso wie der zweite Teil des Beweises von \ref{l:H1}.
+\end{proof}				 
+\end{satz}
+
+Es wurde gezeigt, dass aus dem Systemverhalten $R(\frac{d}{dt}) w = 0$ ein Faltungssystem gewonnen werden kann. Diese Tatsache wird uns auch noch in den nächsten Beweisen begegnen.
+
+\section{Signalbereich}
+Eine Anwendung der Laplace - Transformation (siehe Anhang \ref{lt}) ist LTI - Systeme in den Signalbereich zu transformieren. Um somit die Übertragungsfunktion bzw. durch Zurückwandeln die Impulsantwort zu finden. Diese Vorgehensweise ist oft in den Ingenieurwissenschaften üblich. \\
+Wenden wir uns zunächst dem Signalbereich des Faltungsintegrals zu.
+\begin{figure}
+	\centering
+	\def\svgwidth{0.75\columnwidth}
+	\input{images/faltung.pdf_tex}
+	\caption{Die Übertragungsfunktion $G(s)$ beschreibt das System}
+	\label{fig:faltung}
+\end{figure}
+\begin{satz}  \label{s:transfer}
+Betrachtet man ein lineares, zeitinvariantes und beschränktes System $\mathscr{S}$ und setzt voraus, dass die Impulsantwort $h$ laplacetransformierbar ist, dann wird die Laplacetransformierte von $h(t)$ als Übertragungsfunktion $G$ bezeichnet. Sei auch das Eingabesignal $u: \mathbb{R} \rightarrow \mathbb{C}$ laplacetransformierbar und bezeichnet die Laplacetransformierte als $\hat{u}$. Man setzt zudem voraus, dass der Durchschnitt der Konvergenzbereiche von $G$ und $\hat{u}$ nicht leer ist. Dann ist auch das Ausgabesignal von dem Faltungssystem $y(t) = \int_{-\infty}^{\infty} h(t-\theta) u(\theta) \mathrm{d\theta}$ laplacetransformierbar und wird als $\hat{y}$ bezeichnet, so ist $\hat{y}(s) = G(s)\hat{u}(s)$ und der Konvergenzbereich von $\hat{y}$ umfasst den Durchschnitt von $G$ und $\hat{u}$.
+\begin{proof}
+Nach Satz \ref{sys:faltung}, Definition \ref{def:eLT} und der Eigenschaft der Zeitinvarianz Definition \ref{sys:timeinvarianz} folgt
+\begin{align}
+\hat{y}(s) &= \int_{-\infty}^{\infty} y(t) e^{-st} \mathrm{dt}\\
+&= \int_{-\infty}^{\infty} \left(\int_{-\infty}^{\infty} h(t-\theta) u(\theta) \mathrm{d\theta} \right) e^{-st} \mathrm{dt}\\
+&= \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} h(t-\theta) e^{-s(t-\theta)} u(\theta) e^{-\theta} \mathrm{dt} \mathrm{d\theta} \\
+&= \int_{-\infty}^{\infty} h(t) e^{-st} \mathrm{dt} \int_{-\infty}^{\infty} u(\theta) e^{-\theta}\mathrm{d\theta} \\
+&= G(s) \hat{u}(s)
+\end{align} 
+\end{proof}
+\end{satz}
+Zu guter Letzt betrachten wir Systeme, die als lineare gewöhnliche Differentialgleichungssysteme 1. Ordnung mit konstanten Koeffizienten, dargestellt werden können.
+\begin{satz}\label{sys:general} 
+Betrachte das System $R(\frac{d}{dt})(w)=0$ dann gilt für die Übertragungsfunktion $G$:
+\begin{align}
+	G(s) = p^{-1}(s)q(s)
+\end{align}
+\begin{proof}
+	\begin{align}
+		R(\frac{d}{dt})(w) &= 0 \\
+		\Leftrightarrow p(\frac{d}{dt})y &= q(\frac{d}{dt})u
+	\end{align}
+	\begin{itemize}
+		\item Fall 1: $p^{-1}(\xi) q(\xi)$ ist echt gebrochen rational d.h $p^{-1}(\xi) q(\xi) = \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\frac{a_{ij}}{(\xi - \lambda_i)^j}}}$ und $p(\xi) \neq 0$ , dann folgt nach Satz \ref{s:Impuls}
+		\begin{align}
+			h(t) &=\sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\frac{a_{ij}\cdot t^{j-1}}{(j-1)!}\exp{\lambda_i\cdot t}}} 
+		\end{align}
+		und wird als Impulsantwort bezeichnet. \\
+		Für $Re(s) > Re(\lambda_i)$ folgt aus der Linearität der Laplacetransformation und aus dem Satz \ref{LT:texpn} die Laplacetransformierte von $h(t)$:
+		\begin{align}
+			\mathscr{L}\{h(t)\}(s) &= \mathscr{L}\{ \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\frac{a_{ij}\cdot t^{j-1}}(s){(j-1)!}\exp{\lambda_i\cdot t}}}\} \\ 
+			&=  \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{ a_{ij} \mathscr{L}\left\{ \frac{t^{j-1}}{(j-1)!}\exp{\lambda_i\cdot t} \right\}}}(s) \\
+			&=  \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{ \frac{a_{ij}}{(s-\lambda_i)^j}}}
+		\end{align}
+		Nach Satz \ref{s:transfer} wird $G(s):=\mathscr{L}\{h(t)\}(s)$ als Übertragungsfunktion bezeichnet und es folgt mit Satz \ref{a:par}
+		\begin{align}
+			G(s) = p(s)^{-1}q(s) = \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\frac{a_{ij}}{(s - \lambda_i)^j}}} 
+		\end{align}	
+		Für die Wohldefiniertheit von $G(s)$ betrachtet man die Laplacetransformation $\mathscr{L}\{p(\frac{d}{dt})y\}(s)$ und $\mathscr{L}\{q(\frac{d}{dt})y\}(s)$ sowie das Eingabe / Ausgabe System $p(\frac{d}{dt})y = q(\frac{d}{dt})u$
+		\begin{align}
+			\mathscr{L}\{p(\frac{d}{dt})y\}(s) &= \mathscr{L}\left\{(a_n \frac{d}{dt}^n  + a_{n-1} \frac{d}{dt}^{n-1} + \hdots + a_1 \frac{d}{dt} + a_0)\cdot y\right\}(s) \\
+			&=  (a_n s^n  + a_{n-1} s^{n-1} + \hdots + a_1 s + a_0)\hat{y}(s)\\
+			&= \prod_{i=1}^N{(s -\lambda_i)^{n_i}} \hat{y}(s)\\\\
+			\mathscr{L}\{q(\frac{d}{dt})y\}(s) &= \mathscr{L}\left\{(b_n \frac{d}{dt}^n  + b_{n-1} \frac{d}{dt}^{n-1} + \hdots + b_1 \frac{d}{dt} + b_0)\cdot u\right\}(s) \\
+			&=  (b_n s^n  + b_{n-1} s^{n-1} + \hdots + b_1 s + b_0)\hat{u}(s)\\
+			&= \prod_{i=1}^M{(s -\theta_i)^{m_i}} \hat{u}(s)\\\\
+			\Rightarrow {\mathscr{L}\{p(\frac{d}{dt})y\}(s)} &= {\mathscr{L}\{q(\frac{d}{dt})u\}(s)} \\
+			\Leftrightarrow \hat{y}(s) &= \sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\frac{a_{ij}}{(s - \lambda_i)^j}}} \hat{u}(s)\\ 
+			&= p(s)^{-1}q(s)\hat{u}(s) = G(s)\hat{u}(s)
+		\end{align}
+		\item Fall 2: $p^{-1}(\xi) q(\xi)$ ist gebrochen und nicht echt gebrochen rational, d.h $p^{-1}(\xi) q(\xi) = a_0 +\sum_{i=1}^{N}{\sum^{n_i}_{j=1}{\frac{a_{ij}}{(\xi - \lambda_i)^j}}}$ und $q(\xi) \neq 0$ , dann existiert für das Eingabe/Ausgabe System $p(\xi)y = q(\xi)u$ nach Satz \ref{s:makeerational} eine echt rationale Beziehung mit
+		$p(\xi) (y - \tilde{p}u) = \tilde{q}(\xi)u$ und $p(\xi)^{-1}\tilde{q}(\xi)$. So existiert aber nach Fall 1, eine Übertragungsfunktion für $p(\xi)^{-1}\tilde{q}(\xi)$ mit $p(s)^{-1}\tilde{q}(s) = \tilde{G}(s)$ und es folgt
+		\begin{align}
+			p(s) (\hat{y} - \tilde{p}\hat{u}) &= \tilde{q}(s)\hat{u} \\
+			\Leftrightarrow \hat{y}  &= p^{-1}(s)\tilde{q}(s) \hat{u} + \tilde{p} \hat{u} = \tilde{G}(s) \hat{u} + \tilde{p} \hat{u}\\
+			&= p^{-1}(s) q(s) \hat{u} = G(s) \hat{u} \text{ mit }G(s) := \tilde{G}(s) + \tilde{p}
+		\end{align}
+	\end{itemize}
+\end{proof}
+\end{satz}
+\section{Frequenzbereich}
+Mit Hilfe der Fourier - Transformation (Anhang \ref{ft}) wird das LTI - System in den Frequenzbereich transformiert. Dabei wird im Gegensatz zur Laplace - Transformation, die einen ganzen Konvergenzstreifen betrachtet, nur die Imaginärachse berücksichtigt. Liegt die Imaginärachse im Konvergenzbereich der Laplace-Transformation, so ist die Fourier-Transformation ein Spezialfall der Laplace - Transformation.
+Die Fourier - Transformation der Impulsantwort wird wie folgt definiert:
+\begin{align}
+H(\omega) := \ft{h(t)} 
+\end{align}
+Wir haben nun die Grundlagen der Systemtheorie dieser Arbeit erfasst und werden weitere Eigenschaften vom System kennenlernen. 
+
+\subsection{Stabilität}
+Ein stabiles System verknüpft eine beschränkte Eingabe mit einem beschränkten Ausgabesignal.
+\begin{defi}\label{sys:stabil:defi}
+Ein System $\mathscr{S}$ ist stabil, wenn zwei Konstanten $M, \tilde{M} \in \mathbb{R}$ existieren, so dass gilt
+\begin{align}
+	\abs{u(t)} < M \Rightarrow \abs{y(t)} < \tilde{M}
+\end{align}
+\end{defi}
+\begin{bem}
+Diese Definition der Stabilität wird auch BIBO - Stabilität genannt. Die Abkürzung BIBO steht dabei für \textit{Bounded Input} - \textit{Bounded Output}. 
+\end{bem}
+\begin{satz}\label{sys:stabil} Ein LTI - System ist genau dann BIBO - stabil, wenn für die Impulsantwort $h(t) \in \lint{1}{\mathbb{R}}$ gilt.
+\begin{proof}
+Folgt sofort aus Satz \ref{sys:faltung} und Definition \ref{sys:stabil:defi}.
+\end{proof}
+\end{satz}
+\begin{satz}
+Die Übertragungsfunktion $H(\omega)$ eines BIBO - stabilen System ist beschränkt
+\begin{proof}
+	Per Definition ist das System BIBO - stabil, also gilt nach Satz \ref{sys:stabil} $h(t) \in L_1$. Somit existiert per Satz \ref{ft:def:fourier} die Fourier - Transformation und es folgt
+	\begin{align}
+		\abs{H(\omega)} \leq \int_{-\infty}^{\infty} \abs{h(t) \exp{-i \omega t}} \mathrm{dt} = \norm{h(t)}_{L_1}
+	\end{align}
+\end{proof}
+\end{satz}
+
+\subsection{Reelle Systeme}
+\begin{defi}\label{sys:reell}
+	Ein System $\mathscr{S}$ heißt reell, wenn für $x(t) \in \mathbb{R}$ folgt $y(t) \in \mathbb{R}$
+\end{defi}
+Es scheint natürlich zu sein, dass ein reelles System reelle Eingabe - und Ausgabesignale besitzt. Aber vom formellen Punkt aus gesehen, gibt es einige wichtige Konsequenzen.
+
+\begin{lemma}\label{s:korHelp} 
+Sei $\mathscr{S}$ ein Faltungssystem, $h(t) \in \lint{1}{\mathbb{R}}$ die Impulsantwort und $H(\omega) = \Re{H(\omega)} + i \Im{H(\omega)}$ die Transferfunktion. Dann sind folgende Punkte äquivalent
+\begin{enumerate}[label=\roman*]
+	\item \label{s:korHelp:1} $\mathscr{S}$ ist reell.
+	\item \label{s:korHelp:2} $h(t) \in \mathbb{R}$ für alle $t$'s
+	\item \label{s:korHelp:3} $\conj{H(\omega)} = H(-\omega)$ für alle $\omega$'s
+	\item \label{s:korHelp:4} $F(-\omega) = F(\omega)$ und $G(-\omega) = G(\omega)$ für alle $\omega$'s
+\end{enumerate}
+\begin{proof}
+	\ref{s:korHelp:1} $\Rightarrow$ \ref{s:korHelp:2} Per Definition \ref{sys:reell} folgt $x(t)$, $y(t) \in \mathbb{R} $. Da per Voraussetzung $\mathscr{S}$ ein Faltungssystem ist, folgt mit Satz \ref{sys:faltung} 
+	$y(t) = T\{x(t)\} = h(t) * x(t)$ und $h \in \mathbb{R}$\\
+	\ref{s:korHelp:2} $\Rightarrow$ \ref{s:korHelp:3}. Mit Satz \ref{ft:def:fourier} ist die Existenz der Fourier - Transformation gesichert und es folgt mit $h(t) \in \mathbb{R}$
+	$\conj{H(\omega)} = \int_{-\infty}^{\infty}h(t) \conj{\exp{(-i \omega t)}} \mathrm{dt} = H(-\omega)$\\
+	\ref{s:korHelp:3} $\Rightarrow$ \ref{s:korHelp:4}. $H(-\omega) = \conj{H(\omega)} = \int_{-\infty}^{\infty}h(t) cos(\omega t) + i h(t) sin(\omega t) \mathrm{dt}$
+	$\Rightarrow \Re{H(\omega)} = \int_{-\infty}^{\infty}h(t) cos(\omega t) \mathrm{dt}$ und 
+	$\Im{H(\omega)} = \int_{-\infty}^{\infty}h(t) sin(\omega t) \mathrm{dt}$. Durch die Symmetrieeigenschaften der $\cos$ und $\sin$ Funktion folgt die Behauptung.\\
+	\ref{s:korHelp:4} $\Rightarrow$ \ref{s:korHelp:1}, da $h(t)$ in $\mathbb{R}$ liegt, folgt für $x(t) \in \mathbb{R}$ und mit dem Satz \ref{sys:reell} sowie dem Faltungsintegral die Behauptung.
+\end{proof}
+\end{lemma}
+\begin{bem}
+Dieser Satz gilt auch, wenn $\mathscr{S}$ kein Faltungssystem ist, aber dafür $h(t) \in \lint{2}{\mathbb{R}}$. bzw. $H(\omega) \in \lint{2}{\mathbb{R}}$ liegen.
+\end{bem}
+\subsection{Hilbert - Transformation und Kausalität}
+Wir werden nun einige bekannte Resultate Revue passieren lassen.
+\begin{defi}(Kausalität)\label{sys:kausalität}
+Ein System $\mathscr{S}$ ist kausal, wenn mit $u_1(t) = u_2(t)$ für $\forall t< t_0$ folgt: $y_1(t) = y_2(t)$ für $\forall t< t_0$  
+\end{defi}
+\begin{bem}
+Anders ausgedrückt: Das Ausgangssignal $u(t)$ zu einem Zeitpunkt $t_0$ wird nur von dem Verlauf des Eingangssignals $y(t)$ bis einschließlich zu diesem Zeitpunkt $t_0$ bestimmt.
+\end{bem}
+\begin{satz} \label{sys:kausalität:lti}
+\begin{itemize}
+	\item \label{sys:kausalität:gl1} Ein lineares System $\mathscr{S}$ ist genau dann kausal, wenn gilt
+	\begin{align}
+		\forall u \in \mathscr{X}:  u(t < t_0) = 0 \Rightarrow y(t < t_0) = 0
+	\end{align}
+	\item \label{sys:kausalität:gl2}	Ein Faltungssystem $\mathscr{S}$ ist kausal genau wenn $h(t < 0) = 0$. 
+\end{itemize}
+\begin{proof}
+Zu \ref{sys:kausalität:gl1}. Aus der Definition \ref{sys:kausalität} und der Eindeutigkeit von linearen Systemen folgt die "$\Rightarrow$". Für die "$\Leftarrow$" sei $y_1 = T\{u_1\}$, $y_2 = T\{u_2\}$ und $u_1(t < t_0)  = u_2(t < t_0)$ mit $u(t): =u_1(t < t_0) - u_2(t < t_0)$, dann folgt
+\begin{align}
+	y := T\{u(t < t_0)\}  = T\{u_1(t < t_0)\} - T\{u_2(t < t_0)\} = y_1(t) - y_2(t) = 0
+\end{align}
+Zu \ref{sys:kausalität:gl2} $\Rightarrow$ Sei $u(t)$ der Diracimpuls d.h. $u(t) = \delta(t)$ dann folgt mit der Definition der Kausalität und dem Faltungsintegral (Satz \ref{sys:faltung}), dass $0 = y(t < 0) = h(t< 0)$
+$\Leftarrow$ Sei nun $h(t < 0) = 0$. Anschließend folgt mit dem Faltungsintegral
+\begin{align}
+	y(t) &= \int_{-\infty}^{\infty} u(\theta) h(t - \theta) \mathrm{d\theta} \text{, mit Subsitution } \stackrel{t - \theta = s}{-\mathrm{d\theta} = \mathrm{ds}}\\
+	&= \int_{-\infty}^{\infty} u(t - s) h(s) \mathrm{ds} \text{, mit } h(s < 0) = 0\\
+	&= \int_{0}^{\infty} u(t - s) h(s) \mathrm{ds} \text{, mit Subsitution } \stackrel{t - s = \theta}{-\mathrm{ds} = \mathrm{d\theta}}\\
+	&= \int_{-\infty}^{t} u(t- \theta) h(\theta) \mathrm{d\theta}\\
+\end{align}
+Zu Zeigen ist für $u_1 = u_2  \Rightarrow  y_1 = y_2$ 
+\begin{align}
+	y_1(t < t_0) - y_2(t < t_0) &= \int_{-\infty}^{t_0} u_1(\theta) h(t-\theta) \mathrm{d\theta} - \int_{-\infty}^{t_0} u_1(\theta) h(t-\theta) \mathrm{d\theta} \\
+	&= \int_{-\infty}^{t_0} \left(u_1(\theta) - u_2(\theta) \right) h(t-\theta) \mathrm{d\theta} = 0\\ &\text{für } u_1(t < 0) = u_2(t < 0)
+\end{align} 
+\end{proof}
+\end{satz}
+Wir gehen nun kurz auf die Hilbert - Transformation und ihren Zusammenhang mit der Kausalität ein.
+\begin{defi}\label{ht}
+Sei $F(\omega)$ eine Funktion mit $F: \mathbb{R} \rightarrow \mathbb{R}$, so bezeichnet $\mathscr{H}\{F(\omega)\}(\omega_0): \mathbb{R}\rightarrow \mathbb{C}$ die Hilbert - Transformation mit
+\begin{align}
+\mathscr{H}\{F(\omega)\}(\omega_0)= \frac{1}{\pi}\cdot P \int_{-\infty}^{\infty} \frac{F(\omega)}{\omega-\omega_0} \mathrm{d\omega}
+\end{align}
+\end{defi}
+und es gelten folgende Eigenschaften
+\begin{align}
+	\mathscr{H}\{a \cdot x(t) + b \cdot y(t)\} = a \cdot \mathscr{H}\{\cdot x(t)\} + b \cdot \mathscr{H}\{y(t)\} \quad \text{Linearität}\\
+	x(t) =-\mathscr{H}\{\mathscr{H}\{x(t)\}\} \Rightarrow \mathscr{H}^{-1}\{\}:= -\mathscr{H}\{\}
+\end{align}
+\cite[Seite 191]{Frey2009}\\
+
+Der folgende Satz ist elementar für diese Arbeit. Er wurde von Titchmarsh \cite[Seite 125]{titch1948} zum ersten mal geführt und stellt einen Zusammenhang zwischen dem Real - und Imaginärteil der Hilbert- Transformation her. 
+
+\begin{satz}\label{ht:titch}(Satz von Titchmarsh) Sei $s = \sigma + i\omega$. Für die $L^2$ - Funktion $H(\omega) = \Re{H(\omega)} + i\Im{H(\omega)}$ sind folgende Aussagen äquivalent
+\begin{enumerate}
+	\item\label{ht:titch:1} $H(\omega)$ ist der Grenzwert einer für $\omega > 0$ analytischen Funktion $\left. H(\sigma + i\omega)\right|_{\sigma \rightarrow 0^+} \rightarrow H(\omega)$ und es gilt für $\omega> 0$, $K \in \mathbb{R}$ 
+	\begin{align}
+		\sup_{\sigma > 0}{\int_{-\infty}^{\infty} \abs{H(\sigma + i\omega)}^2 \mathrm{d\sigma}} \leq K	
+	\end{align}
+	\item\label{ht:titch:2} $\Re{H(\omega)}$ steht in Beziehung zu $\Im{H(\omega)}$ mit
+		$\Re{H(\omega_0)} = -\mathscr{H}\{\Im{\omega}\}(\omega_0)$
+	\item\label{ht:titch:3} $\Im{H(\omega)}$ steht in Beziehung zu $\Re{H(\omega)}$ mit
+		$\Im{H(\omega_0)} = \mathscr{H}\{\Re{\omega)}\}(\omega_0)$ 
+	\item\label{ht:titch:4} $h(t) = \mathscr{F}^{-1}\{H(\omega)\} \in L^2$ und $h(t) = 0$ für $\forall t < 0$
+\end{enumerate}
+\end{satz}
+\begin{bem}
+\begin{itemize}
+\item Besonders Hervorzuheben ist, wenn $H(\omega) \in \lint{2}{\mathbb{R}}$ die Bedingung \ref{ht:titch:1} oder Bedingung \ref{ht:titch:4} erfüllt, dann ist wenn man den Realteil bzw. Imaginärteil gegeben ist, die Funktion $H(\omega)$ bestimmt.
+\item Eine von der Zeit abhängige Funktion $h(t < 0) = 0$ wird auch kausales Signal genannt. Damit charakterisiert der Satz von Titchmarsh kausale Signale von endlicher Energie, d.h $h(t) \in \lint{2}{\mathbb{R}}$ in Zeit und Frequenzbereich. 
+\item Die Äquivalenz von \ref{ht:titch:1} und \ref{ht:titch:4} ist gegeben durch den Satz von Paley - Wiener \cite{Rubin1991}
+\item Erfüllt die komplexwertige Funktion $H(\omega) = \Re{H(\omega)} + i \Im{H(\omega)}$ eine der Bedingungen des Satz von Titchmarsh, dann ist der Realteil $\Re{H(\omega)}$ der Funktion $H(\omega)$ mit dem Imaginärteil $\Im{H(\omega)}$ verbunden und sie werden als Hilbert - Paar bezeichnet.
+\end{itemize}
+\end{bem}
+Eine wichtige Bemerkung noch: $H(\omega)$ muss keine Übertragungsfunktion eines Faltungssystems sein, aber wenn es eine ist, folgt
+
+\begin{kor} 
+	Ist System $\mathscr{S}$ ein Faltungssystem und $H(\omega) \in \lint{2}{\mathbb{R}}$ die Transferfunktion von $\mathscr{S}$. Dann ist $\mathscr{S}$ kausal, genau dann wenn $\Re{H(\omega)}$ und $\Im{H(\omega)}$ Hilbert - Paare sind.
+	\begin{proof}
+	Durch den Satz \ref{sys:kausalität:lti} ist ein Faltungssystem $\mathscr{S}$ genau dann kausal, wenn $h(t < 0) = 0$. Dann folgt nach dem Satz von Plancherel (Satz \ref{ft:plancherel}), dass $h(t)$ in $\lint{2}{\mathbb{R}}$ liegt.
+	Das Anwenden des Satzes von Titchmarsh \ref{ht:titch} beweist die Behauptung.  
+	\end{proof}
+\end{kor}
+
+Es wird nun eine Klasse von mir eigens erarbeiteten linearen gewöhnlichen Differentialgleichungen vorgestellt, bei der der Satz von Titchmarsh (Satz \ref{ht:titch}) angewandt werden kann.
+
+\begin{lemma}\label{sys:quad}
+Sei $p, q \in \mathbb{R}[\xi]$ und das System $p(\frac{d}{dt})y = q(\frac{d}{dt})u$ gegeben und stehen sich $p$ und $q$ in einer echt rationalen Beziehung gegenüber, mit reellen Nullstellen $\lambda_i$ von $q$, so ist die Übertragungsfunktion von $H(\omega) := G(i\omega)$ quadratintegrierbar. 
+\begin{proof}
+Aus der Beziehnung von $p$ zu $q$ und durch Satz \ref{a:par} folgt
+\begin{align}
+	\frac{q(\xi)}{p(\xi)} = \sum_{i=1}^{N}{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(\xi - \lambda_i)^j}}} \label{gl:rat}
+\end{align}
+Sei $1_i, c_i \in \mathbb{C}^N$,  $1_i :=\left(\begin{array}{c}
+1 \\ 
+\vdots \\ 
+1
+\end{array}\right)$ und $c_i:= \sum_{j=1}^{n_i}\frac{a_{ij}}{(iw-\lambda_i)^j}$\\
+dann ist 
+\begin{align}
+	\abs{\sum_{i=1}^{N}{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(iw - \lambda_i)^j}}}}^2 = \abs{\langle c_i, 1_i \rangle}^2 
+\end{align}
+und es folgt nach der Cauchy-Schwarzsche Ungleichung
+\begin{align}
+	\abs{\langle c_i, 1 \rangle}^2 \leq \abs{c_i}^2 \cdot \abs{1_i}^2 = N \cdot \sum_{i=1}^{N}{\abs{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(iw - \lambda_i)^j}}}^2}
+\end{align}
+Sei nun $1_j, y_j \in \mathbb{C}^{n_i}$, $1_i, c_i \in \mathbb{C}^N$,  $1_i :=\left(\begin{array}{c}
+1 \\ 
+\vdots \\ 
+1
+\end{array}\right)$ und $y_j := \frac{a_{ij}}{(i\omega - \lambda_i)^j}$ dann folgt
+\begin{align}
+	{\abs{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(iw -\lambda_i)^j}}}^2} = \abs{\langle y_j, 1_j \rangle}^2 \leq \abs{1_j}^2 \cdot \abs{\frac{a_{ij}}{(i\omega -\lambda_i)}}^2 = n_i \cdot \sum_{j=1}^{n_i}{\abs{\frac{a_{ij}}{(iw -\lambda_i)^j}}^2}
+\end{align}
+Und es folgt mit Satz \ref{sys:general}
+\begin{align}
+	\int_{-\infty}^{\infty} \abs{H(\omega)}^2 \mathrm{d\omega} &= \int_{-\infty}^{\infty} \abs{\sum_{i=1}^{N}{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(iw - \lambda_i)^j}}}}^2 \mathrm{d\omega}\\
+	&\leq  \int_{-\infty}^{\infty} N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i}{\abs{\frac{a_{ij}}{(iw -\lambda_i)^j}}^2} \mathrm{d\omega}
+\end{align}
+da $\lambda_i \in \mathbb{R}$ folgt:
+\begin{align}
+	&=  N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i} \int_{-\infty}^{\infty}{\frac{\abs{a_{ij}}^2}{(\omega^2 +\lambda_i^2)^j}} \mathrm{d\omega}
+\end{align}
+Nach Lemma \ref{lem:absch} folgt:
+\begin{align}
+	& N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i} \int_{-\infty}^{\infty}{\frac{\abs{a_{ij}}^2}{(\omega^2 +\lambda_i^2)^j}} \\
+	&\leq N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i} \int_{-\infty}^{\infty}{c_{ij} \cdot \abs{w}^{-2j}} \mathrm{d\omega}
+\end{align}
+mit $c_{ij} = \abs{a_{ij}}^2 + 1$ und $\abs{\omega} > R$ dann folgt, nach Lemma \ref{lem:deg2}, dass das Integral konvergiert. D.h 
+$\int_{-\infty}^{\infty}{c_{ij} \cdot \abs{w}^{-2j}} \mathrm{d\omega} < K_{ij}$. Dann existiert aber ein Maximum aller $K_{ij}$ mit $K_{max} := \max{K_{1,1}, \hdots K_{N, n_{N}}}$ und ein Maximum von $n_i$ mit $n_i:= \max{n_1, \hdots, n_N}$ und es folgt
+\begin{align}
+	 N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i} \int_{-\infty}^{\infty}{c_{ij} \cdot \abs{w}^{-2j}} \mathrm{d\omega} &\leq N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i} K_{ij} \leq N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i} K_{max}\\
+	 &= N \cdot \sum_{i=1}^{N} n_i^2 \cdot K_{max} \leq  N^2 \cdot n_{max}^2 \cdot K_{max} < \infty
+\end{align}
+\end{proof}    
+\end{lemma}
+\begin{satz}\label{sys:titch:rational} Sei $p, q \in \mathbb{R}[\xi]$ und das System $p(\frac{d}{dt})y = q(\frac{d}{dt})u$ gegeben  und stehen $p$ und $q$ in einer echt rationalen Beziehung gegenüber mit reellen Nullstellen $\lambda_i$, so erfüllt die Übertragungsfunktion $H(\omega)$ den Satz von Titchmarsh. 
+\begin{proof} Nach Satz \ref{sys:impuls} kann jedes Eingabe / Ausgabe System in Faltungssystem überführt werden. 
+Zudem ist die Impulsantwort für $h(t < 0) = 0$. Nach Lemma \ref{sys:quad} folgt für Systeme mit  $p(\frac{d}{dt})y = q(\frac{d}{dt})u$, wobei $p$ und $q$ in einer echt rationalen Beziehung gegenüber stehen müssen, mit reellen Nullstellen $\lambda_i$, dass die Übertragungsfunktion $H(\omega)$ in $\lint{2}{\mathbb{R}}$ liegt und somit erfüllt sie die Bedingung \ref{ht:titch:4} vom dem Satz von Titchmarsh.
+\end{proof}
+\end{satz}
+
+\section{Passivität}
+Passive Systeme sind weitgehend erforscht in der Elektrotechnik.
+\begin{defi}
+ Ein System $\mathscr{S}$ wird als schwach passiv bezeichnet, wenn für alle $x(t) \in \mathscr{X}$ und $y(t) := T\{ x(t)\} \in \mathscr{N}$ die Bedingung gilt
+ \begin{align}
+ 	\Re{\int_{-\infty}^{\infty} \conj{x(t)} y(t) \mathrm{dt}} \in \mathbb{R}^+_0
+ \end{align}
+ Solche Systeme werden als passiv bezeichnet, wenn zudem für $\theta > - \infty$ die Bedingung gilt
+ \begin{align}
+ 	\Re{\int_{-\infty}^{\theta} \conj{x(t)} y(t) \mathrm{dt}} \in \mathbb{R}^+_0
+ \end{align}
+\end{defi}
+\begin{bem}
+In beiden Fällen wird die Existenz von den Integralen implizit angenommen. Ein passives System ist trivialerweise auch schwach - passiv, aber nicht umgekehrt.
+\end{bem}
+Wir werden kurz auf die Hauptergebnisse von \cite{Dambrowski2013} eingehen. 
+\begin{satz} \label{sys:passiv}
+	Sei $\mathscr{S}$ ein lineares System. Dann ist $\mathscr{S}$ passiv genau dann, wenn es schwach - passiv und kausal ist. 
+\end{satz}
+
+\begin{satz}
+Sei $\mathscr{S}$ ein reelles Faltungssystem mit $H(\omega) = \Re{H(\omega)} + i \Im{H(\omega)} \in \lint{2}{\mathbb{R}}$. Dann gilt folgende Aussage: $\mathscr{S}$ ist genau dann passiv, wenn $\Re{H(\omega)} \geq 0$ für fast alle $\omega$'s und $\Re{H(\omega)}, \Im{Im(\omega)}$ Hilbert - Paare sind.
+\end{satz}
+
+
+%\begin{lemma}
+%Sei $\mathscr{S}$ ein Faltungssystem und $h(t) = \fti{H(\omega)}$ der Impulsantwort und $H(\omega)$ die Übertragungsfunktion. Dann ist $\mathbb{S}$ schwach - passiv genau dann, wenn $\Re{H(\omega)} \geq 0$
+%für fast alle $\omega$'s
+%\begin{proof}
+%	Sei $x \in \mathscr{X}$. Durch die Definiton des Faltungssystems gilt:
+%	\begin{align}
+%		y(t) = \int_{\mathbb{R}} x(\theta) h(t - \theta) \mathrm{d \theta} = \frac{1}{\sqrt{2 \pi}} \int_{-\infty}^{\infty } x(\theta) \int_{-\infty}^{\infty } H(\omega) \exp{i \omega t} \exp{-i \omega \theta} \mathrm{d\omega} \mathrm{d \theta}
+%	\end{align}
+%	und damit 
+%	\begin{align}
+%		\int_{\mathbb{R}} \conj{x(t)} y(t) \mathrm{dt} =  \frac{1}{\sqrt{2 \pi}} \int_{-\infty}^{\infty } H(\omega)   \conj{\int_{-\infty}^{\infty } x(t) \exp{-i \omega t} \mathrm{dt}} \int_{-\infty}^{\infty } x(\theta) \exp{-i \omega \theta} \mathrm{d\theta} \mathrm{d \omega}
+%	\end{align}
+%	mit $X(\omega) = \ft{x(t)}$ folgt
+%	\begin{align}
+%		\int_{\mathbb{R}} \conj{x(t)} y(t) \mathrm{dt} = \frac{1}{\sqrt{2 \pi}} \int_{-\infty}^{\infty } H(\omega) \abs{X(\omega)}^2 \mathrm{d \omega}
+%	\end{align}
+%	Dann folgt 
+%	\begin{align}
+%		\Re{\int_{-\infty}^{\infty} \conj{x(t)} y(t) \mathrm{dt}} = \frac{1}{\sqrt{2 \pi}} \int_{-\infty}^{\infty } \Re{H(\omega}) \abs{X(\omega)}^2 \mathrm{d \omega}
+%	\end{align}
+%	W
+%\end{proof}
+%\end{lemma}
+
+%\begin{satz}\label{sys:TitchBed1}
+%Sei $p, q \in \mathbb{R}[\xi]$ und das System $p(\frac{d}{dt})y = q(\frac{d}{dt})u$ gegeben und stehen $p$ und $q$ in einer echt rationalen Beziehung gegenüber mit reellen Nullstellen $\lambda_i < 0$ und $\sigma \in \mathbb{R}$, $\sigma > 0$, dann gilt:
+%\begin{align}
+%	\int_{-\infty}^{\infty} \abs{H(\sigma + i\omega)}^2 \mathrm{d\omega} < K
+%\end{align}
+%\begin{proof}
+%Aus der Beziehnung von $p$ zu $q$ und durch Satz \ref{a:par} folgt
+%\begin{align}
+%	\frac{q(\xi)}{p(\xi)} = \sum_{i=1}^{N}{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(\xi - \lambda_i)^j}}} \label{gl:rat}
+%\end{align}
+%mit Satz \ref{sys:general} folgt:
+%\begin{align}
+%	\int_{-\infty}^{\infty} \abs{H(\sigma + i\omega)}^2 \mathrm{d\omega} &= \int_{-\infty}^{\infty} \abs{H(\sigma + i\omega)}^2 \mathrm{d\omega} = \int_{-\infty}^{\infty} \abs{\sum_{i=1}^{N}{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(\sigma + i\omega - \lambda_i)^j}}}}^2 \mathrm{d\omega}\\
+%\end{align}
+%Mit der Abschätzung von Satz \ref{sys:quad} folgt
+%\begin{align}
+%	&\int_{-\infty}^{\infty} \abs{\sum_{i=1}^{N}{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(\sigma + i\omega - \lambda_i)^j}}}}^2 \mathrm{d\omega} \leq  \int_{-\infty}^{\infty} N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i}{\abs{\frac{a_{ij}}{(\sigma + i\omega -\lambda_i)^j}}^2} \mathrm{d\omega}\\
+%	&=  N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i} \int_{-\infty}^{\infty}{\abs{\frac{a_{ij}}{(\sigma + i\omega -\lambda_i)^j}}^2} \mathrm{d\omega} = N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i} \int_{-\infty}^{\infty}{\frac{\abs{a_{ij}}^2}{((\sigma + i\omega -\lambda_i)^2)^j}} \mathrm{d\omega}
+%\end{align}
+%Betrachte nun die reellen Nullstellen für den quadrierten Betrag von $(\sigma + i\omega -\lambda_i)$ 
+%\begin{align}
+%	0 &= \abs{(\sigma + i\omega -\lambda_i)}^2 = (\sigma + i\omega -\lambda_i)\cdot \overline{(\sigma + i\omega -\lambda_i)} 
+% 	= (\sigma - \lambda_i)^2 + \omega^2  \\
+% 	&\Leftrightarrow \omega = \pm i(\sigma - \lambda_i) 
+%\end{align}
+%D.h. wenn $\sigma = \omega$, dies ist aber per Definition $\lambda_i < 0$ und $\sigma > 0$ ausgeschlossen. d.h. $\frac{\abs{a_{ij}}^2}{(\sigma + i\omega -\lambda_i)^j}$ ist stetig und es folgt mit Lemma \ref{lem:deg2} und \ref{lem:absch}
+%\begin{align}
+%N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i} \int_{-\infty}^{\infty}{\frac{\abs{a_{ij}}^2}{((\sigma - \lambda_i)^2 + \omega^2)^j}} \mathrm{d\omega}
+%&\leq N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i} \int_{-\infty}^{\infty}{c_{ij} \cdot \abs{w}^{-2j}} \mathrm{d\omega}
+%\end{align}
+%mit $c_{ij} = \abs{a_{ij}}^2 + 1$ und $\abs{\omega} > R$ dann folgt, nach Lemma \ref{lem:deg2}, dass das Integral konvergiert. d.h 
+%$\int_{-\infty}^{\infty}{c_{ij} \cdot \abs{w}^{-2j}} \mathrm{d\omega} < K_{ij}$. Dann existiert aber ein Maximum aller $K_{ij}$ mit $K_{max} := \max{K_{1,1}, \hdots K_{N, n_{N}}}$ und ein Maximum von $n_i$ mit $n_i:= \max{n_1, \hdots, n_N}$ und es folgt
+%\begin{align}
+%	 N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i} \int_{-\infty}^{\infty}{c_{ij} \cdot \abs{w}^{-2j}} \mathrm{d\omega} &\leq N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i} K_{ij} \leq N \cdot \sum_{i=1}^{N} n_i \sum_{j=1}^{n_i} K_{max}\\
+%	 &= N \cdot \sum_{i=1}^{N} n_i^2 \cdot K_{max} \leq  N^2 \cdot n_{max}^2 \cdot K_{max} < \infty
+%\end{align}
+%\end{proof}
+%\end{satz}
+%\begin{satz}
+%Betrachte das Input/Output System $p(\frac{d}{dt})y = q(\frac{d}{dt})u$ mit $p, q \in \mathbb{R}[\xi]$ und es existiert die Partialbruchzerlegung von $p(\xi)^{-1}q(\xi)$ mit $\frac{q(\xi)}{p(\xi)} = a_0 + \sum_{i=1}^{N}{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(\xi + \lambda_i)^j}}}$ mit $\lambda_i \in \mathbb{R}$, $\lambda_i < 0$ dann folgt:
+%\begin{align}
+%	\Re{H(\omega)} &= R_{\Omega} + \mathscr{H}\{\Im{\tilde{H}(\omega)}\} \\
+%	\Im{H(\omega)} &= \mathscr{H}\{\Re{\tilde{H}(\omega)}\} \\
+%	\text{mit } \tilde{H}(\omega)&:= H(\omega) - R_{\omega}
+%\end{align}
+%\begin{proof}
+%Sei das System $p(\frac{d}{dt})y = q(\frac{d}{dt})u$ mit $p, q \in \mathbb{R}[\xi]$ gegeben und es existiert die Partialbruchzerlegung von $p(\xi)^{-1}q(\xi)$ mit $\frac{q(\xi)}{p(\xi)} = a_0 + \sum_{i=1}^{N}{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(\xi + \lambda_i)^j}}}$. Nach Satz \ref{s:makeerational} und \ref{mod:innen} folgt, dass
+%\begin{align}
+%	p(\frac{d}{dt})(y-R_{\omega}\tilde{u}) y = \tilde{q} u \text{ mit } \tilde{q}:= p(\frac{d}{dt}) \sum_{i=1}^{N}{\sum_{j=1}^{n_i}{\frac{a_{ij}}{(\frac{d}{dt} + \lambda_i)^j}}}
+%\end{align}
+%eine echt rationale Lösung des Gleichungssystems $p(\frac{d}{dt})y = q(\frac{d}{dt})u$ ist. Mit Satz \ref{sys:general} und \ref{s:transfer} folgt:
+%\begin{align}
+%	(\tilde{y}(s)-R_{\Omega}\tilde{u}(s)) = \tilde{H}(s) \tilde{u}(s) = p(s)^{-1}\tilde{q}(s) \tilde{u}(s)
+%\end{align}
+%Und es folgt für die Fourierttransformierte:
+%\begin{align}
+%	\tilde{Z}(\omega) := \tilde{H}(iw) = p(iw)^{-1}\tilde{q}(iw)
+%\end{align}
+%nach Satz \ref{sys:quad} ist $\tilde{H}(\omega)$ quadratintegrierbar und das Integral $\int_{-\infty}^{\infty} \abs{H(\sigma + i\omega)}^2 \mathrm{d\omega}$ kleiner K. Da $\lambda_i < 0$ ist und $p(iw)^{-1}\tilde{q}(iw)$ stetig in ganz $\mathbb{R}$ folgt, das die komplexwertige Funktion $H(\sigma + i\omega)$ für $\sigma > 0$ holomorph ist. Damit sind alle Voraussetzungen für den Satz von Titchmarsh \ref{ht:titch} erfüllt und es folgt:
+%\begin{align}
+%	\Re{(\tilde{y}(s)-R_{\Omega}u(s))} &=  \mathscr{H}\{\Im{\tilde{H}(\omega)}\} \tilde{u}(s)\\
+%	\Im{(\tilde{y}(s)-R_{\Omega}u(s))} &=  \mathscr{H}\{\Re{\tilde{H}(\omega)}\} \tilde{u}(s)\\ 
+%	\Leftrightarrow 
+%	\Re{(\tilde{y}(s)} &=  (R_{\Omega} + \mathscr{H}\{\Im{\tilde{H}(\omega)}\}) \tilde{u}(s)\\
+%	\Im{(\tilde{y}(s)} &=  \mathscr{H}\{\Re{\tilde{H}(\omega)}\} \tilde{u}(s)\\ 
+%\end{align}
+%\end{proof}
+%\end{satz}
