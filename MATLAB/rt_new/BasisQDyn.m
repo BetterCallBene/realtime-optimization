@@ -9,7 +9,6 @@ classdef BasisQDyn < BasisGenQDyn
         function bQDyn = BasisGenQDyn(varargin)
             
             if (nargin >= 1)
-                
                 mc = metaclass(varargin{1});
                 if strcmp(mc.getSuperclassList(1).Name, 'Model')
                     bQDyn.robot = varargin{1};
