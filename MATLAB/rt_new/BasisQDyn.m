@@ -6,11 +6,11 @@ classdef BasisQDyn < BasisGenQDyn
     end
     
     methods
-        function bQDyn = BasisGenQDyn(varargin)
+        function bQDyn = BasisQDyn(varargin)
             
             if (nargin >= 1)
                 mc = metaclass(varargin{1});
-                if strcmp(mc.getSuperclassList(1).Name, 'Model')
+                if strcmp(mc.SuperclassList(1).Name, 'Model')
                     bQDyn.robot = varargin{1};
                 else
                     error('First argument must be instance of Model');

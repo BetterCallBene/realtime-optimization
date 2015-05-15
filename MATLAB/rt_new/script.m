@@ -15,15 +15,25 @@ options.HessFcn         = @hessianAdapter;
 
 %TODO: n_int auf einen sinnvollen Wert festlegen
 n_int = 50;
-%TODO: xbc=? Anfangs und Endbedingungen festlegen
-xbc = [];
+% Quadrocopter soll 5 Meter hoch fliegen
+xbc = [         ... Variablenname Länge   Name
+                ... Anfangsbedingung
+    0, 0, 0,    ...     r           3      Ortsvektor
+    1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
+    0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
+    0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
+                ... Endbedingung
+    0, 0, 5,    ...
+    1, 0, 0, 0, ...
+    0, 0, 0,    ...
+    0, 0, 0     ...
+];    
 
-env = Enviroment();
+env = Environment();
 env.xbc = xbc;
 env.setUniformMesh(uint8(n_int));
 
 cQ = Quadrocopter();
-
 
 % TODO: Irgendwas besser für Startlösung als rand finden
 %v0 = rand(cR.n_state_contr*(n_int+1),1);
@@ -31,29 +41,29 @@ cQ = Quadrocopter();
 % Initialisierung der Dynamik
 %TODO: Klasse
 cBQD = BasisQDyn(cQ, env);
+CBQD.state = rand(cQ.n_state, n_int+1);
+CBQD.contr = rand(cQ.n_contr, n_int+1);
 
 % Wahl des Integrators
 cFE = ForwEuler(cBQD);
 
 % Initialisierung der Nebenbedingungen
 %TODO: Klasse
-cC = classConstraints(cFE,cOCPp);
-%TODO: irgendwas besseres als rand finden
-cC.vec = rand((n_int+1)*cQ.n_state_contr,1);
+cC = Constraints(cFE);
 
 % Initialisierung Kostenfunktion
-cCost = classCosts(cOCPp);
+cCost = Costs(cBQD);
 
 %Variablen für fmincon verfügbar machen
-global objectCost objectConstr;
-objectCost = cCost;
-objectConstr = cC;
+%global objectCost objectConstr;
+%objectCost = cCost;
+%objectConstr = cC;
 
 %% Lösung des Problems
-tic;
+%tic;
 %TODO: Realtime Ansatz einbauen, bzw. fmincon ersetzen/erweitern
-v = fmincon(@costAdapter,v0,[],[],[],[],[],[],@constrAdapter, options);
-toc;
+%v = fmincon(@costAdapter,v0,[],[],[],[],[],[],@constrAdapter, options);
+%toc;
 
 %% Vorlage von Sebastian
 % %% this file is used to call various subroutine for evaluating and testing

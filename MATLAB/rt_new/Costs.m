@@ -1,4 +1,4 @@
-classdef Cost < handle
+classdef Costs < handle
     % COST providing cost function based on control only
     %   Approximate the integral over the squared two-norm of the controls
     %   by a piecewise constant function using the discretized control values,
@@ -16,11 +16,11 @@ classdef Cost < handle
     
     methods
         %constructor
-        function cC = classCosts(varargin)
+        function cC = Costs(varargin)
             % constructor based on one input value: a classOCPparam object
             if (nargin == 1)
                 mc = metaclass(varargin{1});
-                if strcmp(mc.getSuperclassList(2).Name, 'Dyn')
+                if strcmp(mc.SuperclassList(1).SuperclassList(1).Name, 'Dyn')
                     cC.dyn = varargin{1};
                 else
                     error('wrong class type for problem parameter');

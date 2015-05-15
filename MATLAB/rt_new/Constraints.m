@@ -1,4 +1,4 @@
-classdef Constraint < handle
+classdef Constraints < handle
 % classConstraints providing discretized ODE constraint using forward euler
 
     properties
@@ -10,12 +10,12 @@ classdef Constraint < handle
     
     methods
         %constructor
-        function cC = Constraint(varargin)
+        function cC = Constraints(varargin)
             % constructor based on two input values
             % a classForwEuler element and a classOCPparam element
-            if (nargin == 2)
-                if (isa(varargin{2},'ForwEuler'))
-                    cC.dode = varargin{2};
+            if (nargin == 1)
+                if (isa(varargin{1},'ForwEuler'))
+                    cC.dode = varargin{1};
                     cC.dyn = cC.dode.dyn; % Initializierung von Dynamik
                 else
                     error('wrong class type for discretized ode');
