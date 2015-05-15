@@ -13,10 +13,12 @@ classdef Quadrocopter < Model
         kT  = 1.5e-07;                              % N/(RPM^2)
         kQ  = 3e-09;                                % N*m/(RPM)^2
         d   = 0.22;                                 % Abstand in m
+        
     end
 
 	properties(Dependent)
 		n_var;
+        I_1;
     end
     
     methods

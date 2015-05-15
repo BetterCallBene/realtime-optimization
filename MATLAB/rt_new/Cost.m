@@ -20,7 +20,7 @@ classdef Cost < handle
             % constructor based on one input value: a classOCPparam object
             if (nargin == 1)
                 mc = metaclass(varargin{1});
-                if strcmp(mc.getSuperclassList(1).Name, 'Dyn')
+                if strcmp(mc.getSuperclassList(2).Name, 'Dyn')
                     cC.dyn = varargin{1};
                 else
                     error('wrong class type for problem parameter');
@@ -104,9 +104,9 @@ classdef Cost < handle
         
         function [n_int, n_tp, n_state, n_contr] = getParams(obj)
             n_int       = obj.dyn.environment.n_intervals;
+            n_tp        = obj.dyn.enviroment.n_timepoints;
             n_state     = obj.dyn.robot.n_state;
-            n_tp        = obj.param.n_timepoints;
-            n_contr     = obj.param.n_contr;
+            n_contr     = obj.dyn.robot.n_contr;
         end
         % general type get functions -> interace for testing
         function f = get_func(obj)
