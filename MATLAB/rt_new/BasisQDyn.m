@@ -1,8 +1,12 @@
 classdef BasisQDyn < BasisGenQDyn
     
     properties
-        state; % the state matrix [r, q, v, w] in R^(13xn) for all time instances
+        state_; % the state matrix [r, q, v, w] in R^(13xn) for all time instances
         contr; % the control matrix [u1, u2, u3, u4] in R^(4xn) for all time instances
+    end
+    
+    properties(Dependent)
+        state;
     end
     
     methods
@@ -39,11 +43,19 @@ classdef BasisQDyn < BasisGenQDyn
                     state(4:7, i) = q./norm(q);
                 end
             
-                cq.state = state;
+                cq.state_ = state;
                 cq.emptyResults();
           %  else
 %                 error(strcat('Gr��e der State Matrix ist falsch. Erwartete Gr��e  ',int2str(cq.n_state),'xn'));
            % end
+        end
+        
+        function set.state_(cq, state)
+            cq.state_ = state;
+        end
+        
+        function res = get.state(cq)
+            res = cq.state_;
         end
         
         function set.contr(cq, cntrl)
