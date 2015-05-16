@@ -16,6 +16,9 @@ classdef(Abstract) BasisGenQDyn < Dyn
     end
     
     methods
+        function cBGQD = BasisGenQDyn()
+            cBGQD.emptyResults();
+        end
         
         function emptyResults(obj)
             
@@ -34,7 +37,7 @@ classdef(Abstract) BasisGenQDyn < Dyn
                 
                 {0}
                 
-                obj.F = cg;
+                obj.F = t1;
                 obj.isEmptyF = false;
             end
             res = obj.F;
@@ -56,7 +59,7 @@ classdef(Abstract) BasisGenQDyn < Dyn
             if obj.isEmptyH
                 [q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = getParams(obj);
                 
-                onesV = ones(1, obj.environment.n_intervals); %Korregiere die Matrix Dimension
+                onesV = ones(1, obj.environment.n_timepoints); %Korregiere die Matrix Dimension
                 
                 {2}
                 

@@ -2,7 +2,7 @@ classdef(Abstract) Dyn < handle  & classTestEnv
     % Dyn Diese Klasse repräsentiert die Dynamik
     
     
-    properties(SetAccess = protected, GetAccess= public)
+    properties(SetAccess = public, GetAccess= public)
         environment; % in this object all outside parameters are stored, like gravity, wind, time mesh,...
         robot; % handle for a classRobot element providing the mass matrix and the coriolis terms
     end
@@ -16,12 +16,12 @@ classdef(Abstract) Dyn < handle  & classTestEnv
         dot(obj,ind);
         dotD(obj,ind);
         dotDD(obj,ind);
-        
     end
     
     methods(Test)
         
         function testdotD(obj)
+
             %TODO: Debug do we have to init timemesh?
             %Initialize state with random values
             obj.state=rand(13,1);
@@ -70,7 +70,7 @@ classdef(Abstract) Dyn < handle  & classTestEnv
             obj.assertSize(ana_dotD, [13,17]);
             
             %Compare the results
-            obj.assertLessThan(max(abs(ana_dotD - num_dotD)), obj.tol);
+            obj.assertLessThan(max(abs(ana_dotD - numDiff)), obj.tol);
             
         end
         
@@ -103,7 +103,6 @@ classdef(Abstract) Dyn < handle  & classTestEnv
 %                 obj.contr=stco_n(14:17);
 %                 dotD_n = obj.dotD(1);
 %                 
-%                               
 %                 %central difference
 %                 dotDD_xj = (dotD_p - dotD_n)/(2*eps);
 %                 num_dotDD(:,j,:) = dotDD_xj;
@@ -117,8 +116,9 @@ classdef(Abstract) Dyn < handle  & classTestEnv
             
             ana_dotDD = obj.dotDD(obj,1);
             for j = 1:length(num_dotDD)
-                obj.assertLessThan(max(abs(ana_dotDD{j} - num_dotDD(j,:,:))),obj.tol);
+                obj.assertLessThan(max(abs(ana_dotDD{j} - numDiff(:,j,:))),obj.tol);
             end
+
         end
         
         function  [vec_old, n,m] = setup(obj,func)
