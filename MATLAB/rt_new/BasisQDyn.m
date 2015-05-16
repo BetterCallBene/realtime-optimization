@@ -31,7 +31,7 @@ classdef BasisQDyn < BasisGenQDyn
                 error('Gitter ist noch nicht initialisiert');
             end
             
-            if size(state, 1) == cq.robot.n_state && size(state, 2) == cq.environment.n_timepoints;
+         %   if size(state, 1) == cq.robot.n_state && size(state, 2) == cq.environment.n_timepoints;
            
                 n = size(state, 2);
                 for i=1:n
@@ -41,9 +41,9 @@ classdef BasisQDyn < BasisGenQDyn
             
                 cq.state = state;
                 cq.emptyResults();
-            else
-                 error(strcat('Gr��e der State Matrix ist falsch. Erwartete Gr��e  ',int2str(cq.n_state),'xn'));
-            end
+          %  else
+%                 error(strcat('Gr��e der State Matrix ist falsch. Erwartete Gr��e  ',int2str(cq.n_state),'xn'));
+           % end
         end
         
         function set.contr(cq, cntrl)
@@ -52,13 +52,14 @@ classdef BasisQDyn < BasisGenQDyn
                 error('Gitter ist noch nicht initialisiert');
             end
             
-            if size(cntrl, 1) == cq.robot.n_contr && size(cntrl, 2) == cq.environment.n_timepoints
+         %   if size(cntrl, 1) == cq.robot.n_contr && size(cntrl, 2) == cq.environment.n_timepoints
             
                 cq.contr = cntrl;
                 cq.emptyResults();
-            else
-                error(strcat('Gr��e der State Matrix ist falsch. Erwartete Gr��e  ',int2str(cq.n_contr),'xn'));
-            end
+          
+                %else
+           %     error(strcat('Gr��e der State Matrix ist falsch. Erwartete Gr��e  ',int2str(cq.n_contr),'xn'));
+            %end
         end
         
         function res = dot(obj,ind) % Rechte Seite der ODE aus (Quadrocoptermodell.pdf: (1.46))

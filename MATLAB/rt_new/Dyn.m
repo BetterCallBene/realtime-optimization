@@ -1,4 +1,4 @@
-classdef(Abstract) Dyn < handle  & classTestEnv
+classdef(Abstract) Dyn < handle  & TestEnv
     % Dyn Diese Klasse repräsentiert die Dynamik
     
     
@@ -21,50 +21,18 @@ classdef(Abstract) Dyn < handle  & classTestEnv
     methods(Test)
         
         function testdotD(obj)
-
-            %TODO: Debug do we have to init timemesh?
-            %Initialize state with random values
-            obj.state=rand(13,1);
-            obj.contr=rand(4,1);
+            % TESTDOTD This method nummerially derives dot and compares it
+            % with dotD
+            n_intervals = 50;
+            obj.setupTest(n_intervals);
             
-            stco = [obj.state; obj.contr];
-            
-            eps = 1e-6;
-            
-            num_dotD = zeros(13,17);
-            
-            %Test at time step 1
-            %TODO: Decide, if we also want to loop over time
-%             for j=1:17
-%                 
-%                 %plus epsilon shift
-%                 stco_p = stco;
-%                 stco_p(j) = stco_p(j) + eps;
-%                 obj.state=stco_p(1:13);
-%                 obj.contr=stco_p(14:17);
-%                 dot_p = obj.dot(1);
-%                 
-%                 %minus epsilon shift
-%                 stco_n = stco;
-%                 stco_n(j) = stco_n(j) - eps;
-%                 obj.state=stco_n(1:13);
-%                 obj.contr=stco_n(14:17);
-%                 dot_n = obj.dot(1);
-%                 
-%                 %central difference
-%                 dotD_xj = (dot_p - dot_n)/(2*eps);
-%                 num_dotD(:,j) = dotD_xj;
-%                 
-%                 obj.state=stco(1:13);
-%                 obj.contr=stco(14:17);
-%                 
-%             end
+            time_step = 1;
             
             func = @() obj.dot(time_step);
-            numDiff = obj.numdiffDnD(func);
+            numDiff = obj.numDiff_nD(func);
             
             %Calculate analytic solution
-            ana_dotD = obj.dotD(obj,1);
+            ana_dotD = obj.dotD(time_step);
             
             %Assert that the result has the correct form
             obj.assertSize(ana_dotD, [13,17]);
@@ -75,56 +43,35 @@ classdef(Abstract) Dyn < handle  & classTestEnv
         end
         
         function testdotDD(obj)
-            %TODO: Debug do we have to init timemesh? 
-            %Initialize state with random values
+            % TESTDOTDD This method nummericaly derives dotD and compares
+            % it with dotDD
+            n_intervals = 50;
+            obj.setupTest(n_intervals);
+            
+            
             time_step = 1;
-            obj.state=rand(13,1);
-            obj.contr=rand(4,1);
-            
-            stco = [obj.state; obj.contr];
-            
-            eps = 1e-6;
-            
-            num_dotDD = zeros(13,17,17);
-            
-            %TODO: Decide if we also want to loop over time
-%             for j = 1:n
-%                 %plus epsilon shift
-%                 stco_p = stco;
-%                 stco_p(j) = stco_p(j) + eps;
-%                 obj.state=stco_p(1:13);
-%                 obj.contr=stco_p(14:17);
-%                 dotD_p = obj.dotD(1);
-%                 
-%                 %minus epsilon shift
-%                 stco_n = stco;
-%                 stco_n(j) = stco_n(j) - eps;
-%                 obj.state=stco_n(1:13);
-%                 obj.contr=stco_n(14:17);
-%                 dotD_n = obj.dotD(1);
-%                 
-%                 %central difference
-%                 dotDD_xj = (dotD_p - dotD_n)/(2*eps);
-%                 num_dotDD(:,j,:) = dotDD_xj;
-%                 
-%                 obj.state=stco(1:13);
-%                 obj.contr=stco(14:17);
-%             end
             
             func = @() obj.dotD(time_step);
-            numDiff = obj.numdiffDnxnD(func);
+            numDiff = obj.numDiff_nxnD(func);
             
-            ana_dotDD = obj.dotDD(obj,1);
-            for j = 1:length(num_dotDD)
-                obj.assertLessThan(max(abs(ana_dotDD{j} - numDiff(:,j,:))),obj.tol);
+            ana_dotDD = obj.dotDD(time_step);
+            for j = 1:length(ana_dotDD)
+                num_dotDD = reshape(numDiff(j,:,:), [17 17] );
+                obj.assertLessThan(max(abs(ana_dotDD{j} - num_dotDD)),obj.tol);
             end
-
+            
         end
+    end
+    
+    methods
         
-        function  [vec_old, n,m] = setup(obj,func)
+        %Overwrite from TestEnv as functions depend on state and contr
+        function  [vec_old, n,m] = setup(obj, func)
             vec_old = [obj.state ; obj.contr];
-            n = length(vec_old);
-            m = length(func());
+            n = size(vec_old);
+            n = n(1);
+            m = size(func());
+            m = m(1);
         end
         
         %Overwrite from TestEnv as functions depend on state and contr
@@ -134,16 +81,46 @@ classdef(Abstract) Dyn < handle  & classTestEnv
             obj.state = vec_p(1:13,:);
             obj.contr = vec_p(14:17,:);
             func_p = func();
+            obj.state = vec_old(1:13,:);
+            obj.contr = vec_old(14:17,:);
         end
         
         %Overwrite from TestEnv as functions depend on state and contr
-        function func_n = minusEpsShift(obj,vec_old,func)
+        function func_n = minusEpsShift(obj,i,vec_old,func)
             vec_n = vec_old;
             vec_n(i) = vec_n(i) - obj.eps;
             obj.state = vec_n(1:13,:);
             obj.contr = vec_n(14:17,:);
             func_n = func();
+            obj.state = vec_old(1:13,:);
+            obj.contr = vec_old(14:17,:);
         end
         
+       function setupTest(obj,n_intervals)
+            % Quadrocopter soll 5 Meter hoch fliegen
+            xbc = [         ... Variablenname L�nge   Name
+                ... Anfangsbedingung
+                0, 0, 0,    ...     r           3      Ortsvektor
+                1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
+                0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
+                0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
+                ... Endbedingung
+                0, 0, 5,    ...
+                1, 0, 0, 0, ...
+                0, 0, 0,    ...
+                0, 0, 0     ...
+                ];
+            
+            env = Environment();
+            env.xbc = xbc;
+            env.setUniformMesh(uint8(n_intervals));
+            
+            model = Quadrocopter();
+            obj.environment = env;
+            obj.robot = model;
+            obj.state=rand(13,n_intervals+1);
+            obj.contr=rand(4,n_intervals+1);
+            
+        end
     end
 end
