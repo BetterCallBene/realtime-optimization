@@ -4,7 +4,7 @@
 
 
 
-%TODO: options für fmincon festlegen
+%TODO: options fï¿½r fmincon festlegen
 options                 = optimoptions('fmincon');
 options.Algorithm       = 'interior-point';
 options.Display         = 'iter';
@@ -16,7 +16,7 @@ options.HessFcn         = @hessianAdapter;
 %TODO: n_int auf einen sinnvollen Wert festlegen
 n_int = 50;
 % Quadrocopter soll 5 Meter hoch fliegen
-xbc = [         ... Variablenname Länge   Name
+xbc = [         ... Variablenname Lï¿½nge   Name
                 ... Anfangsbedingung
     0, 0, 0,    ...     r           3      Ortsvektor
     1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
@@ -35,8 +35,8 @@ env.setUniformMesh(uint8(n_int));
 
 cQ = Quadrocopter();
 
-% TODO: Irgendwas besser für Startlösung als rand finden
-%v0 = rand(cR.n_state_contr*(n_int+1),1);
+% TODO: Irgendwas besser fï¿½r Startlï¿½sung als rand finden
+v0 = rand(cQ.n_var*(n_int+1),1);
 
 % Initialisierung der Dynamik
 %TODO: Klasse
@@ -54,16 +54,16 @@ cC = Constraints(cFE);
 % Initialisierung Kostenfunktion
 cCost = Costs(cBQD);
 
-%Variablen für fmincon verfügbar machen
+%Variablen fï¿½r fmincon verfï¿½gbar machen
 %global objectCost objectConstr;
 %objectCost = cCost;
 %objectConstr = cC;
 
-%% Lösung des Problems
-%tic;
+%% Lï¿½sung des Problems
+tic;
 %TODO: Realtime Ansatz einbauen, bzw. fmincon ersetzen/erweitern
-%v = fmincon(@costAdapter,v0,[],[],[],[],[],[],@constrAdapter, options);
-%toc;
+v = fmincon(@costAdapter,v0,[],[],[],[],[],[],@constrAdapter, options);
+toc;
 
 %% Vorlage von Sebastian
 % %% this file is used to call various subroutine for evaluating and testing

@@ -30,7 +30,7 @@ classdef Quadrocopter < Model
             ];
         end
 
-		function ret = n_var.get(obj)
+		function ret = get.n_var(obj)
 			ret = obj.n_state + obj.n_contr;
 		end
     end
