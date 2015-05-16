@@ -1,7 +1,7 @@
 classdef BasisQDyn < BasisGenQDyn
     
     properties
-        state_; % the state matrix [r, q, v, w] in R^(13xn) for all time instances
+        backdoor_state; % the state matrix [r, q, v, w] in R^(13xn) for all time instances
         contr; % the control matrix [u1, u2, u3, u4] in R^(4xn) for all time instances
     end
     
@@ -35,27 +35,28 @@ classdef BasisQDyn < BasisGenQDyn
                 error('Gitter ist noch nicht initialisiert');
             end
             
-         %   if size(state, 1) == cq.robot.n_state && size(state, 2) == cq.environment.n_timepoints;
-           
-                n = size(state, 2);
-                for i=1:n
-                    q = state(4:7, i);
-                    state(4:7, i) = q./norm(q);
-                end
+            %   if size(state, 1) == cq.robot.n_state && size(state, 2) == cq.environment.n_timepoints;
             
-                cq.state_ = state;
-                cq.emptyResults();
-          %  else
-%                 error(strcat('Gr��e der State Matrix ist falsch. Erwartete Gr��e  ',int2str(cq.n_state),'xn'));
-           % end
+            n = size(state, 2);
+            for i=1:n
+                q = state(4:7, i);
+                state(4:7, i) = q./norm(q);
+            end
+            
+            cq.backdoor_state = state;
+            cq.emptyResults();
+            %  else
+            %                 error(strcat('Gr��e der State Matrix ist falsch. Erwartete Gr��e  ',int2str(cq.n_state),'xn'));
+            % end
         end
         
-        function set.state_(cq, state)
-            cq.state_ = state;
+        
+        function set.backdoor_state(cq, state)
+            cq.backdoor_state = state;
         end
         
         function res = get.state(cq)
-            res = cq.state_;
+            res = cq.backdoor_state;
         end
         
         function set.contr(cq, cntrl)
@@ -64,13 +65,13 @@ classdef BasisQDyn < BasisGenQDyn
                 error('Gitter ist noch nicht initialisiert');
             end
             
-         %   if size(cntrl, 1) == cq.robot.n_contr && size(cntrl, 2) == cq.environment.n_timepoints
+            %   if size(cntrl, 1) == cq.robot.n_contr && size(cntrl, 2) == cq.environment.n_timepoints
             
-                cq.contr = cntrl;
-                cq.emptyResults();
-          
-                %else
-           %     error(strcat('Gr��e der State Matrix ist falsch. Erwartete Gr��e  ',int2str(cq.n_contr),'xn'));
+            cq.contr = cntrl;
+            cq.emptyResults();
+            
+            %else
+            %     error(strcat('Gr��e der State Matrix ist falsch. Erwartete Gr��e  ',int2str(cq.n_contr),'xn'));
             %end
         end
         

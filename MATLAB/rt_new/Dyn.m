@@ -78,7 +78,7 @@ classdef(Abstract) Dyn < handle  & TestEnv
         function func_p = plusEpsShift(obj,i,vec_old,func)
             vec_p = vec_old;
             vec_p(i) = vec_p(i) + obj.eps;
-            obj.state = vec_p(1:13,:);
+            obj.backdoor_state = vec_p(1:13,:);
             obj.contr = vec_p(14:17,:);
             func_p = func();
             obj.state = vec_old(1:13,:);
@@ -89,7 +89,7 @@ classdef(Abstract) Dyn < handle  & TestEnv
         function func_n = minusEpsShift(obj,i,vec_old,func)
             vec_n = vec_old;
             vec_n(i) = vec_n(i) - obj.eps;
-            obj.state = vec_n(1:13,:);
+            obj.backdoor_state = vec_n(1:13,:);
             obj.contr = vec_n(14:17,:);
             func_n = func();
             obj.state = vec_old(1:13,:);
@@ -121,6 +121,7 @@ classdef(Abstract) Dyn < handle  & TestEnv
             obj.state=rand(13,n_intervals+1);
             obj.contr=rand(4,n_intervals+1);
             
-        end
+       end
+      
     end
 end

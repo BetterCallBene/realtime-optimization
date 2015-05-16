@@ -4,7 +4,7 @@ classdef TestEnv < matlab.unittest.TestCase
     
     properties(Constant)
         eps = 1e-5;
-        tol = 1e-2;
+        tol = 1e-8;
     end
     
     methods
@@ -56,14 +56,15 @@ classdef TestEnv < matlab.unittest.TestCase
         %Some help functions
         function [vec_old, n,m] = setup(obj, func)
             vec_old = obj.vec;
-            n = length(vec_old);
+            n = size(vec_old);
+            n = n(1);
             m = size(func());
             m = m(1);
         end
         
         function func_p = plusEpsShift(obj,i,vec_old,func)
             vec_p = vec_old;
-            vec_p(i) = vec_p(i) + obj.eps;
+            vec_p(i) = vec_p(i,:) + obj.eps;
             obj.vec = vec_p;
             func_p = func();
             obj.vec = vec_old;
@@ -71,7 +72,7 @@ classdef TestEnv < matlab.unittest.TestCase
         
         function func_n = minusEpsShift(obj,i,vec_old,func)
             vec_n = vec_old;
-            vec_n(i) = vec_n(i) - obj.eps;
+            vec_n(i) = vec_n(i,:) - obj.eps;
             obj.vec = vec_n;
             func_n = func();
             obj.vec = vec_old;
