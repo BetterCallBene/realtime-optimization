@@ -26,20 +26,20 @@ classdef(Abstract) Dyn < handle  & TestEnv
             n_intervals = 50;
             obj.setupTest(n_intervals);
             
-            time_step = 1;
-            
-            func = @() obj.dot(time_step);
-            numDiff = obj.numDiff_nD(func);
-            
-            %Calculate analytic solution
-            ana_dotD = obj.dotD(time_step);
-            
-            %Assert that the result has the correct form
-            obj.assertSize(ana_dotD, [13,17]);
-            
-            %Compare the results
-            obj.assertLessThan(max(abs(ana_dotD - numDiff)), obj.tol);
-            
+            for time_step = 1:(n_intervals+1)
+                
+                func = @() obj.dot(time_step);
+                numDiff = obj.numDiff_nD(func);
+                
+                %Calculate analytic solution
+                ana_dotD = obj.dotD(time_step);
+                
+                %Assert that the result has the correct form
+                obj.assertSize(ana_dotD, [13,17]);
+                
+                %Compare the results
+                obj.assertLessThan(max(abs(ana_dotD - numDiff)), obj.tol);
+            end
         end
         
         function testdotDD(obj)
@@ -49,17 +49,17 @@ classdef(Abstract) Dyn < handle  & TestEnv
             obj.setupTest(n_intervals);
             
             
-            time_step = 1;
-            
-            func = @() obj.dotD(time_step);
-            numDiff = obj.numDiff_nxnD(func);
-            
-            ana_dotDD = obj.dotDD(time_step);
-            for j = 1:length(ana_dotDD)
-                num_dotDD = reshape(numDiff(j,:,:), [17 17] );
-                obj.assertLessThan(max(abs(ana_dotDD{j} - num_dotDD)),obj.tol);
+            for time_step = 1:(n_intervals+1)
+                
+                func = @() obj.dotD(time_step);
+                numDiff = obj.numDiff_nxnD(func);
+                
+                ana_dotDD = obj.dotDD(time_step);
+                for j = 1:length(ana_dotDD)
+                    num_dotDD = reshape(numDiff(j,:,:), [17 17] );
+                    obj.assertLessThan(max(abs(ana_dotDD{j} - num_dotDD)),obj.tol);
+                end
             end
-            
         end
     end
     
@@ -77,7 +77,7 @@ classdef(Abstract) Dyn < handle  & TestEnv
         %Overwrite from TestEnv as functions depend on state and contr
         function func_p = plusEpsShift(obj,i,vec_old,func)
             vec_p = vec_old;
-            vec_p(i) = vec_p(i) + obj.eps;
+            vec_p(i,:) = vec_p(i,:) + obj.eps;
             obj.backdoor_state = vec_p(1:13,:);
             obj.contr = vec_p(14:17,:);
             func_p = func();
@@ -88,7 +88,7 @@ classdef(Abstract) Dyn < handle  & TestEnv
         %Overwrite from TestEnv as functions depend on state and contr
         function func_n = minusEpsShift(obj,i,vec_old,func)
             vec_n = vec_old;
-            vec_n(i) = vec_n(i) - obj.eps;
+            vec_n(i,:) = vec_n(i,:) - obj.eps;
             obj.backdoor_state = vec_n(1:13,:);
             obj.contr = vec_n(14:17,:);
             func_n = func();
@@ -96,7 +96,7 @@ classdef(Abstract) Dyn < handle  & TestEnv
             obj.contr = vec_old(14:17,:);
         end
         
-       function setupTest(obj,n_intervals)
+        function setupTest(obj,n_intervals)
             % Quadrocopter soll 5 Meter hoch fliegen
             xbc = [         ... Variablenname L�nge   Name
                 ... Anfangsbedingung
@@ -121,7 +121,7 @@ classdef(Abstract) Dyn < handle  & TestEnv
             obj.state=rand(13,n_intervals+1);
             obj.contr=rand(4,n_intervals+1);
             
-       end
-      
+        end
+        
     end
 end
