@@ -104,7 +104,7 @@ classdef Costs < handle
         
         function [n_int, n_tp, n_state, n_contr] = getParams(obj)
             n_int       = obj.dyn.environment.n_intervals;
-            n_tp        = obj.dyn.enviroment.n_timepoints;
+            n_tp        = obj.dyn.environment.n_timepoints;
             n_state     = obj.dyn.robot.n_state;
             n_contr     = obj.dyn.robot.n_contr;
         end

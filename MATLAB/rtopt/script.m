@@ -41,8 +41,8 @@ v0 = rand(cQ.n_var*(n_int+1),1);
 % Initialisierung der Dynamik
 %TODO: Klasse
 cBQD = BasisQDyn(cQ, env);
-CBQD.state = rand(cQ.n_state, n_int+1);
-CBQD.contr = rand(cQ.n_contr, n_int+1);
+cBQD.state = rand(cQ.n_state, n_int+1);
+cBQD.contr = rand(cQ.n_contr, n_int+1);
 
 % Wahl des Integrators
 cFE = ForwEuler(cBQD);
@@ -55,9 +55,9 @@ cC = Constraints(cFE);
 cCost = Costs(cBQD);
 
 %Variablen f�r fmincon verf�gbar machen
-%global objectCost objectConstr;
-%objectCost = cCost;
-%objectConstr = cC;
+global objectCost objectConstr;
+objectCost = cCost;
+objectConstr = cC;
 
 %% L�sung des Problems
 tic;

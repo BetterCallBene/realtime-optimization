@@ -45,7 +45,7 @@ classdef Constraints < handle
         function eq_con = get_eq_con(obj)
             % the equality constraint of the ocp
             % combine the discretized ode with the boundary conditions
-            xbc         = obj.dyn.enviroment.xbc;
+            xbc         = obj.dyn.environment.xbc;
             state_mat   = obj.dyn.state;
 
             eq_con      = [obj.dode.h(); state_mat(:,1) - xbc(:,1); ...
