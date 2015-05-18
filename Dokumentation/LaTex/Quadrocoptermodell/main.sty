@@ -1,0 +1,172 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  LaTeX-2e package file "intRep.sty", 2013/09/28 v1.1         %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%---------------------- Identification --------------------------
+\NeedsTeXFormat{LaTeX2e}[1996/06/01]
+\ProvidesPackage{main}[2013/09/28 v1.0 (AG)]
+
+%Randeinstellungen
+\usepackage{geometry} 
+
+
+% page layout definition with standard LaTeX commands (def. margin 1 in)
+\setlength{\topmargin}     {-21.0mm} %{-13.4mm} % 25.4mm default
+\setlength{\headheight}    {23mm}
+\setlength{\headsep}       {5mm}
+\setlength{\evensidemargin}{-5.9mm}% 25mm
+\setlength{\oddsidemargin} {-5.9mm}%
+\setlength{\textwidth}     {170mm} %
+\setlength{\textheight}    {233mm} %
+\parindent 0pt	
+															
+\usepackage[ngerman]{babel}	
+\usepackage[T1]{fontenc}										
+\usepackage[utf8]{inputenc}	
+						% Paket zur Verwendung verschiedener Sprachen in einem Paket\textbf{•}
+\usepackage{intRepDef}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{epstopdf}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\renewcommand{\familydefault}{\sfdefault} 
+\usepackage{helvet}         % use helvetica
+\usepackage{calc}
+\usepackage{color}
+%\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{lscape}
+\usepackage{wrapfig}
+\usepackage{url}
+%\usepackage{jurabib}
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{extarrows}
+\usepackage{mathtools}
+\usepackage{multirow}
+\usepackage{tabu}
+\usepackage{tabulary}
+\usepackage{svg}
+\usepackage{maplestd2e}
+%\usepackage{biblatex}
+
+\setkomafont{caption}{\fontsize{9bp}{18.8bp}\selectfont\bfseries}	%Größe der Schrift in Beschriftung
+\setcounter{secnumdepth}{3}  % subsubsection auch Nummerieren
+
+
+\usepackage{pdfpages}
+\usepackage[
+pdfpagelabels={true},
+plainpages={false},
+hypertexnames={true}
+]{hyperref}
+
+
+\geometry{left=35mm, right=25mm, bottom=3cm}
+\newcommand{\tw}{\textwidth}
+\newcommand{\pl}{0.6\textwidth} % picture size
+\newcounter{annex}
+
+%\renewcommand{\bibname}{References}
+
+\graphicspath{{./images/}}
+
+
+%\jurabibsetup{ 
+%	authorformat=smallcaps, 
+%	commabeforerest, 
+%	titleformat=colonsep, 
+%	bibformat=tabular
+%} % Jurastyle aktivieren
+\pagestyle{fancy} % heading style
+
+\newcommand{\tabhead}{\scriptsize Bachelorarbeit}
+\newcommand{\tabheadl}{\begin{tabular}{l}
+                       %\includegraphics[width=0.1\textwidth]{OTHLogo.pdf}\\[2mm]
+                       \end{tabular}
+                      }
+\newcommand{\tabheadc}{{\scriptsize\bf \begin{tabular}{c}
+                        \\
+                       \end{tabular}}
+                      }
+
+\providecommand{\norm}[1]{\left\lVert#1\right\rVert}
+\providecommand{\abs}[1]{\left\lvert#1\right\rvert}
+\renewcommand{\max}[1]{\mathrm{max} \left\{#1\right\}}
+\newcommand{\sgn}[1]{\mathrm{sgn} \left(#1\right)}
+\newcommand{\logz}[1]{\mathrm{log} \left(#1\right)}
+\renewcommand{\Re}[1]{\mathfrak{Re} \left\{#1\right\}}
+\renewcommand{\Im}[1]{\mathfrak{Im} \left\{#1\right\}}
+\renewcommand{\exp}[1]{\mathrm{e}^{#1}}
+\newcommand{\conj}[1]{\overline{#1}}
+\newcommand{\res}[2]{\mathrm{Res}(#1\text{, } #2)}
+\renewcommand{\tanh}[1]{\mathrm{tanh}(#1)}
+\renewcommand{\sinh}[1]{\mathrm{sinh}(#1)}
+\renewcommand{\cosh}[1]{\mathrm{cosh}(#1)}
+\newcommand{\lt}[1]{\mathscr{L}\left\{#1\right\}}
+\newcommand{\ft}[1]{\mathscr{F}\left\{#1\right\}}
+\newcommand{\fti}[1]{\mathscr{F}^{-1}\left\{#1\right\}}
+\newcommand{\diff}[2]{\mathrm{C}^{#1}(#2)}
+\newcommand{\ltr}[1]{L_{#1}}
+\newcommand{\lint}[3][]{\mathrm{L}^{#2}_{#1}(#3)}
+\newcommand{\rang}[1]{\mathrm{Rang}(#1)}
+\newcommand{\eis}{elektrochemische Impedanzspektroskopie }
+\newcommand{\R}{\ensuremath{\mathbb{R}}} 
+%\renewcommand{\min}[1]{\mathrm{min}\limits_{#1}}
+%\renewcommand{\lim}{2}{\mathrm{lim}_{#1}{#2}}
+
+%\renewcommand{\Im}[1]{\mathscr{Im} \left\{#1\right\}}
+%\renewcommand{\Re}[1]{\mathscr{Re} \left\{#1\right\}}
+
+\newcommand{\exmfoot}{\fancyfoot[L]{}{\fancyfoot[R]{\footnotesize\thepage}}}
+
+\fancyhead[L]{\tabheadl}
+\fancyhead[C]{\tabheadc}
+\fancyhead[R]{\tabhead}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% define same headers and footers for chapter pages
+\fancypagestyle{plain}{%
+\fancyhf{} % clear all header and footer fields
+\fancyhead[L]{\tabheadl}
+\fancyhead[C]{\tabheadc}
+\fancyhead[R]{\tabhead}
+%\exmfoot
+\fancyfoot[R]{\footnotesize\thepage}
+\fancyfoot[L]{}
+\renewcommand{\footrulewidth}{0.4pt}}
+
+% global table and figure counter
+\newcommand*{\OrigChapter}{}
+\let\OrigChapter\chapter
+\newcounter{abstables}
+\newcounter{absfigures}
+\renewcommand*{\chapter}{%
+  \addtocounter{abstables}{\value{table}}%
+  \addtocounter{absfigures}{\value{figure}}%
+  \OrigChapter
+}
+\newcommand*{\AbsTables}{0}
+\newcommand*{\AbsFigures}{0}
+\makeatletter
+\AtBeginDocument{%
+  \AtEndDocument{%
+    \addtocounter{abstables}{\value{table}}%
+    \addtocounter{absfigures}{\value{figure}}%
+    \immediate\write\@mainaux{%
+      \string\gdef\string\AbsTables{\number\value{abstables}}%
+      \string\gdef\string\AbsFigures{\number\value{absfigures}}%
+    }%
+  }%
+}
+
+\newtheorem{satz}{Satz}
+\newtheorem{defi}{Definition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{kor}{Korollar}
+\newtheorem{bem}{Bemerkung}
+
+\makeatother

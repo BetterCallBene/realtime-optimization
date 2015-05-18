@@ -1,0 +1,48 @@
+\section{Einige Hilbertransformationen mit Beweisen}\label{ht:alltrans}
+In der folgenden Tabelle stehen einige Hilberttransformationen. Die Tabelle ist nur in einer Richtung zu lesen, d.h. aus $x(t) \Rightarrow \mathscr{H}\{x(s)\}$. Die andere Richtung $\mathscr{H}\{x(s)\} \Rightarrow x(t)$ gilt nicht.
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\rule[-1ex]{0pt}{2.5ex} Signal & Hilbertransformierte \\  
+\rule[-1ex]{0pt}{2.5ex} $x(s)$ & $\mathscr{H}\{x(s)\}$ \\
+\hline  
+\rule[-1ex]{0pt}{2.5ex} $a$ & $0$ \\
+\hline
+\rule[-1ex]{0pt}{2.5ex} $\frac{\alpha}{s^2+1}$ & $\frac{-\alpha \cdot s}{s^2+1}$ \\ 
+\hline
+\rule[-1ex]{0pt}{2.5ex} $\sin(t)$ & $-\cos(t)$ \\  
+\hline
+\rule[-1ex]{0pt}{2.5ex} $\cos(t)$ & $\sin(t)$ \\  
+\hline 
+\end{tabular} 
+\end{center}
+\begin{lemma}\label{ht:const}
+Für ein festes $a \in \mathbb{R}$ gilt: $\mathscr{H}\{a\} = 0$
+\begin{proof}
+\begin{align}
+\text{Sei } a \in \mathbb{R} \text{ und } x(s) &= a\\
+\Rightarrow \mathscr{H}\{x(s)\} &= \mathscr{H}\{a\} = \frac{1}{\pi }P \cdot a \cdot \int_{-\infty}^{\infty} \frac{1}{s-s_0} \mathrm{ds}\\
+&= a \cdot \lim_{\xi \rightarrow 0} \left \lbrack  \int_{-\frac{1}{\xi}}^{s_0-\xi} \frac{1}{s - s_0} \mathrm{ds}+ \int_{s_0+\xi}^{\frac{1}{\xi}} \frac{1}{s - s_0} \mathrm{ds}\right\rbrack \\
+&= a \cdot \lim_{\xi \rightarrow 0} \left[\ln{\frac{\vert -\xi\vert\vert\frac{1}{\xi}-s_0\vert}{\vert \xi\vert\vert-\frac{1}{\xi}-s_0\vert}}\right]\\
+&=a\cdot \ln{1}= 0
+\end{align}
+\end{proof}
+\end{lemma}
+\begin{lemma}\label{s:HTR} Sei $x(s)$ eine rationale Funktion $x(s) := \frac{\alpha}{s^2+1}$, dann folgt für ein festes $\alpha \in \mathbb{R}$, $\mathscr{H}\{x(s)\} = -\alpha \cdot \frac{s}{s^2+1}$
+\begin{proof}
+\begin{align}
+\text{Sei } s_0, \alpha \in \mathbb{R} \text{ und } x(s) &= \frac{\alpha}{s^2+1}\\
+\Rightarrow \mathscr{H}\{x(t)\} &= \mathscr{H}\{\frac{\alpha}{s^2+1}\} = \frac{1}{\pi }P  \cdot \int_{-\infty}^{\infty} \frac{\alpha}{(s-s_0)\cdot (s^2+1)} \mathrm{ds}
+\end{align}
+Durch Partialbruchzerlegung ereicht man folgende Form:
+\begin{align}
+\frac{\alpha}{\pi } \cdot \frac{1}{s_0^2+1} \cdot \left[ P \int_{-\infty}^{\infty} \frac{1}{s-s_0} \mathrm{ds} - P \int_{-\infty}^{\infty} \frac{s}{s^2+1} \mathrm{ds} - P \int_{-\infty}^{\infty} \frac{s_0}{s^2+1} \mathrm{ds} \right]
+\end{align}
+Dabei ist der erste Summand einer Hilbert - Transformation mit einer Konstanten und ist somit nach Satz \ref{ht:const} gleich Null. Mit $\int \frac{dx}{a^2+x^2} = \frac{1}{a}\cdot \arctan(\frac{x}{a})$ \cite{Formeln2010} und $a=1$  folgt für den letzten Summanden\\
+\begin{align}
+-s_0 \cdot P \int_{-\infty}^{\infty} \frac{1}{s^2+1} \mathrm{ds} = -s_0 \cdot \left. \arctan{(x)}\right|_{-\infty}^{\infty} = -s_0 \cdot \pi \text{.}
+\end{align}
+Damit die Aussage von Satz \ref{s:HTR} stimmt, ist noch zu zeigen, dass der zweite Summand 
+$-P \int_{-\infty}^{\infty} \frac{s}{s^2+1} = 0$ ist. Wegen der Punktsymmetrie von $\frac{s}{s^2+1}, f(-s) = \frac{-s}{(-s)^2+1} = -\frac{s}{s^2+1} = -f(s)$ folgt sofort, dass der Flächeninhalt unter dem Integral 0 ist.
+\end{proof}
+\end{lemma}

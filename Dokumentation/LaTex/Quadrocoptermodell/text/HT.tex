@@ -1,0 +1,586 @@
+\chapter{Vertiefung der Hilbert - Transformation}\label{kkt:c}
+In den vorherigen Kapiteln \ref{sys} und \ref{eis}  wurde die Hilbert - Transformation (Satz \ref{ht}) schon kurz angesprochen. Wir werden nun in diesem Kapitel eine weitere wichtige Eigenschaft sowie verschiedene Darstellungsformen kennenlernen.   
+\section{Energiebegrenzung: Eine wichtige Eigenschaft der HT} 
+\label{ht:Anmerkung}Eine wichtige Eigenschaft der Hilbert - Transformation ist, dass man ihre Energiebegrenzung anhand des Real - bzw. Imaginärteils charakterisieren kann. Dazu ist aber einiges an Vorarbeit nötig, die an Titchmarsh \cite{titch1948} angelehnt wurde. \\\\
+Damit das nächste Lemma nicht zu unübersichtlich wird, betrachte man zunächst folgende Hilfslemma. 
+\begin{lemma}\label{kkt:kor:cossin}
+Sei für alle $F(\omega) \in L^2$ folgt die Darstellung
+\begin{align}
+	F(\omega) = \int_{0}^{\infty} a(t) \cos(\omega t)  +  b(t) \sin(\omega t) \mathrm{dt} 
+\end{align} 
+mit 
+\begin{align}
+	a(t) &= (f(-t) + f(t)) = \frac{1}{\pi} \int_{-\infty}^{\infty} F(\omega) \cos(\omega t) \mathrm{d\omega} \\
+	b(t) &= i \cdot (f(-t) - f(t)) = -\frac{1}{\pi} \int_{-\infty}^{\infty} F(\omega) \sin(\omega t) \mathrm{d\omega}
+\end{align}
+\begin{proof}
+Sei $F(\omega) \in L^2$, dann existiert nach Satz \ref{ft:umkehr} ein $f(t) \in L^2$, mit $f(t) = \mathscr{F}^{-1}\{F(\omega)\}(t)$ und es folgt: 
+\begin{align}
+	F(\omega) &= \int_{-\infty}^{\infty} f(t) e^{-i \omega t} \mathrm{dt}  = \int_{-\infty}^{\infty} f(t) (\cos(\omega t) + i \sin(\omega t)) \mathrm{dt}\\
+	&= \int_{-\infty}^{\infty} f(t) \cos(\omega t) \mathrm{dt} + i \cdot \int_{-\infty}^{\infty} f(t) \sin(\omega t) \mathrm{dt}\\
+	&= \int_{-\infty}^{0} f(t) \cos(\omega t) \mathrm{dt} + \int_{0}^{\infty} f(t) \cos(\omega t) \mathrm{dt} + \\
+	&i \cdot \left( \int_{-\infty}^{0} f(t) \sin(\omega t) \mathrm{dt} + \int_{0}^{\infty} f(t) \sin(\omega t) \mathrm{dt} \right)
+\end{align}
+Durch Substitution von $t = -t$ folgt:
+\begin{align}
+	F(\omega) &= \int_{0}^{\infty} f(-t) \cos(\omega t) \mathrm{dt} + \int_{0}^{\infty} f(t) \cos(\omega t) \mathrm{dt} + \\
+	&i \cdot \left( -\int_{0}^{\infty} f(-t) \sin(\omega t) \mathrm{dt} + \int_{0}^{\infty} f(t) \sin(\omega t) \mathrm{dt} \right) \\
+	&= \int_{0}^{\infty} (f(t) + f(-t)) \cos(\omega t) \mathrm{dt} + i \cdot \left( \int_{0}^{\infty} (f(t) - f(-t)) \sin(\omega t) \mathrm{dt} \right) \\
+	&= \int_{0}^{\infty} \underbrace{(f(t) + f(-t))}_{a(t)} \cos(\omega t)  + \underbrace{ i \cdot (f(t) - f(-t))}_{b(t)} \sin(\omega t) \mathrm{dt}
+\end{align}
+Das Einsetzen der Rücktransformation (Definition \ref{ft:umkehr}) liefert den Beweis.
+\end{proof}
+\end{lemma}
+\begin{lemma}\label{ht:sgnFou}
+Sei $F(\omega) \in L^2(\mathbb{R})$, $f(t) \in L^2(\mathbb{R})$ mit $f(t) = \mathscr{F}^{-1}\{F(\omega)\}(t) $ dann gilt:  
+\begin{align}
+	\int_0^{\infty} -a(t) \sin(\omega t) + b(t) \cos(\omega t) \mathrm{dt} = -i \mathscr{F}\{\sgn{t} f(t)\}(\omega)
+\end{align} 
+mit 
+\begin{align}
+	a(t) := (f(-t) + f(t))  = \frac{1}{\pi} \int_{-\infty}^{\infty} F(\omega) \cos(\omega t) \mathrm{d\omega} \\
+	b(t) := i (f(-t) - f(t)) = -\frac{1}{\pi} \int_{-\infty}^{\infty} F(\omega) \sin(\omega t) \mathrm{d\omega}
+\end{align}
+\begin{proof}
+Da $F(\omega) \in L^2(\mathbb{R})$  folgt 
+\begin{align}
+&\int_0^{\infty} -a(t) \sin(\omega t) + b(t) \cos(\omega t) \mathrm{dt} \\
+&= \int_0^{\infty} -(f(-t) + f(t)) \sin(\omega t) + i (f(-t) - f(t)) \cos(\omega t) \mathrm{dt} \\
+&= i \left\{ \int_0^{\infty} -f(t) \left(\cos(\omega t) - i \sin(\omega t) \right)  \mathrm{dt} + \int_0^{\infty} f(-t) \left(\cos(\omega t) + i \sin(\omega t) \right)  \mathrm{dt} \right\}\\
+&\stackrel{Subst. t = -t}{=} i \left\{ \int_{-\infty}^{0} f(t) \left(\cos(\omega t) - i \sin(\omega t) \right)  \mathrm{dt} +  \int_0^{\infty} -f(t) \left(\cos(\omega t) - i \sin(\omega t) \right)  \mathrm{dt} \right\}\\
+&= - i \int_{-\infty}^{\infty} \sgn{t} \cdot  f(t) \cdot  e^{- i \omega t}  \mathrm{dt}\\
+&= - i \mathscr{F}\{\sgn{t} f(t)\}
+\end{align}
+%Da $f(t) \in L^2$ und $\int_{-\infty}^{\infty} \norm{-i \sgn{t} \cdot  f(t)}^2 \mathrm{dt} = \norm{f(t)}^2$ folgt 
+%mit Hilfe von Plancherel (\ref{ft:plancherel}) $F_H \in L^2$ mit $\norm{f(t)}_{L^2} = \norm{F_H(\omega)}_{L^2}$
+\end{proof}
+\end{lemma}
+Das nächste Lemma zeigt eine andere Darstellung der Hilbert - Transformation. Der Vorteil dieser Darstellung ist, dass sich dieses Integral als uneigentliches Integral darstellen lässt und keine Definitionslücke vorweist, wie beim Cauchy - Hauptwert.
+\begin{lemma}\label{ht:artFou}
+Sei $F(\omega) \in L^2(\mathbb{R})$ dann folgt:
+\begin{align}
+	\mathscr{H}\{F(\omega)\}(\omega_0) &= \int_0^{\infty} b(t) \cdot \cos(\omega_0 t) - a(t) \cdot \sin(\omega_0 t) \mathrm{dt}\\
+	&=\int_0^{\infty} \int_{-\infty}^{\infty} \sin((u-\omega_0) \cdot t) F(u) \mathrm{du} \mathrm{dt}  \label{ht:artIntegral1}
+\end{align}
+mit 
+\begin{align}
+	a(t) = \int_{-\infty}^{\infty} F(u) \cos(u t) \mathrm{du}\\
+	b(t) =  \int_{-\infty}^{\infty} F(u) \sin(u t) \mathrm{du}
+\end{align}
+\begin{proof}
+	Da $F(\omega) \in L^2(\mathbb{R})$, existiert nach Satz \ref{ft:umkehr} ein $f(t) \in L^2(\mathbb{R})$ mit $f(t) = \mathscr{F}^{-1}\{F(\omega)\}(t)$ \\
+	Des Weiteren betrachtet man nun die Funktionen 
+	\begin{align}
+		F_k((\omega)) := \left\{\begin{array}{cc}
+		F((\omega)) & \abs{\omega} \leq k \\ 
+		0 & \text{ sonst }
+		\end{array} \right.
+	\end{align}	
+	\begin{align}
+		f_k(t) := \left\{\begin{array}{cc}
+		f(t) & \abs{t} \leq k \\ 
+		0 & \text{ sonst }
+		\end{array} \right.
+	\end{align}	
+	Es gilt offensichtlich, dass $F_k \stackrel{k  \rightarrow \infty}{\rightarrow} F$ bzw. $f_k \stackrel{k  \rightarrow \infty}{\rightarrow} f$ in $L^2$ liegt. Zudem liegt $F_k$ und $f_k$ in $L^1 \cap L^2$, da $F, f \in L^2$ und der Support von $F_k$ und $f_k$ kompakt ist. Mit Satz \ref{ft:umkehr} folgt, dass für $F_k$ eine Umkehrfunktion existiert mit $f_k(t) = \mathscr{F}^{-1}\{F_k(\omega)\}(t)$.  Dann folgt per Definition \ref{ht}, dass $F_{H_k}(\omega_0):=\mathscr{H}\{F_k(\omega)\}(\omega_0) = \frac{1}{\pi}\cdot P \int_{-\infty}^{\infty} \frac{F_k(\omega)}{\omega-\omega_0} \mathrm{d\omega}$ ist. Mit der Definition des Cauchy - Hauptwerts folgt:
+	\begin{align}
+		F_{H_k}(\omega_0) &= \lim_{R \rightarrow \infty}\lim_{\epsilon \rightarrow 0}{\int_{-R}^{\omega_0 - \epsilon} \frac{F_k(\omega)}{\omega - \omega_0} \mathrm{d\omega} +\int_{\omega_0 + \epsilon}^{R} \frac{F_k(\omega)}{\omega - \omega_0} \mathrm{d\omega}} \\
+		&\stackrel{Subst.}{=} \lim_{R \rightarrow \infty}\lim_{\epsilon \rightarrow 0}{\int_{\epsilon}^{R} \frac{F_k(\omega_0 + \omega)- F_k(\omega_0 - \omega)}{\omega} \mathrm{d\omega}}
+		\end{align}
+		Mit dem Satz von Riemann - Lebesgues (\ref{a:RLebesgue}) ergibt sich: 
+		\begin{align}
+		F_{H_k}(\omega_0) &= \lim_{R \rightarrow \infty}\lim_{\epsilon \rightarrow 0}\left\{\int_{\epsilon}^{R} \frac{F_k(\omega_0 + \omega)- F_k(\omega_0 - \omega)}{\omega} \mathrm{d\omega} \right. \\
+		&- \left. \lim_{\lambda \rightarrow \infty} \int_{\epsilon}^{R} \cos(\lambda \cdot \omega) \frac{F_k(\omega_0 + \omega)- F_k(\omega_0 - \omega)}{\omega} \mathrm{d\omega}\right\} \\
+		&= \lim_{R \rightarrow \infty}\lim_{\epsilon \rightarrow 0}\lim_{\lambda \rightarrow \infty}\left\{\int_{\epsilon}^{R} \frac{1-\cos(\lambda \omega)}{\omega} (F_k(\omega_0 + \omega)- F_k(\omega_0 - \omega)) \mathrm{d\omega}  \right\}
+		\end{align}
+		Mit Aufspalten und Substitution des Integrales von $\omega + \omega_0$ durch $u$ bzw. $\omega - \omega_0$ durch $u$ folgt:
+		\begin{align}
+		F_{H_k}(\omega_0) &= \lim_{R \rightarrow \infty}\lim_{\epsilon \rightarrow 0}\lim_{\lambda \rightarrow \infty}\left\{\int_{-R}^{\omega_0 - \epsilon} \frac{1-\cos(\lambda (u-\omega_0))}{u-\omega_0} F_k(u) \mathrm{du} \right. \\
+		&\left. + \int_{\omega_0 + \epsilon}^{R} \frac{1-\cos(\lambda (u-\omega_0))}{u-\omega_0} F_k(u) \mathrm{du}  \right\} \\
+		&= \int_{-\infty}^{\infty} \lim_{\lambda \rightarrow \infty} \left\{ \int_{0}^{\lambda} \sin((u-\omega_0) t) F_k(u) \mathrm{dt} \right\} \mathrm{du} \\		
+		&=\lim_{\lambda \rightarrow \infty} \left\{ \int_0^{\lambda}  \int_{-\infty}^{\infty} \sin((u-\omega_0) t) F_k(u) \mathrm{du} \mathrm{dt} \right\}\\
+		&= \lim_{\lambda \rightarrow \infty}\left\{ \int_{0}^{\lambda} \int_{-\infty}^{\infty} \sin(u t) \cos(\omega_0 t) F_k(u)  \mathrm{du} \mathrm{dt} \right.\\
+		&- \left.\int_{0}^{\lambda} \int_{-\infty}^{\infty} \cos(u t) \sin(\omega_0 t) F_k(u)  \mathrm{du} \mathrm{dt} \right\}\\
+		&= \int_{0}^{\infty} b_k(t) \cos(\omega_0 t)  - a_k(t) \sin(\omega_0 t)  \mathrm{dt} \label{ht:artIntegral2}
+	\end{align}
+	mit
+	\begin{align}
+		a_k(t) = \int_{-\infty}^{\infty} F_k(u) \cos(u t) \mathrm{du}\\
+		b_k(t) =  \int_{-\infty}^{\infty} F_k(u) \sin(u t) \mathrm{du}
+	\end{align}
+	Das Vertauschen des Grenzwerts und das Anwenden des Fubinis konnte stillschweigend angewandt werden. Zudem lassen sich die Integrale als eine Komposition stetiger Funktionen interpretieren. Des Weiteren existiert das Integral als Cauchy - Hauptwert. Sowie mit
+	\begin{align}
+	\int_0^{\lambda} \int_{-\infty}^{\infty} \abs{\sin((u-\omega_0) t) F_k(u)} \mathrm{du} \mathrm{dt}
+	= \int_0^{\lambda} \int_{-\infty}^{\infty} \abs{F_k(u)} \mathrm{du} \mathrm{dt} = \lambda \cdot \norm{F_k}_{L^1} < \infty
+	\end{align}
+	eine Majorante existiert.\\\\
+	Da $f_k$ gegen $f$ in $L^2$ konvergiert, existiert eine Cauchy - Folge, d.h. sei $\epsilon > 0$ und wähle $n_0(\epsilon) \in \mathbb{N}$ so, dass $\norm{f_k - f_l} <  \epsilon$, mit $k, l \geq n_0$. Dann folgt mit der Gl. \ref{ht:artIntegral2} und dem vorher bewiesenen Lemma \ref{ht:sgnFou}  
+	\begin{align}
+	&\norm{F_{H_k} - F_{H_l}}_{L^2} \\
+	&=\norm{\int_{0}^{\infty} b_k(t) \cos(\omega_0 t)  - a_k(t) \sin(\omega_0 t)  \mathrm{dt} - \int_{0}^{\infty} b_l(t) \cos(\omega_0 t)  - a_l(t) \sin(\omega_0 t)  \mathrm{dt}}_{L^2} \\
+	&=\norm{ \int_{-\infty}^{\infty} - i \cdot \sgn{t} \cdot  (f_k(t) - f_l(t)) \cdot  e^{- i \omega_0 t}  \mathrm{dt}}_{L^2}\\
+	&=\norm{ \mathscr{F}\{-i \cdot \sgn{t} \cdot (f_k(t) - f_l(t))\}(\omega_0)}_{L^2}
+	\end{align}
+	und es folgt mit Plancherel (\ref{ft:plancherel})
+	\begin{align}
+	\norm{F_{H_k} - F_{H_l}}_{L^2} = \norm{-i \cdot \sgn{t} \cdot (f_k(t) - f_l(t))}_{L^2} = \norm{(f_k(t) - f_l(t))}_{L^2} < \epsilon
+	\end{align}
+	Damit ist $F_{H_k}$ eine Cauchy - Folge und da $L^2$ vollständigt ist, konvergiert $F_{H_k} \in L^2$
+\end{proof}
+\end{lemma}
+\begin{bem}
+Das Integral \ref{ht:artIntegral1} wird von Titchmarsh \cite[Seite 119]{titch1948} als artverwandtes Fourierintegral bezeichnet.
+\end{bem}
+Mit dem Korollar \ref{ht:sgnFou} und Lemma \ref{ht:artFou} lässt sich nun folgender Satz einfach beweisen 
+\begin{satz}\label{ht:energy}
+Sei $F(\omega) \in L^2$ so ist die $L^2$ - Norm der Hilberttransformierten $\mathscr{H}\{F(\omega)\}(\omega_0)$ mit
+\begin{align}
+	\norm{\mathscr{H}\{F(\omega)\}(\omega_0)}_{L^2} = \int_{-\infty}^{\infty} \abs{\mathscr{H}\{F(\omega)\}(\omega_0)}^2 \mathrm{d\omega_0} = \int_{-\infty}^{\infty} \abs{F(\omega_0)}^2 \mathrm{d\omega_0} = \norm{F(\omega_0)}_{L^2}
+\end{align}
+gegeben.
+\begin{proof}
+\label{ht:energy:b1} Da $F(\omega) \in L^2(\mathbb{R})$, existiert nach Satz \ref{ft:umkehr} ein $f(t) \in L^2(\mathbb{R})$ mit $f(t) = \mathscr{F}^{-1}\{F(\omega)\}(t)$ \\
+Es folgt nun nach Lemma \ref{ht:artFou}: 
+\begin{align}
+	\norm{\mathscr{H}\{F(\omega)\}(\omega_0)}_{L^2} &= \int_{-\infty}^{\infty} \abs{\mathscr{H}\{F(\omega)\}(\omega_0)}^2 \mathrm{d\omega_0} \\
+	&= \int_{-\infty}^{\infty}\left\{ \int_0^{\infty} \int_{-\infty}^{\infty} \sin((u-\omega_0) \cdot t) F(u) \mathrm{du} \mathrm{dt} \right\} \mathrm{d\omega_0}
+\end{align}
+Wendet man die Folgerung \ref{ht:energy:b1} und das Lemma \ref{ht:sgnFou} sowie zweimal den Satz von Plancherel \ref{ft:plancherel} an, führt dies zu
+\begin{align}
+	\int_{-\infty}^{\infty} \abs{\mathscr{H}\{F(\omega)\}(\omega_0)}^2 \mathrm{d\omega_0} &=  \norm{-i \mathscr{F}\{\sgn{t} f(t)\}(\omega_0) }_{L^2} \\
+	&= \norm{f(t)}_{L^2} = \norm{F(\omega_0)}_{L^2}
+\end{align}
+\end{proof}
+\end{satz}
+Abschließend beweisen wir die Anmerkung \ref{ht:Anmerkung}.
+\begin{satz}
+Sind Real - und Imaginärteil der Übertragungsfunktion $H(\omega) = \Re{H(\omega)} + i \Im{H(\omega)}$ Hilbert - Paare und einer der beiden Funktionen quadratintegrierbar, so ist das System energiebegrenzt \cite[Seite 41]{Dotz2012}.
+\begin{proof}
+Nach Satz \ref{ht:energy:b1} folgt aus der Quadratintegierbarkeit von $\Re{H(\omega)}$ diejenige von $\Im{H(\omega)}$ und umgekehrt. Es bleibt die Quadratintegrierbarkeit von $H(\omega)$ zu zeigen:
+\begin{align}
+	\norm{H(\omega)}_{L^2} \leq \norm{\Re{H(\omega)}}_{L_2} + \norm{\Im{H(\omega)}}_{L^2}
+\end{align}
+\end{proof}
+\end{satz}
+Mit Hilfe der Hilbert - Transformation lassen sich somit Eigenschaften im Frequenzbereich validieren. In der Praxis treten schnell Probleme auf. Besonders das Kreisfrequenzspektrum macht die meisten Schwierigkeiten. Für die Hilbert - Transformation muss das Spektrum $\omega \in (-\infty, \infty)$ integriert werden. Da beim reellen System natürlich keine negativen Frequenzen existieren und nicht alle Frequenzen von $0$ bis $\infty$ bestimmt werden können, müssen andere Lösungen gefunden werden. 
+\section{Darstellungsarten der Hilbert Transformation}\label{kkt:darstellung}
+\subsection{Kramers - Kronig Transformation}
+Ein Lösungsansatz ist die sogenannte Kramers - Kronig Beziehung. Sie stellt einen Spezialfall der Hilbert - Transformation dar. Die Beziehungen wurden nach ihren Entdeckern Hendrik Anthony Kramers und Ralph Kronig benannt. Im Folgenden wird sie durch Ausnutzung von Eigenschaften reeller Systeme aus der Hilbert - Transformation gewonnen. Die folgenden Sätze \ref{kkt},\ref{kkt:alternative} wurden von Dotz \cite{Dotz2012} bewiesen und von mir verfeinert.
+\begin{satz}\label{kkt}
+Sei $H(\omega) \in L^2(\mathbb{R})$ eine Funktion, die den Satz von Titchmarsh \ref{ht:titch} erfüllt und es gilt: $\overline{H(\omega)} = H(-\omega)$, d.h. $H(\omega)$ ist eine Übertragungsfunktion eines reellen Systemes. Dann folgt:
+\begin{align}
+	\Re{H(\omega_0)} = \mathscr{KKT}_R \{\Im{H(\omega)}\} = -\frac{2}{\pi} P \int_0^{\infty} \frac{\omega \Im{H(\omega)}}{\omega^2 - \omega^2_0} \mathrm{d\omega}\label{kkt:Re}\\
+	\Im{H(\omega_0)} = \mathscr{KKT}_I \{\Re{H(\omega)}\} = \frac{2}{\pi} P \int_0^{\infty} \frac{\omega_0 \Re{H(\omega)}}{\omega^2 - \omega^2_0} \mathrm{d\omega}\label{kkt:Im}
+\end{align}
+\begin{proof}
+Die Funktion $H(\omega)$ liegt per Definition in $L^2$ und erfüllt den Satz von Titchmarsh \ref{ht:titch} dann folgt:
+\begin{align}
+	\Re{H(\omega_0)} =-\mathscr{H}\{\Im{H(\omega)}\}= \frac{1}{\pi}\cdot P \int_{-\infty}^{\infty} \frac{\Im{H(\omega)}}{\omega-\omega_0} \mathrm{d\omega}
+\end{align}
+Sei nun $\overline{H(\omega)} = H(-\omega)$, dann folgt nach Korollar \ref{s:korHelp}, dass der $\Im{H(-\omega)} = -\Im{H(\omega)}$ ist und es folgt o.B.d.A $\omega_0 > 0$
+\begin{align}
+		&-\frac{1}{\pi}\cdot P \int_{-\infty}^{\infty} \frac{\Im{H(\omega)}}{\omega-\omega_0} \mathrm{d\omega} \\
+		= -\frac{1}{\pi} \cdot &\lim_{\epsilon \rightarrow 0} \left\{ \int_{-\infty}^{0} \frac{\Im{H(\omega)}}{\omega-\omega_0} \mathrm{d\omega} + \int_{0}^{w_0-\epsilon} \frac{\Im{H(\omega)}}{\omega-\omega_0} \mathrm{d\omega} + \int_{w_0 + \epsilon}^{\infty} \frac{\Im{H(\omega)}}{\omega-\omega_0} \mathrm{d\omega} \right\}\\
+		= -\frac{1}{\pi} \cdot &\lim_{\epsilon \rightarrow 0} \left\{ \int_{-\infty}^{0} \frac{-\Im{H(-\omega)}}{\omega-\omega_0} \mathrm{d\omega} + \int_{0}^{w_0-\epsilon} \frac{\Im{H(\omega)}}{\omega-\omega_0} \mathrm{d\omega} + \int_{w_0 + \epsilon}^{\infty} \frac{\Im{H(\omega)}}{\omega-\omega_0} \mathrm{d\omega} \right\}\\
+		= -\frac{1}{\pi} \cdot &\lim_{\epsilon \rightarrow 0} \left\{ \int_{0}^{\infty} \frac{\Im{H(\omega)}}{\omega+\omega_0} \mathrm{d\omega} + \int_{0}^{w_0-\epsilon} \frac{\Im{H(\omega)}}{\omega-\omega_0} \mathrm{d\omega} + \int_{w_0 + \epsilon}^{\infty} \frac{\Im{H(\omega)}}{\omega-\omega_0} \mathrm{d\omega} \right\}\\
+		=-\frac{1}{\pi} \cdot &\lim_{\epsilon \rightarrow 0} \left\{ \int_{0}^{w_0-\epsilon} \frac{\Im{H(\omega)}}{\omega+\omega_0} \mathrm{d\omega} + \int_{w_0-\epsilon}^{w_0+\epsilon} \frac{\Im{H(\omega)}}{\omega+\omega_0} \mathrm{d\omega} + \int_{w_0+\epsilon}^{\infty} \frac{\Im{H(\omega)}}{\omega+\omega_0} \mathrm{d\omega} + \right. \\
+		&\left. \int_{0}^{w_0-\epsilon} \frac{\Im{H(\omega)}}{\omega-\omega_0} \mathrm{d\omega} + \int_{w_0 + \epsilon}^{\infty} \frac{\Im{H(\omega)}}{\omega-\omega_0} \mathrm{d\omega} \right\}
+\end{align}
+Mit Hilfe des Cauchy Hauptwertes lassen sich die Integrale zusammenfassen
+\begin{align}
+\Re{H(\omega_0)} = -\frac{2}{\pi}\cdot P \int_{-\infty}^{\infty} \frac{\omega \Im{H(\omega)}}{\omega^2-\omega_0^2} \mathrm{d\omega} - \frac{1}{\pi} \cdot \lim_{\epsilon \rightarrow 0}\underbrace{\int_{w_0-\epsilon}^{w_0+\epsilon} \frac{\Im{H(\omega)}}{\omega+\omega_0} \mathrm{d\omega}}_{(*)}
+\end{align}
+Betrachtet man nun $g:=\frac{1}{\omega - \omega_0}$ mit $\epsilon > 0$ und $\omega_0 > \frac{\epsilon}{2}$ dann folgt: 
+\begin{align}
+	\norm{g(\omega)}^2 &= \int_{\omega_0 -\epsilon}^{\omega_0 + \epsilon} \abs{g(\omega)}^2 \mathrm{d\omega} = \int_{-\infty}^{\infty} \left(\frac{1}{\omega - \omega_0}\right)^2 \mathrm{d\omega} =  \left.- \frac{1}{\omega - \omega_0} \right\vert_{\omega_0 - \epsilon}^{\omega_0 + \epsilon} = \frac{2 \epsilon}{4 \omega_0^2 - \epsilon^2 }\\
+	\Rightarrow g(\omega) &\in L^2(\omega_0 - \epsilon, \omega_0 + \epsilon)
+\end{align}
+Es folgt für den Grenzwert des Integrals $(*)$ mit $\omega_0 > 0$ und der Höldersche Ungleichung (Satz \ref{a:hoelder}):
+\begin{align}
+\lim_{\epsilon \rightarrow 0}\abs{\int_{w_0-\epsilon}^{w_0+\epsilon} \frac{\Im{H(\omega)}}{\omega+\omega_0} \mathrm{d\omega}} &\leq \lim_{\epsilon \rightarrow 0}\int_{w_0-\epsilon}^{w_0+\epsilon} \frac{\abs{H(\omega)}}{\abs{\omega+\omega_0}} \mathrm{d\omega} \\
+&\leq \norm{H(\omega)}_{L_2(\omega_0 - \epsilon, \omega_0 + \epsilon)} \cdot \lim_{\epsilon \rightarrow 0} \sqrt{\frac{2 \epsilon}{4 \omega_0^2 - \epsilon^2 }} = 0
+\end{align}
+Analog verfahre man mit $\Im{H(\omega_0)}$.
+\end{proof}
+\end{satz}
+Nun sind zwar die negativen Frequenzen verschwunden, aber das Integral existiert nur als Cauchy - Hauptwert, d.h. es gibt bei $\omega = \omega_0$ eine Definitionslücke. Die kann aber behoben werden, wenn die Funktion in $\omega_0$ differenzierbar ist, wie das nächste Lemma und der nächste Satz zeigen werden. 
+\begin{lemma}\label{kkt:alternative}
+Sei $H(\omega) \in L^2$ eine Funktion, die den Satz von Titchmarsh \ref{ht:titch} erfüllt und es gilt: $\overline{H(\omega)} = H(-\omega)$ dann folgt die Darstellung:
+\begin{align}
+	\Re{H(\omega_0)} = -\frac{2}{\pi} P \int_0^{\infty} \frac{\omega \Im{H(\omega)}-\omega_0 \Im{H(\omega_0)}}{\omega^2 - \omega^2_0} \mathrm{d\omega}\\
+	\Im{H(\omega_0)} = \frac{2}{\pi} P \int_0^{\infty} \frac{\omega_0 \Re{H(\omega)} - \omega_0 \Re{H(\omega_0)}}{\omega^2 - \omega^2_0} \mathrm{d\omega}
+\end{align}
+\begin{proof}
+Sei $F(w_0):= -\frac{2}{\pi} P \int_0^{\infty} \frac{\omega \Im{H(\omega)}-\omega_0 \Im{H(\omega_0)}}{\omega^2 - \omega^2_0} \mathrm{d\omega}$ dann folgt:
+\begin{align}
+F(w_0) &= -\frac{2}{\pi} P \int_0^{\infty} \frac{\omega \Im{H(\omega)}}{\omega^2 - \omega^2_0} \mathrm{d\omega} -\underbrace{\frac{2}{\pi} P \int_0^{\infty} \frac{\omega_0 \Im{H(\omega_0)}}{\omega^2 - \omega^2_0} \mathrm{d\omega}}_{(*)}
+\end{align}
+Betrachtet man das Integral (*)
+\begin{align}
+\frac{2}{\pi} \Im{H(\omega_0)} \left( P \int_0^{\infty} \frac{1}{\omega - \omega_0} \mathrm{d\omega} - P \int_0^{\infty} \frac{1}{\omega + \omega_0} \mathrm{d\omega} \right)
+\end{align}
+Substitution von $\omega = -\omega$, anschließend folgt:
+\begin{align}
+&\frac{1}{\pi} \Im{H(\omega_0)} \left( P \int_0^{\infty} \frac{1}{\omega - \omega_0} \mathrm{d\omega} - P \int_{-\infty}^0 \frac{-1}{\omega + \omega_0} \mathrm{d\omega} \right) \\
+&= \frac{1}{\pi} \Im{H(\omega_0)} P \int_{-\infty}^{\infty} \frac{1}{\omega - \omega_0} \mathrm{d\omega} 
+\end{align}
+dann folgt wegen Satz \ref{ht:const}
+\begin{align}
+\frac{2}{\pi} P \int_0^{\infty} \frac{\omega_0 \Im{H(\omega_0)}}{\omega^2 - \omega^2_0} = 0
+\end{align}
+Abschließend folgt für $F(\omega_0)$ mit Satz \ref{kkt}
+\begin{align}
+F(w_0) &= -\frac{2}{\pi} P \int_0^{\infty} \frac{\omega \Im{H(\omega)}}{\omega^2 - \omega^2_0} \mathrm{d\omega} + 0 = \Re{H(\omega_0)}
+\end{align}
+Analog verfahre mit $\Im{H(\omega_0)}$. Somit folgt die Behauptung.
+\end{proof}
+\end{lemma}
+\begin{satz}\label{kkt:alternative:heb}
+Sei $H(\omega) \in L^2$ eine Funktion, die den Satz von Titchmarsh \ref{ht:titch} erfüllt,  gilt: $\overline{H(\omega)} = H(-\omega)$, es existieren die Ableitungen $\frac{d}{d\omega} \Re{H(\omega)}$ und $\frac{d}{d\omega} \Im{H(\omega)}$ an der Stelle $\omega_0$, dann lassen sich die Polstellen der Kramers - Kronig Transformation heben. Es gilt dann
+\begin{align}
+	\Re{H(\omega_0)} = -\frac{2}{\pi} \int_0^{\infty} \frac{\omega \Im{H(\omega)}-\omega_0 \Im{H(\omega_0)}}{\omega^2 - \omega^2_0} \mathrm{d\omega}\\
+	\Im{H(\omega_0)} = \frac{2}{\pi} \int_0^{\infty} \frac{\omega_0 \Re{H(\omega)} - \omega_0 \Re{H(\omega_0)}}{\omega^2 - \omega^2_0} \mathrm{d\omega}
+\end{align}
+\begin{proof}
+Nach Satz \ref{kkt:alternative} folgt $\Re{H(\omega_0)} = -\frac{2}{\pi} P \int_0^{\infty} \frac{\omega \Im{H(\omega)}-\omega_0 \Im{H(\omega_0)}}{\omega^2 - \omega^2_0} \mathrm{d\omega}$. Betrachtet man nun den Grenzwert von $\lim_{\omega \rightarrow \omega_0} \frac{\omega \Im{H(\omega)}-\omega_0 \Im{H(\omega_0)}}{\omega^2 - \omega^2_0}$ mit Hilfe von L'Hospital. 
+\begin{align}
+	\lim_{\omega \rightarrow \omega_0} \frac{\omega \Im{H(\omega)}-\omega_0 \Im{H(\omega_0)}}{\omega^2 - \omega^2_0} &\stackrel{\text{L'Hospital}}{=} \frac{\Im{H(\omega)} + \omega \left. \frac{d}{d\omega} \right|_{\omega_0}  \Im{H(\omega)}}{2 \omega}\\
+	& = \lim_{\omega \rightarrow \omega_0}  \frac{1}{2} \left( \underbrace{\frac{\Im{H(\omega)}}{\omega}}_{(*)} + \left. \frac{d}{d\omega}\right|_{\omega_0} \Im{H(\omega)} \right) \label{kkt:alternative:heb:1}
+\end{align}
+Der Fall $\omega > 0$ ist trivial. Wenden wir uns nun dem Spezialfall $\omega = 0$ zu. Dazu schauen wir uns zunächst folgenden Grenzwert  $\lim_{\omega \rightarrow 0} \Im{H(\omega)}$ an. \\
+Es existiert mit Satz \ref{ft:umkehr}, ein $h(t) \in L^2$, mit $h(t) = \mathscr{F}^{-1}\{H(\omega)\}(t)$. Zudem folgt wegen $\overline{H(\omega)} = H(-\omega)$  und Korollar \ref{s:korHelp}
+\begin{align}
+	 \lim_{w \rightarrow 0} \Im{H(\omega)} =  \Im{\int_{-\infty}^{\infty} h(t) e^{-i 0 t} \mathrm{dt}} = 0
+\end{align}
+Anschließend folgt für den ersten Summanden $(*)$ und des Polstelle $\omega = 0$ mit L'Hospital und der Existenz der Ableitung von $\Im{H(\omega)}$
+\begin{align}
+	\lim_{\omega \rightarrow 0} \frac{\Im{H(\omega)}}{\omega} \stackrel{L'H}{=} \frac{\left. \frac{d}{d\omega} \right|_{\omega_0} \lim_{\omega \rightarrow 0}{\Im{H(\omega)}}}{1} = 0
+\end{align}
+Damit folgt die Existenz des Grenzwertes von $\lim_{\omega \rightarrow w_0}  \frac{1}{2} \left( \frac{\Im{H(\omega)}}{\omega} + \left. \frac{d}{d\omega} \right|_{\omega_0}\Im{H(\omega)} \right)$ und so gilt:
+\begin{align}
+\Re{H(\omega_0)} = -\frac{2}{\pi} \int_0^{\infty} \frac{\omega \Im{H(\omega)}-\omega_0 \Im{H(\omega_0)}}{\omega^2 - \omega^2_0} \mathrm{d\omega}
+\end{align}
+Nach Satz \ref{kkt:alternative} folgt $\Im{H(\omega_0)} = \frac{2}{\pi} P \int_0^{\infty} \frac{\omega_0 \Re{H(\omega)}-\omega_0 \Re{H(\omega_0)}}{\omega^2 - \omega^2_0} \mathrm{d\omega}$. Eine Grenzwertbetrachtung von $\lim_{\omega \rightarrow \omega_0} \frac{\omega_0 \Im{H(\omega)}-\omega_0 \Re{H(\omega_0)}}{\omega^2 - \omega^2_0}$
+\begin{align}
+\lim_{\omega \rightarrow \omega_0} \frac{\omega_0 Re{H(\omega)}-\omega_0 \Re{H(\omega_0)}}{\omega^2 - \omega^2_0} \stackrel{\text{L'Hospital}}{=} &\lim_{\omega \rightarrow \omega_0} \frac{\omega_0 \left. \frac{d}{d\omega}\right|_{\omega_0}\Re{H(\omega)}}{2 \omega} \\
+&= \frac{\omega_0 \left. \frac{d}{d\omega} \right|_{\omega_0}\Re{H(\omega_0)}}{2 \omega_0} \\
+&= \frac{1}{2}\left.\frac{d}{d\omega}\right|_{\omega_0}\Re{H(\omega)}
+\end{align}
+Nach Voraussetzung existiert die Ableitung und es folgt
+\begin{align}
+	\Im{H(\omega_0)} = \frac{2}{\pi} \int_0^{\infty} \frac{\omega_0 \Re{H(\omega)}-\omega_0 \Re{H(\omega_0)}}{\omega^2 - \omega^2_0} \mathrm{d\omega}
+\end{align}
+und damit die Behauptung.
+\end{proof}
+\end{satz}
+Die im letzten Satz bewiesene Darstellung wird uns noch im Abschnitt \ref{num} numerische Verfahren zur Hilbert - Transformation  begegnen. \\\\
+Wir werden nun eine weitere Form der Hilbert - Transformation kennen lernen. Sie basiert auf dem artverwandten Fourierintegral \ref{ht:artFou}.
+\subsection{Artverwandtes Fourierintegral für reelle Systeme}
+\begin{satz} \label{ht:artFou:reell}
+Sei $H(-\omega) = \overline{H(\omega)}$ und erfüllt die Funktion $H(\omega)$ den Satz von Titchmarsh (\ref{ht:titch}) dann folgt 
+\begin{align}
+	\Re{H(\omega)} &= - 2 \int_0^{\infty} \cos(\omega_0 t) \int_{0}^{\infty}  \Im{H(\omega)} \sin(\omega t) \mathrm{d\omega} \mathrm{dt}\\
+	\Im{H(\omega)} &= 2 \int_0^{\infty} \sin(\omega_0 t) \int_{0}^{\infty}  \Re{H(\omega)} \cos(\omega t) \mathrm{d\omega} \mathrm{dt}
+\end{align}
+\begin{proof}
+Mit dem Satz von Titchmarsh und dem Lemma \ref{ht:artFou} folgt:
+\begin{align}
+	\Re{H(\omega_0)}) &= - \int_0^{\infty} \left\{\underbrace{\int_{-\infty}^{\infty} \Im{H(\omega)} \sin(u t) \mathrm{du}}_{(*)} \cdot \cos(\omega_0 t) \right.\\
+	&+\left. \underbrace{\int_{-\infty}^{\infty} \Im{H(\omega)} \cos(u t) \mathrm{du}}_{(**)} \cdot \sin(\omega_0 t) \right\}\mathrm{dt}\\
+\end{align}
+Betrachte man den Term (*), d.h
+\begin{align}
+	 \int_{-\infty}^{\infty} \Im{H(u)} \sin(u t) \mathrm{du} 
+	 &=\int_{0}^{\infty} \Im{H(u)} \sin(u t) \mathrm{du}  - \int_{0}^{-\infty} \Im{H(u)} \sin(u t) \mathrm{du} 
+\end{align}
+Mit Korollar \ref{s:korHelp} und Subsitution von $u$ mit $-s$ erreicht man folgenden Ausdruck 
+\begin{align}
+	\int_{-\infty}^{\infty} \Im{H(u)} \sin(u t) \mathrm{du} &= \int_{0}^{\infty} \Im{H(u)} \sin(u t) \mathrm{du}  +  \int_{0}^{\infty} \Im{H(-s)} \sin(-s t) \mathrm{ds} \\
+	&= 2 \cdot \int_{0}^{\infty} \Im{H(u)} \sin(u t) \mathrm{du}
+\end{align}
+Nach kurzer Überlegung stellt sich heraus, dass der Term $(**)$ null ist. Somit folgt die Behauptung. Analog lässt sich der $\Im{H(\omega)}$ herleiten.
+\end{proof}
+\end{satz} 
+Als nächstes wird eine Darstellung der Kramers - Kronig Beziehung bewiesen, die auf der Darstellung der Hilbert - Transformation als Faltungsintegral beruht, d.h.
+\begin{align}
+	F_H(\omega):=-\mathscr{H}\{F(\omega')\}{(\omega)} = \frac{1}{\pi} P \int_{-\infty}^{\infty} \frac{F(\omega')}{\omega - \omega'} \mathrm{d\omega'} \overbrace{=}^{Satz \ref{sys:faltung}} \frac{1}{\pi} P \left(\frac{1}{\omega'} * F(\omega')\right)(\omega)
+\end{align}
+Dann sollte nach Satz \ref{s:transfer} folgen, dass
+\begin{align}
+	\mathscr{F}\{F_H\}(\omega_0):= \frac{1}{\pi}\mathscr{F}\{P \frac{1}{\omega}\}(\omega_0) \cdot \mathscr{F}\{F(\omega)\}{(\omega_0)} \text{.}
+\end{align}
+Da aber die Darstellung des Faltungsintegrals des Cauchy - Hauptwertes a piori nicht definiert ist, muss dies mathematisch begründet werden. 
+\subsection{Hilbert - Transformation auf Basis des Faltungsintegrals}
+\begin{satz}\label{kkt:FourierHilbert}
+Sei  $F(\omega) \in L^2$ und $F_H(\omega_0):=-\mathscr{H}\{F(\omega)\}{(\omega_0)}$, dann folgt
+\begin{align}
+	 \mathscr{F}\{F_H(\omega)\}(\omega_0) = \frac{1}{\pi} \mathscr{F}\{P\frac{1}{\omega}\}(\omega_0) \cdot \mathscr{F}\{F(\omega)\}(\omega_0)  = -\frac{i}{\pi} \cdot \sgn{\omega_0} \cdot \mathscr{F}\{F(\omega)\}(\omega_0) \label{kkt:fft}
+\end{align}
+\begin{proof}
+Da wegen Satz \ref{ht:energy} die Hilberttransformierte $F_H(\omega_0)$ von $F(\omega)$ in $L^2(\mathbb{R})$ liegt, folgt mit Satz \ref{ft:plancherel} die Existenz von $F_H$. \\ 
+Betrachte man nun die Funktion:
+\begin{align}
+	F_k(t) := \left\{\begin{array}{cc}
+	F(t) & \abs{t} \leq k \\ 
+	0 & \text{ sonst }
+	\end{array} \right.
+\end{align}
+Es gilt offensichtlich, dass $F_k \stackrel{k  \rightarrow \infty}{\rightarrow} F \in L^2$ ist. Weiter liegt $F_k$ in $L^1 \cap L^2$, da $F \in L^2$ und der Support von $F_k$ kompakt ist. Weiter ist   
+%Mit Satz \ref{ft:umkehr} folgt, dass für $F_k(t)$ eine Umkehrfunktion existiert mit $f_k(t) = \mathscr{F}^{-1}\{F_k(\omega)\}$ (*).  Dann folgt per Definition \ref{ht:trans}, dass $F_{H_k}(\omega_0):=\mathscr{H}\{F_k(\omega)\}(\omega_0) = \frac{1}{\pi}\cdot P \int_{-\infty}^{\infty} \frac{F_k(\omega)}{\omega-\omega_0} \mathrm{d\omega}$ und per Substitution und Cauchy - Hauptwert folgt und $\epsilon > 0$, Voraussetzungen für Satz (Riemann-Lebegue), weil F(w0)/w auf einem Kompakt von R-e integrierbar
+\begin{align}
+\mathscr{F}\{F_{H_k}\} :=  \int_{-\infty}^{\infty} \frac{-1}{\pi} \left( \lim_{R \rightarrow \infty} \lim_{\epsilon \rightarrow 0} \underbrace{\left(\int_{-R}^{\omega - \epsilon} \frac{F_k(\theta)}{\theta - t} \mathrm{d\theta}  + \int_{\omega + \epsilon}^{R} \frac{F_k(\theta)}{\theta - t} \mathrm{d\theta}\right)}_{(*)} \right) \cdot e^{-i \omega t} \mathrm{dt} 
+\end{align}
+sowie  $(*)$
+\begin{align}
+\lim_{R \rightarrow \infty} \lim_{\epsilon \rightarrow 0} \left(\int_{-R}^{t - \epsilon} \frac{F_k(\theta)}{\theta - t} \mathrm{d\theta}  + \int_{t + \epsilon}^{R} \frac{F_k(\theta)}{\theta - t} \mathrm{d\theta}\right) \stackrel{Subst.}{=} \lim_{R \rightarrow \infty} \lim_{\epsilon \rightarrow 0} \left( \int_{\epsilon}^{R} \frac{F_k(t + \theta)- F_k(t - \theta)}{\theta} \mathrm{d\theta} \right)
+\end{align}
+und wir bekommen folgende Gleichung:
+\begin{align}
+\mathscr{F}\{F_{H_k}\} =  \lim_{L \rightarrow \infty} \int_{-L}^{L} \frac{-1}{\pi} \left( \lim_{R \rightarrow \infty} \lim_{\epsilon \rightarrow 0} \left( \int_{\epsilon}^{R} \frac{F_k(t + \theta)- F_k(t - \theta)}{\theta} \mathrm{d\theta} \right) \right) \cdot e^{-i \omega t} \mathrm{dt} 
+\end{align}
+Damit man den Grenzwert $\lim{R\rightarrow \infty}$ und das Integral vertauschen kann, müssen wir einige Überlegungen anstellen.	 Die Intervalle $[-L, L]$ und $[\epsilon, R)$ sind Borelmengen, die Funktion $\frac{F_k(t + \theta)- F_k(t - \theta)}{\theta} \cdot e^{-i \omega t}$ ist eine Komposition von stetigen Funktionen ( $t \in [-L, L]$, $ \theta \in [\epsilon, R]$ ) und somit messbar. Trivialerweise konvergiert die Folge $g_R(t) := \int_{\epsilon}^{R} \frac{F_k(t + \theta)- F_k(t - \theta)}{\theta} \mathrm{d\theta}\cdot e^{-i \omega t}$ gegen $g(t) = \int_{\epsilon}^{\infty} \frac{F_k(t + \theta)- F_k(t - \theta)}{\theta} \mathrm{d\theta} \cdot e^{-i \omega t}$ für $R \rightarrow \infty$ und es existiert mit, $g_M(t):= \frac{2}{\epsilon} \cdot \norm{F_k}_{L_1}$ eine Majorante, was sich mit folgender Abschätzung zeigen lässt: 
+\begin{align}
+&\int_{-L}^{L} \abs{\int_{\epsilon}^{R} \frac{F_k(t + \theta)- F_k(t - \theta)}{\theta} \mathrm{d\theta}\cdot e^{-i \omega t}} \mathrm{dt} \\
+&\leq \frac{2}{\epsilon} \cdot \int_{-\infty}^{\infty} \int_{-\infty}^{\infty}  \abs{F_k(t + \theta)} \mathrm{d\theta}  \mathrm{dt} = \frac{2}{\epsilon} \cdot \norm{F_k}_{L_1}
+\end{align}
+Weiterhin folgt mit Satz \ref{a:change}
+\begin{align}
+	\mathscr{F}\{F_{H_k}\} =  \frac{-1}{\pi} \lim_{L \rightarrow \infty} \lim_{R \rightarrow \infty} \int_{-L}^{L} \left( \lim_{\epsilon \rightarrow 0} \left( \int_{\epsilon}^{R} \frac{F_k(t + \theta)- F_k(t - \theta)}{\theta} \mathrm{d\theta} \right) \right) \cdot e^{-i \omega t} \mathrm{dt} 
+\end{align}
+Analog konvergiert $h_{\epsilon}(t) := \int_{\epsilon}^{R} \frac{F_k(t + \theta)- F_k(t - \theta)}{\theta} \mathrm{d\theta}\cdot e^{-i \omega t}$ gegen $h(t) := \int_{0}^{R} \frac{F_k(t + \theta)- F_k(t - \theta)}{\theta} \mathrm{d\theta}\cdot e^{-i \omega t}$ für $\epsilon \rightarrow 0$. Wegen der allgemein bekannten Eigenschaft, dass $C^{\infty}$ dicht in $L^1$ liegt (und somit liegt o.E. auch $F_k$ in $\in C^{1}$) und mit den Mittelwertsatz der Differentialrechnung folgt
+\begin{align}
+	&\int_{-L}^{L} \abs{\int_{\epsilon}^{R} \frac{F_k(t + \theta)- F_k(t - \theta)}{\theta} \mathrm{d\theta}\cdot e^{-i \omega t}} \mathrm{dt} \\
+	&\leq \int_{-L}^{L} \int_{\epsilon}^{R} \abs{\frac{F_k(t + \theta) - F_k(t) - F_k(t - \theta) + F_k(t)}{\theta}} \mathrm{d\theta} \mathrm{dt}\\ 
+	&=  \int_{-L}^{L} \int_{\epsilon}^{R} \abs{\frac{F_k(t + \theta) - F_k(t)}{\theta} - \frac{F_k(t - \theta) - F_k(t)}{\theta}} \mathrm{d\theta} \mathrm{dt}\\
+	&\leq \int_{-L}^{L} \int_{\epsilon}^{R} \abs{F'_k(\xi)} + \abs{F'_k(\xi')} \mathrm{d\theta} \mathrm{dt} \quad \text{ mit } \xi \in [t, t + \theta] \text{ und } \xi' \in [t -  \theta, t]\\
+	&\leq  \int_{-L}^{L} 2(R-\epsilon) \sup{\abs{F_k'(\theta)}} \mathrm{dt} \leq 4 \cdot L \cdot R \cdot \sup{\abs{F_k'(\theta)}} 
+\end{align}
+Dann ist $h_M(t):= 4 \cdot L \cdot R \cdot \sup{\abs{F_k'(\theta)}}$ eine Majorante und es folgt mit Satz \ref{a:change}
+\begin{align}
+\mathscr{F}\{F_{H_k}\} =  \frac{-1}{\pi} \lim_{L \rightarrow \infty} \lim_{R \rightarrow \infty} \lim_{\epsilon \rightarrow 0} \int_{-L}^{L} \left( \int_{\epsilon}^{R} \frac{F_k(t + \theta)- F_k(t - \theta)}{\theta} \mathrm{d\theta}\right) \cdot e^{-i \omega t} \mathrm{dt}
+\end{align}
+Wir wollen nun die Integrale miteinander vertauschen. Dazu wird der Fubini verwendet.
+Der Fubini lässt sich deswegen anwenden, da die Intervalle und Funktionen, wie oben behandelt, die Voraussetzungen erfüllen, zu dem gilt:
+\begin{align}
+	\int_{-L}^{L} \int_{\epsilon}^{R} \abs{\frac{F_k(t + \theta)- F_k(t - \theta)}{\theta} \cdot e^{-i \omega t} }\mathrm{d\theta} \mathrm{dt} \leq \frac{2}{\epsilon} \norm{F_k}_{L^1}
+\end{align} 
+Abschließend werden mit den Argumenten von oben, Grenzwerte und Integrale vertauscht
+\begin{align}
+\mathscr{F}\{F_{H_k}\} &= \frac{-1}{\pi} \lim_{R \rightarrow \infty} \lim_{\epsilon \rightarrow 0} \int_{\epsilon}^{R} \lim_{L \rightarrow \infty} \left( \int_{-L}^{L} \frac{F_k(t + \theta)- F_k(t - \theta)}{\theta}  e^{-i \omega t} \mathrm{dt} \right) \mathrm{d\theta} \\ &= \frac{-1}{\pi} \lim_{\epsilon \rightarrow 0} \int_{\epsilon}^{\infty} \int_{-\infty}^{\infty} \frac{F_k(t + \theta)- F_k(t - \theta)}{\theta} \cdot e^{-i \omega t} \mathrm{dt} \mathrm{d\theta}\\
+&=\frac{-1}{\pi}\lim_{\epsilon \rightarrow 0} \left(\int_{\epsilon}^{\infty} \int_{-\infty}^{\infty} \frac{1}{\theta} e^{i \theta \omega} F_k(t + \theta) \cdot e^{-i \omega (t  + \theta)} \mathrm{dt} \mathrm{d\theta} \right. \\
+&\left. - \int_{\epsilon}^{\infty} \int_{-\infty}^{\infty} \frac{1}{\theta} e^{-i \theta \omega} F_k(t - \theta) \cdot e^{-i \omega (t  - \theta)} \mathrm{dt} \mathrm{d\theta}\right)\\
+&=  \lim_{\epsilon \rightarrow 0}\frac{1}{\pi}\left( \int_{-\infty}^{-\epsilon} \frac{1}{\theta} e^{-i \theta \omega} \int_{-\infty}^{\infty}  F_k(t - \theta) \cdot e^{-i \omega (t  - \theta)} \mathrm{dt} \mathrm{d\theta} \right.\\
+&\left.+ \int_{\epsilon}^{\infty} \frac{1}{\theta} e^{-i \theta \omega} \int_{-\infty}^{\infty} F_k(t - \theta) \cdot e^{-i \omega (t  - \theta)} \mathrm{dt} \mathrm{d\theta} \right)\\
+&= \frac{1}{\pi} P \int_{-\infty}^{\infty} \frac{1}{\theta} e^{-i \theta \omega} \mathrm{d\theta} \cdot  \int_{-\infty}^{\infty} F_k(t) \cdot e^{-i \omega t} \mathrm{dt} 
+\end{align}
+Ein Blick in die Tabelle in Anhang \ref{ft:tab} lohnt sich.
+\begin{align}
+\mathscr{F}\{F_{H_k}\} =  -\frac{i}{\pi} \cdot \sgn{\omega} \mathscr{F}\{F_k(\theta)\}(\omega)
+\end{align}
+Mit der Argumentation wie in Satz \ref{ht:artFou} folgt, dass $\mathscr{F}\{F_{H_k}\}$ gegen $\mathscr{F}\{F_{H}\}$ in $L^2$ konvergiert und damit ist die Richtigkeit der Gleichung \ref{kkt:fft} nachgewiesen.
+\end{proof}
+\end{satz}
+\label{kkt:Bemerkung}Erfüllt die Funktion $F(\omega)$ den Satz von Titchmarsh, dann ist der Real - und Imaginärteil von $F(\omega)$ folgendermaßen miteinander verbunden:
+\begin{align}
+	\mathscr{F}\{\Re{F(\omega_0)}) = -\frac{i}{\pi} \cdot \sgn{\omega_0} \cdot \mathscr{F}\{\Im{F(\omega)}\}(\omega_0)\\
+	\mathscr{F}\{\Im{F(\omega_0)}) = \frac{i}{\pi} \cdot \sgn{\omega_0} \cdot \mathscr{F}\{\Re{F(\omega)}\}(\omega_0)\text{, }
+\end{align}
+bzw. für reelle Funktionen ($\conj{F(\omega)} = F(-\omega)$ ) gültig.
+\begin{kor}
+Sei $\conj{F(\omega)} = F(-\omega)$  und erfüllt die Funktion den Satz von Titchmarsh, so ist der Real - und Imaginärteil von $F(\omega)$ folgendermaßen miteinander verbunden:
+\begin{align}
+	\mathscr{F}\{\Re{F(\omega)})(\omega_0) &= \frac{2}{\pi} \Im{ \sgn{\omega_0} \cdot  \mathscr{F}\{\Im{F(\omega)}\}(\omega_0)}\label{kkt:fft:Re}\\
+	\mathscr{F}\{\Im{F(\omega)})(\omega_0) &= - \frac{2 \cdot i}{\pi} \Re{ \sgn{\omega_0} \cdot  \mathscr{F}\{\Re{F(\omega)}\}(\omega_0)}\label{kkt:fft:Im}
+\end{align}
+\begin{proof}
+	Nach dem Satz von Titchmarsh \ref{ht:titch} folgt: 
+	\begin{align}
+		\Re{F(\omega)} &= \frac{1}{\pi} \int_{-\infty}^{\infty} \frac{\Im{F(\omega')}}{\omega - \omega'} \mathrm{d\omega'}\\
+						 &= \frac{1}{\pi} \left(\int_{0}^{\infty} \frac{\Im{F(\omega')}}{\omega - \omega'} \mathrm{d\omega'} - \int_{0}^{-\infty} \frac{\Im{F(\omega')}}{\omega - \omega'} \mathrm{d\omega'}\right)\\
+			&=\frac{1}{\pi} \left(\int_{0}^{\infty} \frac{\Im{F(\omega')}}{\omega - \omega'} \mathrm{d\omega'} - \int_{0}^{\infty} \frac{\Im{F(t)}}{\omega + t} \mathrm{dt}\right)\\
+			&=\frac{1}{\pi} \left(\int_{0}^{\infty} \frac{\Im{F(\omega')}}{\omega - \omega'} \mathrm{d\omega'} + \int_{0}^{\infty} \frac{\Im{F(t)}}{-\omega - t} \mathrm{dt}\right)\\
+	\end{align}
+	Zusammenhängend mit der Anmerkung \ref{ht:Anmerkung}
+	\begin{align}
+		\mathscr{F}\{\Re{F(\omega)}\}(\omega_0) &=  \frac{1}{\pi} \left( \mathscr{F}\{\frac{1}{\omega}\}(\omega_0) \cdot  \mathscr{F}\{\Im{F(\omega)}\}(\omega_0) \right.\\
+		&+  \left. \mathscr{F}\{\frac{1}{\omega}\}(-\omega_0) \cdot  \mathscr{F}\{\Im{F(\omega)}\}(-\omega_0)\right)\\
+		&=  \frac{1}{\pi} \left( \mathscr{F}\{\frac{1}{\omega}\}(\omega_0) \cdot  \mathscr{F}\{\Im{F(\omega)}\}(\omega_0) \right.\\
+		&+  \left. \conj{\mathscr{F}\{\frac{1}{\omega}\}(\omega_0) \cdot  \mathscr{F}\{\Im{F(\omega)}\}(\omega_0)}\right)\\
+		&= \frac{2}{\pi} \Re{\mathscr{F}\{\frac{1}{\omega}\}(\omega_0) \cdot  \mathscr{F}\{\Im{F(\omega)}\}(\omega_0)}\\
+		&= \frac{2}{\pi} \Re{-i \cdot \sgn{\omega_0} \cdot  \mathscr{F}\{\Im{F(\omega)}\}(\omega_0)}\\
+		&= \frac{2}{\pi} \Im{ \sgn{\omega_0} \cdot  \mathscr{F}\{\Im{F(\omega)}\}(\omega_0)}
+	\end{align}
+\end{proof}
+\end{kor}
+Die Gleichung \ref{kkt:fft:Re} und \ref{kkt:fft:Im} werden uns noch im weiteren Verlauf dieser Arbeit begegnen.
+\\\\
+\subsection{Logarithmische Darstellung der Kramers Kronig - Transformation}
+Im Folgenden wird der Beweis von Papoulis \cite[Seite 207-209]{Papoulis1962} für die Logarithmische Darstellung der Kramers Kronig - Transformation vorgestellt. Diese Darstellung wird einerseits zur numerischen Berechnung der Kramers - Kronig Gleichung, andererseits für die LKK für den Z-Hit - Algorithmus benötigt. Zuerst wenden wir uns aber einem Hilfslemma zu:
+\begin{lemma}\label{kkt:asym}
+Sei $n \in \mathbb{N}$, $t \in \mathbb{R}$, $n, t \geq 0$ und $f(t)$ differenzierbar im Ursprung  $t = 0$, dann folgt für die Laplacetransformierte von $f$ mit $F(z) = \mathscr{L}\{f(t)\}(z)$
+\begin{align}
+	f^{(n)}(0) = \lim_{z \rightarrow \infty} z^{n+1} F(z) \label{kkt:asym:gl2}
+\end{align}
+Dabei ist $f^{(n)}$ die erste Ableitung bei der die Ableitung nicht null ist.
+\begin{proof}
+Es folgt
+\begin{align}
+	f(0) = f'(0) \hdots = f^{(n-1)} = 0 \label{kkt:asym:gl1}
+\end{align}
+Betrachte nun die Taylorreihe von $f(t)$
+\begin{align}
+	T_n(x) = f(0) + f'(0) x + \hdots + \frac{f^{(n)}(0)}{n!}x^n \quad\text{, mit \ref{kkt:asym:gl1}, folgt}\\
+	f(t) \sim \frac{f^{(n)}(0)}{n!}x^n
+\end{align}
+und es folgt mit \ref{lt:t_n} für die Laplacetransformierte 
+\begin{align}
+	F(z) \sim \frac{f^{(n)}(0)}{z^{n+1}}
+\end{align}
+Dies beweist die Gleichung \ref{kkt:asym:gl2}
+\end{proof}
+\end{lemma}
+Dieses Lemma hat weittragende Folgen. Es besagt nämlich, dass die Werte der Laplacetransformierten $F(z)$ für große $z$, abhängig sind vom Verhalten von $f(t)$ nahe des Ursprungs $t = 0$. Kommen wir nun zum eigentlichen Beweis.
+\begin{satz}\label{lkk}(Logarithmische Kramers - Kronig Beziehung) Sei $\alpha(\omega), \beta(\omega) \in \mathbb{R}$ und $\alpha(\omega) = \Re{\logz{H(\omega}}$ und $\beta(\omega) = \Im{\logz{H(\omega}}$ und erfüllt die Funktion $H(\omega)$ den Satz von Titchmarsh \ref{ht:titch}, dann ist \ref{kkt:Re} und \ref{kkt:Im} äquivalent zu 
+\begin{align}
+	\beta(\omega_0) &= \frac{ \omega}{\pi} P \int_0^{\infty} \frac{\alpha(\omega)}{\omega^2 - \omega_0^2} \mathrm{d\omega} \text{, und}\label{lkk:gl:beta}\\
+	\alpha(\omega_0) &= \alpha(0) - \frac{\omega^2}{\pi} P \int_0^{\infty} \frac{\beta(\omega)}{\omega(\omega^2 - \omega_0^2)} \mathrm{d\omega}\label{lkk:gl:alpha}
+\end{align}
+\begin{proof}
+Man betrachtet zunächst die Funktion 
+\begin{align}
+	F(z) := \frac{\logz{H(z)}}{z^2 + \omega_0^2} \text{ mit } z \in \mathbb{C}
+\end{align}
+$F(z)$ ist analytisch in der rechten Halbebene, da die Funktion $H(z)$ den Satz von Titchmarsh \ref{ht:titch} per Definition erfüllt. Somit besitzt $H(z)$ keine Pole für $\Re{z} > 0$. Wir stellen fest, dass die einzigen Singularitäten von $F(z)$ auf der Imaginärachse liegen, mit den Punkten $\pm i \omega_0$. Somit ist $F(z)$ analytisch auf dem Gebiet, das durch die Kurve $C$ umrandet ist (Abb. \ref{fig:integralweg1}).
+Da $C$ eine stückweise stetig differenzierbare geschlossene Jordan - Kurve ist, gilt nach dem Cauchy Integralsatz 
+\begin{figure}[ht]
+	\centering
+	\def\svgwidth{0.5\columnwidth}
+	\input{images/integral_weg_1.pdf_tex}
+	\caption{Integralweg zur Berechnung des Phasenwinkels}
+	\label{fig:integralweg1}
+\end{figure}
+\begin{align}
+\int_{L + \gamma_1 + \gamma_2 + \Gamma} F(z) \mathrm{dz} = 0 \label{lkk:int} 
+\end{align}
+Um den Wert von $\int_{\Gamma} F(z) \mathrm{dz} $ zu bestimmen, betrachtet man zunächst das Verhalten $H(z)$ im Unendlichen. Es folgt von der asymptotischen Form \ref{kkt:asym} und $h^{(k-1)}(0) = a$
+\begin{align}
+\lim_{z \rightarrow \infty} \logz{H(z)} = \lim_{z \rightarrow \infty} \logz{\frac{a}{z^{k}}} =  \lim_{z \rightarrow \infty} -k \logz{z} + \logz{a}
+\end{align}
+Es folgt, dass die Grenze für $k \neq 0$ unendlich ist. Für $z F(z)$ schließt sich aber
+\begin{align}
+	\lim_{z \rightarrow \infty} z F(z) = \lim_{z \rightarrow \infty} \frac{-k \logz{z} + \logz{a}}{z + \frac{\omega_0^2}{z}} \overbrace{=}^{L'H} = \lim_{z \rightarrow \infty} \frac{k}{z^2-\omega_0} = 0
+\end{align}
+an. Was zu  
+\begin{align}
+	 \int_{\Gamma} F(z) \mathrm{dz} \rightarrow 0 \text{ für }\Omega \rightarrow \infty  
+\end{align} 
+führt. Betrachtet man nun den oberen Kreis $\gamma_1$, dann folgt mit der Parametrisierung $\gamma_1(t) = i\omega_0 + r \cdot e^{i t}$ und $0 < t < \pi$
+\begin{align}
+	\int_{\gamma_1} \frac{\logz{H(z)}\mathrm{dz}}{z^2+\omega_0^2} = \lim_{r\rightarrow 0} \int_0^{\pi} \frac{H(\omega_0 + r \cdot e^{i t}) \cdot {i r e^{it}} \mathrm{dt}}{(i \omega_0 + r \cdot e^{i t})^2 + \omega_0^2}  = \frac{\logz{H(\omega_0)}}{2 i \omega_0} i \pi 
+\end{align}
+Analog für den unteren Kreis $\gamma_2$ 
+\begin{align}
+	\int_{\gamma_2} \frac{\logz{H(z)}\mathrm{dz}}{z^2+\omega_0^2} = \frac{\logz{H(-\omega_0)}}{-2 i \omega_0} i \pi 
+\end{align}
+Der letzte Abschnitt des Integrales \ref{lkk:int} lässt sich mit Hilfe des Cauchy - Hauptwertes darstellen,
+d.h.
+\begin{align}
+	\int_L \frac{H(z)\mathrm{dz}}{z^2 + \omega_0^2} = P \int_{-\infty}^{\infty} \frac{H(i \omega)}{- \omega^2 + \omega_0^2} i \mathrm{d\omega} \label{lkk:pv}
+\end{align}
+Folgend mit den Gleichungen \ref{lkk:pv} bis \ref{lkk:int} und $H(\omega)$ von $\mathbb{R}$ nach $\mathbb{C}$ geht, ist mit $R(\omega) \in \mathbb{R}^+_0$ sowie
+\begin{align}
+	H(\omega) &= R(\omega) e^{(-i\beta(\omega))} = e^{-\alpha(\omega) - i\beta(\omega)} \text{, und es folgt }\\
+	\logz{H(i \omega)}	&= \logz{H(\omega)}  = -\alpha(\omega) - i \beta(\omega)\text{, }
+\end{align}
+dass
+\begin{align}
+	i \int_{-\infty}^{\infty} \frac{\alpha(\omega) + i \beta(\omega)}{-\omega^2 + \omega_0^2}\mathrm{d\omega} + \frac{\pi}{2\omega_0} \left[ \alpha(\omega_0) + i \beta(\omega_0) - \alpha(-\omega_0) - i \beta(-\omega_0) \right] = 0\label{lkk:gl:end}
+\end{align}
+Die Gleichung \ref{lkk:gl:beta} folgt von \ref{lkk:gl:end}
+\begin{align}
+	\alpha(-\omega) = \alpha(\omega) \qquad \beta(-\omega) = -\beta(\omega)
+\end{align}
+\begin{figure}[ht]
+	\centering
+	\def\svgwidth{0.5\columnwidth}
+	\input{images/integral_weg_2.pdf_tex}
+	\caption{Integralweg zur Berechnung des logarithmischen Betrags}
+	\label{fig:integralweg2}
+\end{figure}
+Um die Gleichung \ref{lkk:gl:alpha} zu beweisen, integriert man über die Funktion
+\begin{align}
+	F(z) = \frac{\logz{H(z}}{z(z^2+\omega_0^2)}
+\end{align}
+entlang der geschlossen Kurve von der Abbildung \ref{fig:integralweg2}. Erneut ist die Funktion $F(z)$ im Inneren analytisch. Die Abschnitte $\Gamma$, $\gamma_1$, $\gamma_2$ und $L$ des Integrals können genauso ausgewertet werden wie oben. Es resultiert eine ähnliche Gleichung wie in \ref{lkk:gl:end}, in welcher aber die Kurve $\gamma_0$ hinzugefügt werden muss. Aus 
+\begin{align}
+	\int_{\gamma_3} \frac{\logz{H(\omega)}}{z(z^2 + \omega_0^2)} \mathrm{dz} \overbrace{=}^{\gamma(t) = r \cdot e^{it} } \frac{\alpha(0)}{\omega_0^2} i\pi
+\end{align} 
+und vorherigen Resultaten folgt die Gleichung \ref{lkk:gl:alpha}.
+\end{proof}
+\end{satz}
+Es wird nun die Hilbert - Transformation mit Subtraktion \cite{Triverio2006a} vorgestellt. In der Praxis kann die Übertragungsfunktion $H(\omega)$ nicht auf ihre Quadratintegrierbarkeit zertifiziert werden. Hier kommt nun die Hilbert - Transformation mit Subtraktion zum Einsatz. Sie filtert konstante Anteile heraus.
+\subsection{Hilbert - Transformation mit Subtraktion}\label{skkt}
+\begin{satz}(Hilbert - Transformation mit Subtraktion und Ableitung   )
+Sei $H(\omega)$, $n + 1$ - mal differenzierbar in $\omega_0$ und beschränkt mit $\abs{H(\omega)}^2 \leq A$ dann gilt:
+\begin{align}
+	H(\omega) &= H(\omega_0) + (\omega - \omega_0) H'(\omega) + \cdots + \frac{(\omega - \omega_0)^n}{n!} H^{(n)}(\omega_0)\\
+	&+ \frac{(\omega - \omega_0)^{n+1}}{\pi i} P \int^{\infty}_{-\infty} \frac{H(\omega') - H(\omega_0) - \hdots - \frac{(\omega' - \omega_0)^n}{n!} H^{(n)}(\omega_0)}{(\omega' - \omega_0)^{n+1}} \\
+	&\cdot \frac{\mathrm{d\omega'}}{(\omega' - \omega)} \label{skkt:diff}
+\end{align}
+\begin{proof}
+Betrachte zunächst die Funktion 
+\begin{align}
+	D(\omega) = \frac{\left[H(\omega) - H(\omega_0)\right]}{\omega - \omega_0}  = \frac{\Delta(\omega)}{(\omega - \omega_0)} 
+\end{align}
+	Sie ist beschränkt für $\omega \rightarrow \omega_0$, da $H$ in $\omega_0$ per Definition n-mal differenzierbar ist, sowie holomorph in der oberen Halbebene quadratintegierbar. Wir zeigen nun die Kausalität der Funktion. Dazu betrachte zuerst die Funktion
+	\begin{align}
+	 	F(\omega) = \frac{1}{\omega - \gamma} \text{, mit } \gamma \in \mathbb{C} \text{ und } \Im{\gamma} < 0,
+	\end{align}
+	Sie ist trivialerweise kausal. Man betrachte nun $H(\omega)$ als Übertragungsfunktion und $F(\omega)$ als Eingabesignal. Da $F(\omega)$ kausal ist und $H(\omega)$ per Definition $\abs{H(\omega} \leq A$ folgt, dass das Ausgabesignal $y(\omega)$ und $\frac{\Delta(\omega)}{(\omega - \gamma)}$ kausal ist. Es gilt die Beziehung \ref{ht}
+	\begin{align}
+		\Delta(\omega) = \frac{\omega - \gamma}{\pi i} P \int_{-\infty}^{\infty} \frac{\Delta(\omega')\mathrm{d\omega'}}{(\omega'-\gamma)(\omega'-\omega)}\label{skkt:gl1}
+	\end{align}
+	Für $\omega  = \omega_0$, dies wird zu 
+	\begin{align}
+		0 = \frac{\omega_0 - \gamma}{\pi i} P \int_{-\infty}^{\infty} \frac{\Delta(\omega')\mathrm{d\omega'}}{(\omega'-\gamma)(\omega'-\omega_0)}\label{skkt:gl2}
+	\end{align}
+	Man subtrahiere \ref{skkt:gl2} von \ref{skkt:gl1} und berechne 
+	\begin{align}
+		\frac{\omega-\gamma}{\omega' - \omega} - \frac{\omega_0 - \gamma}{\omega' - \omega} = \frac{(\omega - \omega_0)(\omega' - \gamma)}{(\omega' - \omega_0)(\omega' - \omega)}\label{skkt:gl3}
+	\end{align}
+	Daraus ergibt sich 
+	\begin{align}
+		H(\omega) = H(\omega_0) + \frac{\omega - \omega_0}{\pi i}  P \int_{-\infty}^{\infty} \frac{\left[H(\omega') - H(\omega_0) \right]\mathrm{d\omega'}}{(\omega'-\omega_0)(\omega'-\omega)}\label{skkt:gl4}
+	\end{align}
+	Dies ist die Hilbertransformatierte von $D(\omega)$ und äquivalent zur Hilbert - Transformation \ref{ht}. Somit ist $D(\omega)$ kausal.
+	Nun haben wir die Hilbert - Transformation mit einer Subtraktion gezeigt. Um auf die endgültige Gleichung \ref{skkt:diff} zu kommen, wendet man die Schritte \ref{skkt:gl1} und \ref{skkt:gl4} iterativ auf die Gleichung 
+	\begin{align}
+		D_n(\omega) = \left[H(\omega) - H(\omega_0) - (\omega - \omega_0)H'(\omega_0) \hdots \frac{(\omega - \omega_0)}{n!} H^{(n)}(\omega_0)   \right]
+	\end{align}
+	an. 
+\end{proof}
+\end{satz}
+Der Zweck des Entfernens von mehr als den notwendigen Subtraktionen (es muss eigentlich nur der konstante Anteil entfernt werden) ist normalerweise das Verbessern der Konvergenz des Integrals bei hohen Frequenzen. Diese Verbesserung wird auf Kosten der zusätzlichen benötigen Kenntnisse über das Verhalten von $H(\omega)$ in der Umgebung von $\omega_0$ gemacht. Anstatt die Ableitungen höherer Ordnung zu bestimmen, welches in der Praxis sehr schwer sein kann, können die Funktionswerte an verschiedenen Punkten bestimmt werden. 
+Beispielsweise bestimmt man die Gleichung \ref{skkt:gl4} für die Phasenwinkel $\omega_0$ und $\omega_1$ und subtrahiert die einzelnen Terme von einander. Man erreicht folgenden Ausdruck:
+\begin{align}
+	H(\omega) = \left(\frac{\omega - \omega_1}{\omega_0 - \omega_1} \right) H(\omega_0) - \left(\frac{\omega - \omega_0}{\omega_0 - \omega_1} \right) H(\omega_1) +\frac{(\omega - \omega_0)(\omega-\omega_1)}{\pi i} \\
+	\cdot P \int_{-\infty}^{\infty} \frac{\left[H(\omega') - \frac{\omega' - \omega_1}{\omega_0 - \omega_1} H(\omega_0) + \frac{\omega' - \omega_0}{\omega_0 - \omega_1} H(\omega_1)\right]}{(\omega' - \omega_0)(\omega' - \omega_1)(\omega' - \omega)}
+\end{align} 
+Iterativ gilt $n$ - Frequenzen:
+\begin{align}
+H(\omega) = S(\omega) + \frac{\prod_{q=0}^{n} (\omega - \omega_q)}{\pi i} P \int_{-\infty}^{\infty} \frac{H(\omega') - S(\omega')}{\prod_{q = 0} (\omega' - \omega_q)} \frac{\mathrm{d\omega'}}{\omega' -\omega} 
+\end{align}
+mit $S(\omega) = \sum_{q=0}^{n} l_q(\omega) H(\omega_q)$ und 
+\begin{align}
+	l_q(\omega) = \prod_{\stackrel{p=0 }{p \neq q}}^n \frac{\omega - \omega_p}{\omega_q - \omega_p} \text{ Lagrange Interpolationpolynom}
+\end{align}\cite{Triverio2006a}\\
+Mit Satz von dem Titchmarsh schließt sich für $\Re{H(\omega)}$ und $\Im{H(\omega)}$ folgendes an:
+\begin{align}
+\Im{H(\omega)} = S_{Im}(\omega) + \frac{\prod_{q=0}^{n} (\omega - \omega_q)}{\pi} P \int_{-\infty}^{\infty} \frac{\Re{H(\omega')} - S_{Re}(\omega')}{\prod_{q = 0} (\omega' - \omega_q)} \frac{\mathrm{d\omega'}}{\omega' -\omega}\label{skkt:Im} \\
+\Re{H(\omega)} = S_{Re}(\omega) - \frac{\prod_{q=0}^{n} (\omega - \omega_q)}{\pi} P \int_{-\infty}^{\infty} \frac{\Im{H(\omega')} - S_{Im}(\omega')}{\prod_{q = 0} (\omega' - \omega_q)} \frac{\mathrm{d\omega'}}{\omega' -\omega}\label{skkt:Re}
+\end{align}
+mit $S_K(\omega) = \sum_{q=0}^{n} l_q(\omega) K\{H(\omega_q)\}$, $K = \{Re, Im\}$ und 
+\begin{align}
+	l_q(\omega) = \prod_{\stackrel{p=0 }{p \neq q}}^n \frac{\omega - \omega_p}{\omega_q - \omega_p} \text{ Lagrange Interpolationpolynom}
+\end{align}
+Die Gleichungen \ref{skkt:Im} und \ref{skkt:Re} stellen Alternativen zu der Gleichung \ref{skkt:diff} dar und werden uns im Abschnitt \grqq numerische Verfahren\grqq wieder begegnen.

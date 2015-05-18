@@ -1,0 +1,48 @@
+\chapter{Fouriertransformation}\label{ft}
+\begin{satz}\label{ft:def:fourier}(Fouriertransformation) Sei $\omega \in \mathbb{R}$, $f \in \lint{1}{\mathbb{R}}$ und man betrachte die Formel
+\begin{align}
+	\mathscr{F}\{f(t)\}(\omega) = \int_{-\infty}^{\infty}{f(t) \exp{(-i \omega t)}} \mathrm{dt}
+\end{align}
+\end{satz}\cite[Seite 1163]{Mathe2012}
+\begin{satz}(Umkehrformel für Fouriertransformation)\label{ft:umkehr}
+Mit $x(t) \in L^2(\mathbb{R})$ ist auch $\tilde{x}:=\mathscr{F} \{x(t)\}(\omega) \in L^2(\mathbb{R})$ und es gilt
+\begin{align}
+	x(t) = \mathscr{F}^{-1}\{\tilde{x}(\omega)\}(t) = \frac{1}{2 \pi} \cdot \int_{-\infty}^{\infty}{\tilde{x}(\omega) e^{i \omega t}} \mathrm{d\omega} =  \frac{1}{2 \pi} \cdot \int_{-\infty}^{\infty}{\mathscr{F} \{x(t)\}(\omega) e^{i \omega t}} \mathrm{d\omega}
+\end{align}
+Ferner gilt die \textbf{Formel von Plancherel}
+\begin{align}\label{ft:plancherel}
+\langle \mathscr{F}x, \mathscr{F}y \rangle_{L^2} = 2 \pi \langle x, y \rangle_{L^2}
+\end{align}
+mit $x$, $y \in L^2(\mathrm{R})$ 
+\end{satz}\cite[Seite 1163]{Mathe2012}
+\begin{defi}
+Der Funktionenraum 
+\begin{align}
+	S(\mathbb{R}):= \left\{x \in C^{\infty}(\mathbb{R}) \vert t^p x^{k} \in L(\mathbb{R}) \forall p\text{, } k \in \mathbb{N}_0\right\}
+\end{align}
+wird Schwartz-Raum oder Menge der schnell abfallenden Funktionen genannt.
+\end{defi}
+\begin{satz}
+Sei $x \in L^2(\mathbb{R})$, $y \in L(\mathbb{R})$ (oder umgekehrt), so gilt 
+\begin{align}
+	\mathscr{F}\{x * y\}(s) = \mathscr{F}\{x\}(s) \cdot \mathscr{F}\{y\}(s)
+\end{align}
+Sei $x \in L^2(\mathbb{R})$, $y \in S(\mathbb{R})$ (oder umgekehrt), so gilt
+\begin{align}
+	\mathscr{F}\{x y\}(s) = (\mathscr{F}\{x\} * \mathscr{F}\{y\})(s)
+\end{align}
+\end{satz}
+\section{Einige Fouriertransformationen}\label{ft:tab}
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\rule[-1ex]{0pt}{2.5ex} Signal & Fouriertransformierte \\  
+\rule[-1ex]{0pt}{2.5ex} $x(t)$ & $\mathscr{F}\{x(t)\}(i \omega)$ \\
+\hline  
+\rule[-1ex]{0pt}{2.5ex} $\sgn{t}$ & $\sqrt{\frac{2}{\pi}} \cdot \frac{1}{i \omega} $ \\ 
+\hline
+\rule[-1ex]{0pt}{2.5ex} $t^n$ & $- i \frac{(-i \omega)^{n-1}}{(n-1)!}\sgn{\omega}$\\ 
+\hline 
+\end{tabular} 
+\end{center} 
+

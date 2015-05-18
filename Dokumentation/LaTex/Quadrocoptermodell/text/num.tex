@@ -1,0 +1,487 @@
+\chapter{Numerische Verfahren zur Hilbert Transformation}\label{num}
+Wir werden nun numerische Lösungsverfahren kennenlernen, die auf in Kapitel \ref{kkt:c} bewiesenen Gleichungen beruhen. Zudem werden wir sie anhand im Kapital \ref{mod} besprochenen Modell validieren und abschließend mit Hilfe von Kriterien miteinander vergleichen. Die Originaldaten werden durch das in Kapitel \ref{mod} besprochene Modell \ref{mod:bsp} generiert. Anzumerken ist noch, dass die numerischen Verfahren nur angeschnitten werden, die Vollständigkeit ist nicht gewährleistet. Beginnen werden wir mit der klassischen KKT.
+\section{Kramers - Kronig Transformation}\label{kkt:num}
+Ich stelle nun das Verfahren von Boukamp \cite{Boukamp1993} zur Kramers - Kronig Transformation vor.
+Rufen wir uns, wie im Abschnitt \ref{kkt} bewiesen, die alternativen Gleichungen, (Satz \ref{kkt}) der Kramers - Kronig  Transformation ins Gedächtnis:
+\begin{align}
+\Re{H(\omega_0)} &= -\frac{2}{\pi} P \int_0^{\infty} \frac{\omega \Im{H(\omega)}-\omega_0 \Im{H(\omega_0)}}{\omega^2 - \omega^2_0} \mathrm{d\omega}\label{num:kkt:re}\\
+	\Im{H(\omega_0)} &= \frac{2}{\pi} P \int_0^{\infty} \frac{\omega_0 \Re{H(\omega)} - \omega_0 \Re{H(\omega_0)}}{\omega^2 - \omega^2_0} \mathrm{d\omega} \label{num:kkt:im}
+\end{align}
+Diese Gleichungen stellen uns vor mehrere Probleme:
+\begin{enumerate}
+\item Bei der Auswertung der EIS können nur eine geringe Anzahl von Datenpunkte gesammelt werden. Datenpunkte, zwischen Messdaten, müssen interpoliert werden\label{num:kkt:prob1}
+\item Um die Integrale, welche als Cauchy - Hauptwerte gegeben sind, in uneigentliche Integrale zu wandeln, werden nach Satz \ref{kkt:alternative:heb} die Ableitungen $\frac{\mathrm{d}}{\mathrm{d\omega}} \Re{H(\omega)}$ und $\frac{\mathrm{d}}{\mathrm{d\omega}} \Im{H(\omega)}$ an der Stelle $\omega_0$ benötigt. \label{num:kkt:prob2}
+\item Der Bereich zwischen $0$ und einer unteren Grenzen $\omega_{min}$ und der Bereich $\omega_{max}$ und Unendlich kann messtechnisch nicht erfasst werden. Die Grenzen $\omega_{min}$ und $\omega_{max}$ sind abhängig von der Auflösung der Messinstrumente (Beispiel Gamry)
+\end{enumerate} (Vgl. \cite{Boukamp1993})
+Wenden wir uns zunächst Punkt \ref{num:kkt:prob1} zu und betrachten die Quotienten\\ $b_{1, i}:=-\frac{2}{\pi} \frac{\omega_i \Im{H(\omega_i)}-\omega_0 \Im{H(\omega_0)}}{\omega_i^2 - \omega^2_0}$ bzw. $b_{2, i}:=\frac{2}{\pi} \frac{\omega_0 \Re{H(\omega_i)} - \omega_0 \Re{H(\omega_0)}}{\omega_i^2 - \omega^2_0}$. Durch Einsetzen der Messdaten $\omega_i$ (ohne $\omega_i = \omega_0$) entsteht ein neuer Datensatz $b_1 = \left(\begin{array}{c}
+b_{1,1} \\ 
+\cdots \\ 
+b_{1,m-1}
+\end{array} \right)$ bzw. $b_2 = \left(\begin{array}{c}
+b_{2,1} \\ 
+\cdots \\ 
+b_{2,m-1}
+\end{array} \right)$. 
+Im Paper \cite{Boukamp1993} von Boukamp werden diese neue gewonnen Datensätze durch zwei Arten approximiert:
+\subsection{Extrapolation durch Polynome}
+Für die Extrapolation, zwischen $\omega_{min}$ und $\omega_{max}$, gibt er $l$ Polynome zweiten bis sechsten Grades durch $m$ Datenpunkte an. Es gilt für eines der $l$ Polynome
+\begin{align}
+	y(t_i, \omega_0 ... \omega_n) = \sum_{k = 0}^{n} x_k \omega_{i}^{k} \text{, mit } n \in [2, 6]
+\end{align}
+Um die Koeffizienten $x_i \in \mathbb{R}$ zu bestimmen, schlägt Boukamp die Methode der kleinsten Quadrate vor. Dies führt zu folgendem Minimierungsproblem 
+\begin{align}
+	\sum_{i=0}^m (y(t_i, \omega_1, \cdots, \omega_n) - b_{i}^2 = \sum_{i=1}^m \left(\sum_{k = 0}^{n} x_k \omega_{i}^{k} - b_i \right)^2 \text{, }
+\end{align}
+bzw. zu dem Ausgleichsproblem (siehe Anhang \ref{a:resp})
+\begin{align}
+	\norm{Ax^* - b}_2 = \min{x \in \mathbb{R}} \norm{A x - b}_2 \text{, mit } \\
+	A= \left[
+		\begin{array}{cccccc}
+		1 & \omega_1 & \omega_1^2 & \cdots & \omega_1^{n-1} & \omega_1^{n} \\ 
+		1 & \omega_2 & \omega_2^2 & \cdots & \omega_2^{n-1} & \omega_2^{n} \\ 
+		\vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+		1 & \omega_m & \omega_m^2 & \cdots & \omega_m^{n-1} & \omega_m^{n}
+		\end{array} 
+		\right] \text{ und } b \in \mathbb{R}^m
+\end{align} 
+Mit Hilfe des Verfahrens, das im Anhang (\ref{a:resp:num}) beschrieben ist, kann das Ausgleichsproblem numerisch gelöst werden. Für $l$ Polynome gibt es somit $l-1$ Ausgleichsprobleme.
+\subsection{Interpolation durch Spline}
+Das zweite Verfahren beruht auf der Problemstellung, dass man einen natürlichen kubischen Spline dritter Ordnung
+\begin{align}
+	S(\omega) = P_i(\omega) = a_i(\omega-\omega_i)^3 + b_i(\omega-\omega_i)^2 + c_i(\omega-\omega_i) +d_i \quad \text{für } \omega\in [\omega_i, \omega_{i+1}], i=1...n-1
+\end{align} durch $n$ Stützstellen legt. Die Bestimmung der Koeffizienten $a_i$, $b_i$, $c_i$ und $d_i$ wird im Anhang \ref{a:spline} angesprochen.
+\subsection{Integration}
+Es wurden nun zwei Möglichkeiten der Interpolation vorgestellt. Wir wenden uns bei der Integration zu der schnellsten Methode zu: Integration über den gewonnenen Spline. Das Integral zwischen zwei Stützstellen lässt sich analytisch bestimmen
+\begin{align}
+	\int_{\omega_i}^{\omega_{i+1}} S(\omega) \mathrm{d\omega} = \frac{1}{4} a_i(\omega_{i+1}-\omega_i)^4 + \frac{1}{3} b_i(\omega_{i+1}-\omega_i)^3 + \frac{1}{2} c_i(\omega_{i+1}-\omega_i)^2 +d_i (\omega_{i+1}-\omega_i)
+\end{align}
+mit vorher bestimmten Koeffizienten $a_i$, $b_i$, $c_i$ und $d_i$ \\
+Die Integration über die Polynome funktioniert äquivalent. Dazu wird ein Polynom $n$ - ten Grades durch einen Teilbereich von $[\omega_{min}, \omega_{max}]$ mit $m$ Datenpunkten gelegt. Auch dafür ist ein analytischer Ausdruck vorhanden
+\begin{align}
+	\int_{\omega_j}^{\omega_{j +m -1}} \sum_{i = 0}^{n} x_i \omega^i \mathrm{d\omega} = \sum_{i = 0}^{n} \frac{x_i}{i+1} (\omega^{i+1}_{j+m-1} - \omega_{j}^{i+1})
+\end{align}
+Dazu müssen die generierten Daten in $l-1$ Datensets eingeteilt werden, mit mindestens $m$ Datenpunkten. Die Koeffizienten werden, wie oben beschrieben, bestimmt. \\
+
+\subsection{Heben der Polstelle}
+Wie in Problemstellung \ref{num:kkt:prob2} beschrieben befindet sich im Punkt $\omega = \omega_0$ eine Polstelle. Beim Auswerten der Quotienten wurde, ohne dies groß zu erwähnen, die Stelle ignoriert. Diese ist nach Boukamp eine von zwei Möglichkeiten diesem Problem her zu werden. Die zweite Möglichkeit ist mit Hilfe der Ableitungen und Satz \ref{kkt:alternative:heb} die Nullstelle zu heben. Dabei muss aber für $\Re{H(\omega)}$ bzw. $\Im{H(\omega)}$ die Ableitung berechnet werden. Entweder berechnet man den Spline für den ganzen Datensatz oder extrapoliert nur den Bereich $\omega_0 \in [\omega_i, \omega_{i+1}]$ mit einem Polynomen $n$ - Grades für den $\Re{H(\omega)}$ bzw. $\Im{H(\omega)}$. Da bei beiden Verfahren Polynomen entstehen, ist es analog zur Integration sehr einfach die Ableitung an der Stelle $\omega_0$ zu finden.\cite{Boukamp1993} 
+\subsection{Randbereiche}
+Für die Approximation der Randbereiche schlägt Boukamp \cite{Boukamp1993} zwei Arten vor: Extrapolation oder Approximation durch passive Elemente. Dabei werden für niedrige Frequenzen das im Kapitel Modell \ref{mod} besprochene, Constant Phase Element und ein in Reihe geschalteter Widerstand $R_{CPE}$ verwendet. Gegebenenfalls können die hohen Frequenzen, wenn Induktionseffekte auftreten, durch eine Spule approximiert werden.\\ Boukamp schlägt folgende Approximation mit Bauteilen zwischen $\omega \in [0, \omega_{min}]$ vor. Für den Realteil für $\omega_{min} << \omega_0$. Mit $\omega <<\omega$ gilt
+\begin{align}
+&\int_0^{\omega_{min}} \frac{\omega Z_{0, \text{im}} \omega^{-\alpha} - \omega_0 \Im{H(\omega)}}{\omega^2 - \omega_0^2} \approx \frac{\omega_{min}}{\omega_0} \Im{H(\omega_0)} - \frac{\omega_{\min}^{2-\alpha}}{\omega_0 (2-\alpha)} Z_{0, im} \text{, mit }\\
+&Z_{0, \text{im}} = Z_0 \sin(\frac{\alpha \pi}{2}) \text{, }
+\end{align} bzw. für den Imaginärteil ist die Abschätzung
+\begin{align}
+&\int_0^{\omega_{min}} \frac{ R_{CPE} + Z_{0, \text{re}} \omega^{-\alpha} - \Re{H(\omega)}}{\omega^2 - \omega_0^2}
+\approx \frac{\omega_{min}}{\omega_0^2} (\Re{H(\omega_0)} - R_{CPE}) - \frac{\omega_{\min}^{1-\alpha}}{\omega_0 (1-\alpha)} Z_{0, re} \text{, mit }\\
+&Z_{0, \text{im}} = Z_0 \cos(\frac{\alpha \pi}{2})
+\end{align}
+\begin{bem}
+	Als Alternative, zur von Boukamp \cite{Boukamp1993} vorgeschlagene Abschätzungen der Warburg - Impedanz, würde sich auch die Approximation der Warburg - Elements durch RC - Glieder anbieten (siehe Approximation des endlichen Warburg Elements \ref{mod:finiteWarburg}).
+\end{bem}
+
+Aufgrund des Umfanges wurde die Interpolation durch Splines und Approximation durch passive Elemente nicht implementiert und muss daher an anderer Stelle vertieft werden. 
+\subsection{Graphische Auswertung}
+\begin{figure}[h]
+	\centering	
+	\includegraphics[width=1\columnwidth]{kkt.eps}
+	\caption{Graphischer Vergleich zwischen Originaldaten: KKT und KKT mit hebbarer Polstelle und mit folgenden Parametern $m=7$,  $n=4$}
+	\label{fig:kkt}
+\end{figure}
+Die Werte bei großen Frequenzen sind so klein in dieser Skalierung, dass der subjektive Eindruck entsteht, dass mit steigender Frequenz die Genauigkeit des Verfahrens zunimmt. Der Abgleich mit dem Relativen Fehler zeigt auf, dass mit steigender Frequenz das Lösungsverfahren divergiert. 
+
+%Man kann gut erkennen, dass mit zunehmenden Frequenz die Divergenz zwischen den Originaldaten und den beiden Lösungsverfahren zunimmt.
+%Der Abgleich mit dem relativen Fehler bestätigt, diesen ersten subjektiven Eindruck. 
+\begin{figure}[h]
+\centering
+	\includegraphics[width=1\columnwidth]{kkt_rel.eps}
+	\caption{Relativer Fehler der KKT und KKT mit hebbarer Ableitung und mit folgenden Parametern $m=7$,  $n=4$}
+	\label{fig:kkt_rel}
+\end{figure}
+Zum anderen ist zu erkennen, dass die Berechnung der Ableitung das Lösungsverfahren nicht verbessert. Im Gegenteil, an vielen Stellen ist die KKT mit Ableitung schlechter als die KKT mit Auslassen der Polstelle. Das lässt sich durch das schlechte numerische Verhalten von Ableitungen erklären. Aufgrund des hohen Mehraufwandes bei der Implementierung sowie nicht zufriedenstellende Resultate wird dieses Verfahren nicht weiter betrachtet. 
+\newpage
+\section{Fast Fourier - Transformation}
+Nun gehen wir auf eine Methode ein, die auf der Fourier - Transformation beruht. Diese Vorgehensweise wird im Paper \cite{Bruzzoni2002} vorgestellt. Erinnern wir uns an die im Abschnitt \ref{kkt} bewiesen Gleichungen \ref{kkt:fft:Re} und \ref{kkt:fft:Im}
+\begin{align}
+	\mathscr{F}\{\Re{F(\omega)})(\tau) &= \frac{2}{\pi} \Im{ \sgn{\tau} \cdot  \mathscr{F}\{\Im{F(\tau)}\}(\tau)}\label{kkt:fft:Re}\\
+	\mathscr{F}\{\Im{F(\omega)})(\tau) &= - \frac{2 \cdot i}{\pi} \Re{ \sgn{\tau} \cdot  \mathscr{F}\{\Re{F(\omega)}\}(\tau)}\label{kkt:fft:Im}
+\end{align}
+Für numerische Lösung verwenden wir nun die Fast Fourier Transformation, abgekürzt FFT. Der FFT - Algorithmus arbeitet nur mit $2^k$, $k \in \mathbb{N}$ Stützstellen. Die Anzahl der Stützstellen $N$ multipliziert mit der konstanten Ausgabeschrittweite $\Delta \omega$ ergibt die Frequenz $\omega_{max}$ des Frequenzspektrums, das von der FFT ausgewertet wird:
+\begin{align}
+	\omega_{max}=  N \cdot \Delta \omega 
+\end{align}
+Bei $N$ geraden Stützstellen werden $\frac{N}{2}$ äquidistante Daten ausgewertet und es gilt folgende Abschätzung
+\begin{align}
+	\tau_{min} = \frac{1}{\omega_{max}} \leq n \frac{1}{\omega_{max}} \leq \frac{N}{2} \frac{1}{\omega_{max}} \underbrace{=}_{\omega_{max} = N \Delta \omega}  \frac{\pi}{\Delta \omega} = \tau_{max} \quad n = 1, \hdots \frac{N}{2}
+\end{align}
+Die Gleichung gilt auch nahezu unverändert für eine ungerade Anzahl von Stützstellen \cite{Kuypers2008}.
+Da aber die Daten eines EIS nicht in konstanter Schrittweite vorliegt, schlägt der Autor des Papers \cite{Bruzzoni2002} vor, einen kubischen Spline durch die Daten zu legen, um diesen bei gleicher Schrittweite auszuwerten. Dabei ist die Schrittweite gegeben mit 
+$\Delta \omega =  \omega_{max}/N$.
+Um nun die Gleichungen \ref{kkt:fft:Re} und \ref{kkt:fft:Im} zu bestimmen, sind folgende Schritte notwendig:
+\begin{enumerate}[label=\roman*]
+\item Anwendung der FFT auf den Imaginär - bzw. Realteil von $F(\omega)$ liefert einen neuen Datensatz von $\frac{N}{2}$ äquidistanten Datenpunkte. Durch die Struktur der FFT - Berechnung ist die erste Hälfte des Ergebnisses den positiven $\tau$ und die zweite Hälfte den negativen $\tau$ zugeordnet.
+\item  Nachdem die Signumfunktion und der Imaginärteil extrahiert worden ist, folgt das Ausführen der Inversen FFT.  
+\end{enumerate}
+\subsection{Graphische Auswertung}
+\begin{figure}[h]
+	\includegraphics[width=1\columnwidth]{faltung.eps}
+	\caption{Lösung mit FFT und Spline mit $N = 2^{14}$ Datenpunkten}
+	\label{fig:fft}
+\end{figure}
+Bei der ersten okularen Inspektion sieht man, dass es bei der Auswertung mit der FFT, besonders für sehr niedrige Frequenzen, zu starken Oszillationen kommt, bedingt durch die Tatsache, dass die FFT auf der Fourier - Reihe beruht. Diese wiederum ist eine, im numerischen Sinne, endliche Reihe von Sinussen und Kosinussen Gliedern.
+\begin{figure}[!htbp]
+\centering
+\caption{Relativer Fehler der FFT mit mit $N = 2^{14}$}\label{fig:faltung_rel}
+\subfloat[Relativer Fehler über den Bereich zwischen 10 und 100000 ]{\includegraphics[width=1\textwidth]{faltung_rel.eps}}{\label{fig:faltung_rel_org}}\\
+\subfloat[Relativer Fehler über den Bereich zwischen 20 und 10000]{\includegraphics[width=1\textwidth]{faltung_rel_part.eps}}{\label{fig:faltung_rel_part}}
+\end{figure}
+Der Relative Fehler zeigt (Abb. \ref{fig:faltung_rel}), dass die Randbereiche für hohe Frequenzen im höchsten Grade unzureichend sind und das Verfahren nur auf ein kleinen Bereich sinnvolle Ergebnisse liefert (Abb. \ref{fig:faltung_rel_part}).
+\newpage 
+\section{Numerische Auswertung der Hilbert - Transformation mit Subtraktion}\label{num:skkt}
+Anstatt die Kramers - Kronig Transformation zu verwenden, benutzt Piero Triverio \cite{Triverio2006a} nun die im Abschnitt \ref{kkt} bewiesene Hilbert - Transformation mit Subtraktion (Satz \ref{skkt}) 
+\begin{align}
+	\Im{H(\omega)} = S_{Im}(\omega) + \frac{\prod_{q=0}^{n} (\omega - \omega_q)}{\pi} P \int_{-\infty}^{\infty} \frac{\Re{H(\omega')} - S_{Re}(\omega')}{\prod_{q = 0} (\omega' - \omega_q)} \frac{\mathrm{d\omega'}}{\omega' -\omega}\label{skkt:gl1} \\
+\Re{H(\omega)} = S_{Re}(\omega) - \frac{\prod_{q=0}^{n} (\omega - \omega_q)}{\pi} P \int_{-\infty}^{\infty} \frac{\Im{H(\omega')} - S_{Im}(\omega')}{\prod_{q = 0} (\omega' - \omega_q)} \frac{\mathrm{d\omega'}}{\omega' -\omega} \label{skkt:gl2}
+\end{align}
+mit $S(\omega) = \sum_{q=0}^{n} l_q(\omega) F(\omega_q)$, $F =\{\Re{H}, \Im{H}\} $ und 
+\begin{align}
+	l_q(\omega) = \prod_{\stackrel{p=0 }{p \neq q}}^n \frac{\omega - \omega_p}{\omega_q - \omega_p} \text{ Lagrange Interpolationpolynom}
+\end{align}
+Um die optimalen Subtraktionspunkte $\omega_q$ zu bestimmen, ermitteln wir den Abbruchfehler. Der Abbruchfehler ist dadurch gegeben, da wir nur Daten von einem endlichen Intervall bekommen. D.h. $\omega \in [\omega_{min}, \omega_{max}]$ 
+bzw. mit Hilfe des Satzes \ref{s:korHelp}, welcher die Symmetrie von reellen Systemen ausnützt, auch von negativen Frequenzen. Somit ist der Abbruchfehler für den Bereich $\abs{\omega} > \omega_{max}$ und $\abs{\omega} < \omega_{min}$ zu bestimmen. Der Einfachheit halber bestimmen wir nun den Abbruchfehler für den Bereich $\abs{\omega} > \omega_{max}$ und nur für den Imaginärteil
+\begin{align}
+	\hat{E}_n(\omega_0) = \frac{\prod_{q=0}^{n} (\omega - \omega_q)}{\pi} P \int_{\abs{\omega} > \omega_{max}} \frac{\Re{H(\omega')} - S_{Re}(\omega')}{\prod_{q = 0} (\omega' - \omega_q)} \frac{\mathrm{d\omega'}}{\omega' -\omega}
+\end{align}
+Dieser Fehler lässt sich in zwei Integrale aufsplitten
+\begin{align}
+	\hat{E}_n(\omega_0) &= \underbrace{\frac{\prod_{q=0}^{n} (\omega - \omega_q)}{\pi} P \int_{\abs{\omega} > \omega_{max}} \frac{\Re{H(\omega')} }{\prod_{q = 0} (\omega' - \omega_q)} \frac{\mathrm{d\omega'}}{\omega' -\omega}}_{E_n(\omega)} \\
+	&\underbrace{-\frac{\prod_{q=0}^{n} (\omega - \omega_q)}{\pi} P \int_{\abs{\omega} > \omega_{max}} \frac{S_{Re}(\omega')}{\prod_{q = 0} (\omega' - \omega_q)} \frac{\mathrm{d\omega'}}{\omega' -\omega}}_{C(\omega)}
+\end{align}
+Der Abbruchfehler kann auf den $E_n(\omega)$ reduziert werden, da der zweite Term $C(\omega)$ analytisch berechnet werden kann. Triverio nimmt für das schlechteste High - Frequenzen Verhalten an, dass die Übertragungsfunktion beschränkt ist, mit: $\abs{H(\omega)} \leq 1$. 
+Dann gilt für den Abbbruchfehler die Abschätzung
+\begin{align}
+	\abs{E_n(\omega)} &\leq \frac{\prod_{q=0}^{n} \abs{(\omega - \omega_q)}}{\pi} P \int_{\abs{\omega} > \omega_{max}} \frac{1}{\prod_{q = 0} \abs{\omega' - \omega_q} } \frac{\mathrm{d\omega'}}{\abs{\omega' -\omega}}\\
+	&= \frac{1}{\pi} \sum_{q = 1}^n \left[\abs{\ln{\frac{\omega_{max}-\omega_q}{\omega_{max}-\omega}}} - (-1)^n \abs{\ln{\frac{\omega_{max}+\omega_q}{\omega_{max} + \omega}}} \right] \cdot \prod^{n}_{\stackrel{p=1}{p \neq q}} \frac{\abs{\omega - \omega_p}}{\omega_q - \omega_p}
+\end{align}
+Triverio zeigt in \cite{Triverio2006a}, dass der Fehler beliebig klein werden kann, mit ansteigender Zahl von Subtraktionen $n$. Zudem gibt er die passende Platzierung der abzuziehenden Frequenzen vor, um einen quasi - optimalen Abbruchfehler zu bekommen. Die passende Platzierung verifiziert er mit der Chebyshev - Distribution
+\begin{align}
+	\omega_q = -\omega_{max} (1 - \epsilon) \cos\left( \frac{(q-1)\pi}{n-1}\right) \text{, mit } q = 1, \hdots, n \text{ und } (
+\epsilon << 1)
+\end{align}
+Diese Aussage wird in dieser Arbeit nicht bewiesen.\\\\
+Zum Ende hin muss noch ein Problem gelöst werden. Die Integrale \ref{skkt:gl1} und \ref{skkt:gl2} sind als Cauchy - Hauptwert gegeben, d.h. die Stelle $\omega = \omega_0$ braucht besondere Behandlung. Dazu nutzt man wieder die Eigenschaft aus, dass die Funktionen $\Re{H}$ und $\Im{H}$ differenzierbar sind und betrachtet nur das Integral 
+\begin{align}
+	 \label{skkt:int:num} P \int_{\omega_{min}}^{\omega_{max}} \frac{F(\omega') - S(\omega')}{\prod_{q = 0} (\omega' - \omega_q)} \frac{\mathrm{d\omega'}}{\omega' -\omega} &=\int_{\omega_{min}}^{\omega_{max}}  \frac{g(\omega') - g(\omega)}{ \omega' - \omega} \mathrm{d\omega'} + g(\omega) \ln{\abs{\frac{\omega_{max} - \omega}{ \omega_{min} - \omega}}}
+\end{align}
+mit $F = \{\Re{H}, \Im{H} \}$ und $g(x) = \frac{F(x) - S(x)}{\prod_{q = 0} (x - \omega_q)}$ \\
+Betrachtet man nun den Fall $\omega \neq \omega_p$. Dann ist die Stelle $\omega = \omega'$ hebbar mit
+\begin{align}
+\lim_{\omega' \rightarrow \omega}  \frac{g(\omega') - g(\omega)}{\omega' - \omega} =  \left. \frac{\mathrm{d}}{\mathrm{d\omega'}}\right|_{\omega} g(\omega') 
+\end{align}
+sowie die Stellen $\omega' = \omega_p$ mit
+\begin{align}
+	 \frac{g(\omega_p) - g(\omega)}{\omega_p - \omega} &= \frac{g(\omega_p)}{\omega_p - \omega} - \frac{g(\omega)}{\omega_p - \omega} =  \lim_{\omega' \rightarrow \omega_p} \frac{F(\omega') - F(\omega_p)}{\prod_{\stackrel{q = 0}{q \neq p}} (\omega' - \omega_q) (\omega' - \omega_p) (\omega_p - \omega)} - \frac{g(\omega)}{\omega_p - \omega}\\
+	 &= \left.\frac{\mathrm{d}}{\mathrm{d\omega'}} \right|_{\omega_p} F(\omega') \frac{1}{\prod_{\stackrel{q = 0}{q \neq p}} (\omega_p - \omega_q) (\omega_p - \omega)} - \frac{g(\omega)}{\omega_p - \omega}
+\end{align}
+Abschließend betrachtet man den Spezialfall, dass der auszuwertende Punkt ein Subtraktionspunkt ist, d.h $\omega  = \omega_p$.
+Dann folgt wegen dem Vorfaktor und der Existenz des Integrals \ref{skkt:gl1} und \ref{skkt:gl2}, dass die Integrale den Wert null besitzen und der Wert des Realteils bzw. Imaginärteils dem Wert von subtrahierenden Frequenzen entspricht. 
+Analog kann man Polstellen für das Integral \ref{skkt:int:num} mit den Grenzen $-\omega_{min}$ und $-\omega_{max}$ bestimmen.
+\subsection{Praktisches Vorgehen und graphische Auswertung}\label{num:skkt:prak}
+Aufgrund der Tatsache, dass es nur positive $\omega$ existieren, die SKKT aber eine Integration zwischen $\omega \in [-\infty, \infty]$ verlangt, muss mit Hilfe des Satzes \ref{s:korHelp} der Datensatz gespiegelt werden. Wegen der geringen Datenpunkte (analog zur gewöhnlichen KKT  \ref{kkt:num}) wurden die benötigten fehlende Datenpunkte durch einen Spline (siehe \ref{a:spline}) approximiert. Um aus der SKKT ein uneigentliches Integral zumachen, also die Polstellen zu heben, wurde die Ableitung, an den Ausnahmestellen, mit Splines bestimmt. 
+\begin{figure}[h]
+	\includegraphics[width=1\columnwidth]{skkt.eps}
+	\caption{Lösung mit SKKT und Spline mit $N = 10^3$ Datenpunkten}
+	\label{fig:skkt}
+\end{figure}
+Der erste subjektive Eindruck der Abbildung \ref{fig:skkt} zeigt, dass die Divergenz an den Randbereichen geringer ist, als bei den beiden vorgestellten Verfahren (siehe Abb. \ref{fig:kkt_rel} und \ref{fig:faltung_rel}). Die Annahme wird untermauert durch die Auswertung des Relativen Fehlers in Abhängigkeit zur Frequenz (Abb. \ref{fig:skkt_rel}).
+\begin{figure}[h]
+	\includegraphics[width=1\columnwidth]{skkt_rel.eps}
+	\caption{Relativer Fehler der SKKT und Spline mit $N = 10^3$ Datenpunkten}
+	\label{fig:skkt_rel}
+\end{figure}
+\newpage
+\section{Logarithmische Hilbert-Transformation Z-Hit}\label{num:z-hit}
+Verwendet man für die Ergebnisse des EIS das Bode - Diagramm, so gleicht der Graph des Phasenwinkels dem Graph der 1. Ableitung des Logarithmus des Betrags \label{vermutung}. Dieses Verhalten wurde schon 1945 von H. W. Bode \cite{Bode1956} erkannt und zeigte mit Hilfe der LKK, dass bei konstanten Phasen über alle Frequenzen, d.h $H(j \omega) = C \cdot (j \omega)$ folgende Beziehungen exakt gelten müssen \cite{Schiller2012} %[Seite 34]{
+\begin{align}
+\alpha = \frac{2}{\pi} \cdot \phi \text{ und } \alpha = \frac{\mathrm{d} \ln{\abs{H(\omega)}}}{\mathrm{d \ln{\omega}}} \text{.}  \label{gl:Annahmen}
+\end{align}
+Die Genauigkeit der Impedanzsprektren lässt sich nicht mit der einfachen Beziehungen Gleichungen \ref{gl:Annahmen} erfassen, da sie nur gesetzmäßig für  $\phi = \text{ const }$ gültig sind. Je größer die Änderung der Phase, um so erkenntlicher ist in der Abbildung \ref{fig:Z-Hit-Korrekturterm} die Diskrepanz zur Absolut - Impedanz. Schiller. K \cite{Schiller2012} nahm an, dass die Gleichung \ref{gl:Annahmen} mit den Korrekturterm $\gamma \cdot \frac{\mathrm{d} \phi(\omega)}{\mathrm{d} \ln{\omega}}$ erweitert werden muss, damit eine gute Approximation erreicht werden kann. So mit gilt dann: 
+\begin{align}
+\ln{\abs{H(\omega_0}} \approx \text{ const. } + \frac{2}{\pi} \int_{\omega_0}^{\omega_1} \phi(\omega) \mathrm{d} \ln{\omega} + \gamma \cdot \frac{\mathrm{d} \phi(\omega}{\mathrm{d}\ln{\omega}} \label{gl:Approximation}
+\end{align}\cite{Schiller2012} %[Seite 34]
+\begin{figure}[htbp] 
+  \centering
+     \includegraphics[width=1 \textwidth]{Z-Hit-Korrekturterm}
+  \caption{Links: Vergleich des Verlaufs der Absolut-Impedanz (blau) mit der Stammfunktion (rot, gestrichelt) des Phasenwinkel-Verlaufs (grau) eines Randles-Schaltkreises. Rechts ist die Abweichung der Stammfunktion von der Impedanz (rot) und die Ableitung des Phasenwinkel-Verlaufs, multipliziert mit $\gamma$ aus Gl. \ref{gl:Approximation} (blau), dargestellt\cite{Schiller2012}}.
+  \label{fig:Z-Hit-Korrekturterm}
+\end{figure}
+Den Wert des Proportionalitätsfaktors $\gamma \approx -0.52$ konnte Schiller mit Hilfe von Experimenten ermitteln. Die empirisch gefundene Approximation \ref{gl:Approximation} wurde durch Ehm \cite{Schiller2012} in ein fundiertes mathematisches Gewand gebracht. Im Folgendem soll nun der Beweis von Ehm vorgestellt werden. Bevor es zu dem eigentlichen Beweis kommt, muss Hilfe von zwei Lemmas und einer Definition in Anspruch genommen werden.
+Im Folgenden wird die k - logarithmische Ableitung von $V(t)$ mit $V_k$ bezeichnet. Es gilt für $k=1$: $\frac{\mathrm{d} V(t)}{\mathrm{d} \logz{t}} = t V'(t)$ sowie $V_k = \frac{\mathrm{d} V_{k+1}(t)}{\mathrm{d} \logz{t}} = t \cdot V'_{k+1}(t)$. Zusätzlich gilt: $\mathrm{d} \logz{t} = \frac{1}{t} \mathrm{dt}$.
+\begin{lemma} \label{lem:z-hit1}
+Sei $V(t)$ $n \geq 2$ mal kontinuierlich differenzierbar dann folgt:
+\begin{align}
+	V(x_0) - V(\omega) = \sum_{k=1}^{n-1} {V_k(\omega) \frac{\logz{\frac{x_0}{\omega}}^k}{k!}} + \int_\omega^{x_0} {K_n(w, x_1)} \mathrm{d} \logz{x_1}
+\end{align}
+mit 
+\begin{align}
+K_n(\omega, x_1) = \int_{\omega}^{x_1} \hdots \int_{\omega}^{x_{n-1}} V_n(x_n) \mathrm{d} \logz{x_n} \hdots \logz{x_2}
+\end{align}
+\begin{proof}
+Sei $n = 2$ anschließend folgt
+\begin{align}
+	V(x_0) - V(\omega) &= V_1(\omega) \frac{\logz{\frac{x_0}{\omega}}}{1!} + \int_{\omega}^{x_0} \left( \int_{\omega}^{x_1} V_2(x_2) \mathrm{d} \logz{x_2} \right) \mathrm{d} \logz{x_1}\\
+	&= V'(\omega) \cdot \omega \cdot \logz{\frac{x_0}{\omega}} + \\
+	&\int_{\omega}^{x_0} \left( \int_{\omega}^{x_1} \left(V''(x_2) \cdot x_2^2 + V'(x_2) \cdot x_2 \right) \cdot \frac{1}{x_2} \mathrm{dx_2} \right) \mathrm{d} \logz{x_1}\label{gl:Int1}
+\end{align}
+Das Aufsplitten des Integrales \ref{gl:Int1} und die partielle Integration führen zu 
+\begin{align}
+   V(x_0) - V(\omega) &= V'(\omega) \cdot \omega \cdot \logz{\frac{x_0}{\omega}} + \int_{\omega}^{x_0} \left(V'(x_1) \cdot x_1 - V'(\omega) \omega \right) \frac{1}{x_1}  \mathrm{dx_1}\\
+   &=  V'(\omega) \cdot \omega \cdot \logz{\frac{x_0}{\omega}} + \int_{\omega}^{x_0} V'(x_1) \mathrm{dx_1} - V'(\omega) \omega \int_{\omega}^{x_0} \frac{1}{x_1} \mathrm{dx_1}\\
+   &= V'(\omega) \cdot \omega \cdot \logz{\frac{x_0}{\omega}} + V(x_0) - V(\omega) - V'(\omega) \cdot \omega \cdot \logz{\frac{x_0}{\omega}} \\
+   &= V(x_0) - V(\omega)
+\end{align}
+Für den Induktionsschritt $n+1$ folgt:
+\begin{align}
+V(x_0) - V(\omega) &= \sum_{n=1}^{n} V_k(\omega) \frac{\logz{\frac{x_0}{\omega}}^k}{k!} + \int_\omega^{x_0} {K_{n+1}(w, x_1)} \mathrm{d} \logz{x_1}\\
+&=\sum_{n=1}^{n-1} V_k(\omega) \frac{\logz{\frac{x_0}{\omega}}^k}{k!} + V_n(\omega) \cdot \frac{\logz{\frac{x_0}{\omega}}^n}{n!}\\
+&+ \int_\omega^{x_0} \hdots \int_{\omega}^{x_{n-1}}\underbrace{\int_{\omega}^{x_{n}} V_{n+1}(x_{n+1}) \mathrm{d}\logz{x_{n+1}}}_{\int_{\omega}^{x_n} V'_n(x_{n+1}) \mathrm{dx_{n+1}} = V_n(x_{n+1}) - V_n(\omega)} \mathrm{d} \logz{x_{n-1}} \hdots \mathrm{d} \logz{x_1}\label{gl:Int2} 
+\end{align}
+Mit dem Aufspalten des Integrales \ref{gl:Int2} und der Gleichung \ref{gl:IntLoes}
+\begin{align}
+\int_\omega^{x_0} \int_{\omega}^{x_1} \hdots \int_{\omega}^{x_{n-1}} \mathrm{d} \logz{x_{n}} \hdots \logz{x_2} \mathrm{d} \logz{x_1} = \frac{\logz{\frac{x_0}{\omega}}^n}{n!}\label{gl:IntLoes} 
+\end{align}
+lässt sich die Richtigkeit des Lemmas beweisen
+\begin{align}
+=V(x_0) - V(\omega) + V_n(\omega) \cdot \frac{\logz{\frac{x_0}{\omega}}^n}{n!} - V_n(\omega) \cdot \frac{\logz{\frac{x_0}{\omega}}^n}{n!} 
+\end{align}
+\end{proof}
+\end{lemma}
+\begin{lemma}
+Sei $V(t)$ $n \geq 2$ mal kontinuierlich differenzierbar dann folgt: 
+	\begin{align}
+		K_n(\omega, x_1) &:= \int_{\omega}^{x_1} \hdots \int_{\omega}^{x_{n-1}} V_n(x_n) \mathrm{d} \logz{x_n} \hdots \logz{x_2}\label{gl:Kn:large}\\
+						 &= \int_{\omega}^{x_1} V_n(x_n) \frac{\logz{\frac{x_1}{x_n}}^{n-2}}{(n-2)!} \mathrm{d} \logz{x_n}\label{gl:Kn:kompakt}
+	\end{align}
+	\begin{proof}
+		Für $n=2$ ist der Fall klar. Betrachte man nun zuerst die Ableitung von $\frac{\logz{\frac{x_1}{x_n}}^{n-2}}{(n-2)!}\label{gl:abl}$ nach $x_{n+1}$. 
+		\begin{align}
+			\frac{\mathrm{d}}{\mathrm{dx}_{n+1}} \frac{\logz{\frac{x_1}{x_{n+1}}}^{n-1}}{(n-1)!} = -\frac{\logz{\frac{x_1}{x_{n+1}}}^{n-2}}{(n-2)! \cdot x_{n+1}}
+		\end{align}
+		Für den Induktionsschritt $n = n + 1$ der Gleichung \ref{gl:Kn:kompakt} gilt:
+		\begin{align}
+			&\int_{\omega}^{x_1} V_{n+1}(x_{n+1}) \frac{\logz{\frac{x_1}{x_{n+1}}}^{n-1}}{(n-1)!} \mathrm{d} \logz{x_{n+1}} = \\
+			&\int_{\omega}^{x_1} V'_{n}(x_{n+1}) \cdot x_{n+1} \frac{\logz{\frac{x_1}{x_{n+1}}}^{n-1}}{(n-1)!} \frac{1}{x_{n+1}}  \mathrm{d x_{n+1}} \overbrace{=}^{\text{Partielle Integration}}\label{gl:Kn:vor}\\
+			&\left[V_n(x_{n+1}) \cdot \frac{\logz{\frac{x_1}{x_{n+1}}}^{n-1}}{(n-1)!}\right]^{x_1}_{\omega} - \int_{\omega}^{x_1} {V_n(x_{n+1}) \frac{\logz{\frac{x_1}{x_{n+1}}}^{n-2}}{(n-2)!}} \mathrm{dx}_{n+1} \label{gl:Kn:nach}\\= \\
+			&-V_n(\omega) \cdot \frac{\logz{\frac{x_1}{\omega}}^{n-1}}{(n-1)!} + \left[V_{n-1}(x_{n+1}) \cdot \frac{\logz{\frac{x_1}{x_{n+1}}}^{n-2}}{(n-2)!}\right]^{x_1}_{\omega} + \\
+			&\int_{\omega}^{x_1} {V_{n-1}(x_{n+1}) \frac{\logz{\frac{x_1}{x_{n+1}}}^{n-3}}{(n-3)!}} \mathrm{dx}_{n+1} \\
+		\end{align}
+		Der Schritt von \ref{gl:Kn:vor} nach \ref{gl:Kn:nach}, d.h. die partielle Integration, wird jetzt $(n-1)$ Mal angewandt.
+		\begin{align}
+		-V_n(\omega) \cdot \frac{\logz{\frac{x_1}{\omega}}^{n-1}}{(n-1)!} + -V_{n-1}(\omega) \cdot \frac{\logz{\frac{x_1}{\omega}}^{n-2}}{(n-2)!} \hdots -V_3(\omega) \cdot \frac{\logz{\frac{x_1}{\omega}}^{1}}{1!} + (V_2(x_{n+1}) - V_2(\omega))\label{gl:Kn:End}
+		\end{align}
+		Zu Zeigen ist nun, dass der Induktionschritt der Gleichung \ref{gl:Kn:kompakt} der selbe wie der von Gleichung \ref{gl:Kn:large} ist
+		\begin{align}
+			&\int_{\omega}^{x_1} \hdots \int_{\omega}^{x_{n-1}}  \int_{\omega}^{x_{n}} V_{n+1}(x_{n+1}) \mathrm{d} \logz{x_{n+1}} \mathrm{d} \logz{x_{n}} \hdots \mathrm{d}  \logz{x_2}\label{gl:Kn:1} = \\
+			&\int_{\omega}^{x_1} \hdots \int_{\omega}^{x_{n-1}}  \int_{\omega}^{x_{n}} V'_{n}(x_{n+1}) \cdot x_{n+1} \frac{1}{x_{n+1}} \mathrm{dx}_{n+1} \mathrm{d} \logz{x_{n}} \hdots  \mathrm{d} \logz{x_2}\label{gl:Kn:2} = \\
+			&\int_{\omega}^{x_1} \hdots \int_{\omega}^{x_{n-1}}  \left[V_{n}(x_{n+1})\right]_{\omega}^{x_n} \mathrm{d} \logz{x_{n}} \hdots \mathrm{d}  \logz{x_2}\label{gl:Kn:3}
+		\end{align}
+		Separieren des Integrales und der Gleichung \ref{gl:IntLoes} führt zu
+		\begin{align}
+			&\int_{\omega}^{x_1} \hdots \int_{\omega}^{x_{n-1}}  V_{n}(x_{n})_{\omega}^{x_n} \mathrm{d} \logz{x_{n}} \hdots \mathrm{d} \logz{x_2} - V_n(\omega) \frac{\logz{\frac{x_1}{\omega}}^{n-1}}{(n-1)!}
+		\end{align}
+		$n-1$ fache Anwendung der Schritte \ref{gl:Kn:1} bis \ref{gl:Kn:2} führt zu der Gleichung \ref{gl:Kn:End}
+	\end{proof}
+\end{lemma}
+Für den eigentlichen Beweis ist noch zu erwähnen, dass $U$ und $V$ gerade bzw. ungerade Funktionen in $\mathbb{R}$ und besonders $V(0) = 0$ ist. Zudem werden im nachfolgenden Beweis nur positive Frequenzen $\omega > 0$ betrachtet. Schlussendlich ist drauf hinzuweisen, dass mit $\zeta(s) = \sum_{n\geq1} n^{-s}$ die Riemann $\zeta$ Funktion gemeint ist. 
+\begin{satz}
+Erfüllt die Funktion $H(\omega)$ den Satz von Titchmarsh \ref{ht:titch} und sei 
+\begin{align}
+U(\omega) &= \logz{\abs{H(\omega)}} = \Re{\logz{H(\omega)}}\\
+V(\omega) &= \arg{H(\omega)} = \Im{\logz{H(\omega)}}
+\end{align}
+und sei $V$ $n \geq 2$ mal kontinuierlich differenzierbar. Dann folgt für jedes $\omega > 0$
+\begin{align}
+	\frac{\pi}{2}(U(\omega) - U(0)) =  \int_0^{\omega} V(x) \mathrm{d} \logz{x}  - \sum_{k=1, k \text{ ungerade}}^{n-1} V_k(\omega) \zeta(k+1) 2^{-k} + R_n(\omega)
+\end{align}
+Der Restterm ist gegeben mit 
+\begin{align}
+	R_n(\omega) &= \int_0^1 ((-1)^n \cdot V_n(\omega r) - V_n(\omega/r) ) \sigma_{n-2}(r) \frac{\mathrm{dr}}{r}\text{, und}\label{gl:Rest1}\\ 
+	\sigma_k(r) &= \int_0^r \frac{\logz{\frac{r}{t}}^k}{k!} \cdot (-\frac{1}{2} \logz{1-t^2})\frac{dt}{t}
+\end{align}
+Zudem gelten folgende Abschätzungen
+\begin{align}
+\abs{R_n(\omega)} \leq 2^{-n} (1 + \frac{1}{2	} \zeta(n))\cdot \sup_n{\abs{V_n(x)}} \text{, }\\ 
+\int_0^{\infty} \abs{R_n(\omega)} \frac{\mathrm{d\omega}}{\omega} \leq 2^{-n} (1 + \frac{1}{2	} \zeta(n))\cdot \int_0^{\infty} \abs{V_n(x)} \frac{\mathrm{dx}}{x}
+\end{align}
+\begin{proof}
+Sei nun $n \in \mathbb{N}$, $n > 1$ und per Definition gilt die Voraussetzung $\omega > 0$. Betrachtet wird nun das Delta des reellen Teiles der logarthmischen Kramers-Kronig Beziehung \ref{lkk} mit der von Schiller aufgestellten Vermutung \ref{vermutung}.
+\begin{align}
+	\Delta(\omega) := \frac{\pi}{2}(U(\omega) - U(0)) - \int_0^{\omega} V(x) \frac{\mathrm{dx}}{x}\\
+	\overbrace{=}^{Satz \ref{lkk}} -\omega^2 \int_0^{\infty} \frac{V(x)}{x(x^2-\omega^2)} \mathrm{dx} - \int_0^{\omega} V(x) \frac{\mathrm{dx}}{x} \label{gl:deltaw}
+\end{align}
+In \ref{gl:deltaw} wurde das Cauchy - Hauptwert - Zeichnen weggelassen. Aus Gründen der Übersichtlichkeit und der Komplexität wird ab hier das P - Zeichen weggelassen, d.h. es findet keine Grenzwertbetrachtung mehr statt. Durch die Substiution von $x$ mit $\omega \cdot t$ und aufbrechen des ersten Integrals bekommt man
+\begin{align}
+	\Delta(\omega) &= -\int_0^{\infty} \frac{V(\omega t)}{(t^2-1)t} \mathrm{dt} - \int_0^{1} V(\omega t) \frac{\mathrm{dt}}{t}\\
+	&=-\int_0^1 V(\omega t) (1 + \frac{1}{t^2-1}) \frac{\mathrm{dt}}{t} - \int_{1}^{\infty} \frac{V(\omega t)\mathrm{dt}}{(t^2-1) t}\\
+\end{align}
+Erneute Subsitution des zweiten Integrale mit $\omega t = \omega / s$ führt zu 
+\begin{align}
+	\Delta(\omega) &=-\int_0^1 V(\omega t) (1 + \frac{1}{t^2-1}) \frac{\mathrm{dt}}{t} - \int_{0}^{1} \frac{V(\omega/s)\mathrm{dt}}{(s^{-2}-1) s^2}\\
+	&=\int_0^1 ( V(\omega/t)- V(\omega t)) \frac{t}{t^2-1} \mathrm{dt}
+\end{align}
+Mit Hinzufügen von $V(\omega) \frac{t \mathrm{dt}}{t^2-1}$ und sofortigem Abziehen davon, sowie mit Anwendung des Lemmas \ref{lem:z-hit1} erreicht man folgende Darstellung
+\begin{align}
+	\Delta(\omega) &=  \int_0^1 (V(\omega/t) - V(\omega)) \frac{t}{t^2-1} \mathrm{dt} - \int_0^1 (V(\omega t) - V(\omega)) \frac{t}{t^2-1} \mathrm{dt}\\
+	&= \sum_{k=1}^{n-1} V_k(\omega) \frac{1}{k!} \int_0^1 \left(\logz{\frac{\omega/t}{\omega}}^k - \logz{\frac{\omega t}{\omega}}^k \right)\frac{t \mathrm{dt}}{t^2-1} + R_n({\omega})
+\end{align} 
+	Da für gerade $k$'s der ganze Ausdruck null wird, folgt sofort
+	\begin{align}
+		\Delta(\omega) &=\sum_{k=1, k \text{ ungerade}}^{n-1} V_k(\omega) \frac{2}{k!} \int_0^1 \logz{1/t}^k \frac{t \mathrm{dt}}{t^2-1} + R_n({\omega})\\
+		&=\sum_{k=1, k \text{ ungerade}}^{n-1} V_k(\omega) c_k
+	\end{align}
+	mit dem Restterm gegeben mit $R_n = R^+_n - R^-_n$, wo
+	\begin{align}
+		R^+_n(\omega) &= \int_0^1 \int_{\omega}^{\omega t} K_n(\omega, x_1) \mathrm{d} \logz{x_1} \frac{t\mathrm{dt}}{1-t^2}\\
+		R^-_n(\omega) &= \int_0^1 \int_{\omega}^{\omega/ t} K_n(\omega, x_1) \mathrm{d} \logz{x_1} \frac{t\mathrm{dt}}{1-t^2} \text{ und }\\
+		K_n(\omega, x_1) &= \int_{\omega}^{x_1} \hdots \int_{\omega}^{x_{n-1}} V_n(x_n) \mathrm{d} \logz{x_n} \hdots \logz{x_2}\label{gl:Kn:large1}\\
+						 &= \int_{\omega}^{x_1} V_n(x_n) \frac{\logz{\frac{x_1}{x_n}}^{n-2}}{(n-2)!} \mathrm{d} \logz{x_n}\label{gl:Kn:kompakt1}
+	\end{align}
+	Die Koeffizienten $c_k = \frac{2}{k!} \int_0^1 \logz{\frac{1}{t}}^k \frac{t \mathrm{dt}}{t^2-1}$ können berechnet werden mit folgender Formel
+	\begin{align}
+		\int_0^{\infty} \frac{x^{s-1}}{e^x-1}\mathrm{dx} = \Gamma(s) \zeta(s) 
+	\end{align}
+	Die Substitution von $t$ mit $e^{-x/2}$ führt zu
+	\begin{align}
+		c_k = -\frac{(1/2)^k}{k!} \int_0^{\infty} \frac{x^k}{e^x-1} \mathrm{dx} = - 2^{-k} \zeta(k+1) \text{.} 
+	\end{align}
+	Wenden wir uns dem Restterm zu. Genauer $R_n^-(\omega)$. Mit Hilfe von zweimaliger partieller Integration folgt
+	\begin{align}
+		R_n^-(\omega) &= \int_0^1 \int_{\omega}^{\omega/t} K_n(\omega, x_1) \frac{\mathrm{dx_1}}{x_1} \frac{t \mathrm{dt}}{1-t^2} \overbrace{=}^{P.} \int_0^1 \left\{ \left[ \underbrace{K_n(\omega, x_1)}_{K_n(\omega, \omega)=0} \logz{x_1} \right]_{\omega}^{\omega/t} - \right. \\
+		&\left. \int_{\omega}^{\omega/t} \underbrace{\frac{\mathrm{d}}{\mathrm{dx_1}}K_n(\omega, x_1)}_{\frac{\mathrm{d}}{dx}K_n(\omega, x_1) = 0} \cdot \logz{x_1} \mathrm{dx_1} \right\} \frac{t \mathrm{dt}}{1-t^2}\\
+		&= \int_{0}^{1} \left(K_n(\omega, \omega/t) \cdot \logz{\omega/t}\right)  \frac{t \mathrm{dt}}{1-t^2}\\
+		&= \left[K_n(\omega, \omega/t) \cdot \logz{\omega/t} \cdot \left(- \frac{1}{2} \logz{1-t^2}\right)\right]^1_0 - \\
+		&\int_0^1 \left(\underbrace{\frac{\mathrm{d}}{\mathrm{dt}}K_n(\omega, \omega/t)}_{\frac{\mathrm{d}}{\mathrm{dt}}K_n(\omega, \omega/t) = 0} \cdot \logz{\omega/t} + K_n(\omega, \omega/t) \cdot \frac{t}{\omega} \cdot - \frac{\omega}{t^2}\right) \left(- \frac{1}{2} \logz{1-t^2}\right) \mathrm{dt}\\
+	\end{align}
+		Mit Hilfe von L'Hospital lässt sich zeigen, dass der Ausdruck
+		\begin{align}
+			\left[K_n(\omega, \omega/t) \cdot \logz{\omega/t} \cdot \left(-\frac{1}{2} \logz{1-t^2}\right)\right]^1_0
+		\end{align}
+		null ist und es erfolgt:
+		\begin{align}
+			R_n^-(\omega) =\int_0^1 K_n(\omega, \omega/t) \left(-\frac{1}{2} \logz{1-t^2}\right) \frac{\mathrm{dt}}{\mathrm{t}}\\
+		\end{align}
+		Mit \ref{gl:Kn:kompakt1} und Substiution $\frac{\omega}{s} = r$ sowie Vertauschen der Integrale führt zu
+		\begin{align}
+			R_n^-(\omega) &=\int_0^1 \int_{\omega}^{\omega/t} V_n(s) \frac{\logz{\frac{\omega}{s t}}^{n-2}}{(n-2)!} \frac{\mathrm{ds}}{s}  \left(-\frac{1}{2} \logz{1-t^2}\right) \frac{\mathrm{dt}}{\mathrm{t}}\\
+			&=\int_0^1 V_n(\omega/r) \int_{0}^{r}  \frac{\logz{\frac{r}{t}}^{n-2}}{(n-2)!} \left(-\frac{1}{2} \logz{1-t^2}\right) \frac{\mathrm{dt}}{\mathrm{t}} \frac{\mathrm{dr}}{r}\\
+			&=\int_0^1 V_n(\omega/r) \sigma_{n-2} \frac{\mathrm{dr}}{r}
+		\end{align}
+		Der andere Restterm kann ähnlich hergeleitet werden und es folgt:
+		\begin{align}
+			R_n(\omega) &= \int_0^1 \left((-1)^n \cdot V_n(\omega r) - V_n(\omega/r) \right) \sigma_{n-2}(r) \frac{\mathrm{dr}}{r}\text{ , und}\\
+	\sigma_k(r) &= \int_0^r \frac{\logz{\frac{r}{t}}^k}{k!} \cdot (-\frac{1}{2} \logz{1-t^2})\frac{dt}{t} 
+		\end{align}	
+	 	Die gesamte Masse vom Maß $\sigma_k(r) \frac{\mathrm{dr}}{r}$ lässt sich abschätzen mit
+	 	\begin{align}
+	 	\int_0^1 \sigma_k(r) \frac{\mathrm{dr}}{r} &= \int_0^1 \int_{t}^{1}  \frac{(\logz{r} - \logz{t})^{k}}{k!}  \frac{\mathrm{dr}}{r} \left(-\frac{1}{2} \logz{1-t^2}\right) \frac{\mathrm{dt}}{\mathrm{t}} \\
+	 	&= \int_0^1 \frac{(-\logz{t})^{k+1}}{(k+1)!} \left(-\frac{1}{2} \logz{1-t^2} \right) \frac{\mathrm{dt}}{t}\\
+	 	&= \int_0^1 \frac{(-\frac{1}{2} \logz{s})^{k+1}}{(k+1)!} \left(-\frac{1}{2} \logz{1-} \right) \frac{\mathrm{ds}}{2s}
+	 	\end{align}
+	 	Folgend mit $-\logz{1-s} \leq s(1+\frac{1}{2} \frac{s}{1-s})$, $0 \leq s < 1$ sowie Substitution $s = e^{-x}$
+	 	\begin{align}
+	 		\int_0^1 \sigma_k(r) \frac{\mathrm{dr}}{r} &\leq 2^{-(k+3)} \int_0^1 \frac{(\logz{t}^{k+1}}{(k+1)!} \mathrm{ds}
+	 		+  2^{-(k+4)} \int_0^1 \frac{(\logz{\frac{1}{s}}^{(k+1)}}{(k+1)!} \frac{\mathrm{ds}}{s^{-1} -1}\\
+	 		&\leq 2^{-(k+3)} \int_0^1 \frac{x^{k+1}}{(k+1)!} e^{-x} \mathrm{dx}
+	 		+  2^{-(k+4)} \int_0^1 \frac{x^{k+1}}{(k+1)!} \frac{e^{-x} \mathrm{dx}}{e^{x} -1} \\
+	 		&\leq 2^{-(k+3)} \left(1 + \frac{1}{2} \zeta(k+2)\right)\label{gl:mass}
+	 	\end{align}
+	 	Der punktweise Fehler ergibt sich sofort aus \ref{gl:Rest1} und \ref{gl:mass}
+	 	\begin{align}
+	 		\int_0^{\infty} \abs{R_n(\omega)} \frac{\mathrm{d\omega}}{\omega} &\leq \int_0^{\infty} \int_0^1 \left(\abs{V_n(\omega/r)} + \abs{V_n({\omega r})}\right) \sigma_{n-2}(r) \frac{\mathrm{dr}}{r} \frac{\mathrm{d\omega}}{\omega}\\
+	 		&= \int_0^{\infty} \int_{\omega}^{\infty} \abs{V_n(s)} \sigma_{n-2}(\omega/s) \frac{\mathrm{ds}}{s} \frac{\mathrm{d\omega}}{\omega} + \int_0^{\infty} \int_{\omega}^{\infty} \abs{V_n(s)} \sigma_{n-2}(s/\omega) \frac{\mathrm{ds}}{s} \frac{\mathrm{d\omega}}{\omega}\\
+	 		&= \int_0^{\infty} \int_{0}^{s} \sigma_{n-2}(\omega/s) \frac{\mathrm{d\omega}}{\omega} \abs{V_n(s)} \frac{\mathrm{ds}}{s} + \int_0^{\infty} \int_{0}^{s} \sigma_{n-2}(s/\omega) \frac{\mathrm{d\omega}}{\omega} \abs{V_n(s)} \frac{\mathrm{ds}}{s}\\
+	 		&= 2 \int_0^1 \sigma_{n-2} (u) \frac{\mathrm{du}}{u} \int_0^{\infty} \abs{V_n(s)} \frac{\mathrm{ds}}{s}
+	 	\end{align}
+	\end{proof}
+\end{satz}
+\subsection{Praktische Vorgehensweise und graphische Auswertung}\label{num:z-hit:prak}
+Analog zur SKKT \ref{num:skkt:prak} wurden die fehlenden Datenpunkte und die für das Verfahren notwendigen Ableitungen mit Hilfe von Splines \ref{a:spline} berechnet. Die Auswertung des Integrals über die neu gewonnenen Datenpunkte fand mit Hilfe der wohlbekannten Trapez - Methode statt. 
+\begin{figure}[!h] 
+  \centering
+     \includegraphics[width=1\textwidth]{z-hit.eps}
+	 \caption{Vergleich der Originaldaten mit den berechneten Daten mit Hilfe des Z-Hit Algorithmus aus der Phase: Mit $\gamma = \frac{\pi}{6}$ und $10^5$ Splinedatenpunkte }
+  \label{fig:z-hit}
+\end{figure}
+In \ref{fig:z-hit} sieht man deutlich den Vorteil des Z-Hit - Algorithmus gegenüber vorher den vorgestellten Verfahren. Da das Integral nur über ein beschränktes Integral integriert werden muss, treten keine Fehler an den Randbereichen auf. Dies verdeutlicht unter anderem folgende Abbildung:
+\begin{figure}[!h]
+	\includegraphics[width=1\columnwidth]{hit_rel.eps}
+	\caption{Relativer Fehler des Z-Hit - Algorithmus: Mit $\gamma = \frac{\pi}{6}$ und $N = 10^5$ Splinedatenpunkten}
+	\label{fig:z-hit_rel}
+\end{figure}
+\newpage
+
+\section{Klassifizierung der numerischen Verfahren}
+Wir werden die Lösungsverfahren anhand folgender Kriterien bewerten:
+\begin{itemize}
+\item Genauigkeit, d.h. Relativer Fehler im Arbeitsintervall $\omega \in [10, 10^4]$
+\item Divergenz der Randbereiche
+\item Bietet das Verfahren eine Fehlerschranke an, um den Fehler a priori zu schätzen?
+\item Laufzeit des Algorithmus 
+\item Implementation des Aufwandes
+\item Notwendigkeit zur Bestimmung der Ableitung, da numerische Ableitungen fehlerbehaftet ist
+\end{itemize}
+Dabei sind die genannten Kriterien schon nach ihrer Wichtigkeit sortiert. Die Genauigkeit kommt mit dem Faktor fünf die meiste, der Notwendigkeit zur Bestimmung Ableitung mit dem Faktor eins die geringste Bedeutung zu. Die Verfahren werden in Kategorien Genauigkeit, Divergenz, Laufzeit und Implementierung mit Noten von $1$ bis $5$ bewertet. Dabei steht eins für sehr gut, zwei für gut, drei für befriedend, etc. In den Kategorien Fehlerschranke und Ableitung wird nur auf die Existenz bzw. auf die Notwendigkeit geprüft, d.h. für $0$ bedeutet das Verfahren hat eine Fehlerschranke, bzw. die Ableitung muss nicht berechnet werden. Für die Eins gilt die Umkehrung. 
+Bevor wir zur tabellarischen Auswertung kommen, müssen die Verfahren anhand ihres Relativen Fehlers im Arbeitsintervall $f \in [10, 10^4]$ verglichen werden. Da aus der Abbildung \ref{fig:compare} nicht ganz ersichtlich ist, in welcher Reihenfolge die Verfahren aufgrund ihres relativen Fehlers klassifiziert werden können, wird der Mittelwert des relativen Fehlers bestimmt. 
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|}
+\hline 
+Verfahren & Mittlerer relativer Fehler $\tilde{\delta}_{Z}$  \\ 
+\hline 
+KKT & $22.60\%$ \\ 
+\hline 
+Faltung &  $42.55\%$\\ 
+\hline 
+SKKT & $2.63\%$ \\ 
+\hline 
+Z-Hit & $0.41\%$ \\ 
+\hline 
+\end{tabular}
+\caption{Bestimmung der Mittelwerte der Relativen Fehler im Bereich $\omega \in [10, 10^4]$}
+\end{table}
+Dies führt uns zur Auswertung
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|c|c|c|c|}
+\hline 
+Faktor & Kriterien & KKT & Faltung & SKKT & Z-Hit	 \\ 
+\hline 
+5 & Relativer Fehler & 4 & 5 & 2 & 1 \\ 
+\hline
+5 & Divergenz der Randbereiche & 3 & 5 & 3 & 1 \\ 
+\hline
+4 & Fehlerschranke & 1 & 1 & 0 & 0\\
+\hline 
+3 & Geringe Laufzeit & 2 & 1 & 5 & 2 \\ 
+\hline 
+2 & Implementierungsaufwand & 2 & 1 & 5 & 3 \\ 
+\hline 
+2 & Ableitung & 0 & 0 & 1 & 1 \\ 
+\hline 
+Ergebnis &	2.45 & 2.95 & 2.3 & 1.15	\\
+\hline
+\end{tabular} 
+\end{table}
+\begin{figure}[!h] 
+  \centering
+     \includegraphics[width=1\textwidth]{compare.eps}
+	 \caption{Vergleich der Verfahren im Bezug auf den relativen Fehler im Bereich $f \in[10, 10^4]$}
+  \label{fig:compare}
+\end{figure}
+\subsection{Fazit}
+Das mit Abstand schlechteste Verfahren zur Berechnung der Hilbert - Transformation ist die Faltung. Sie konnte nur damit punkten, dass ihre Implementation sich als einfach gestaltet hat und die Laufzeit gering war. Die Faltung kann lediglich eine Schnellübersicht über die subjektive Richtigkeit der Daten geben.
+An dritter Stelle steht die Kramers - Kronig Transformation. Der Vorteil gegenüber den anderen Verfahren besteht darin, dass sie allgemein bekannt ist und mit der Problemstellung am ehesten identifiziert ist. Allerdings ist wie bei der Faltung der Relative Fehler mit $22.60 \%$ recht hoch.
+Die SKKT besticht durch den geringen Relativen Fehler und die Angabe einer Fehlerschranke, ist aber in ihrer Implementierung und hoher Laufzeit nicht an vorderster Stelle der Empfehlungen zur Berechnung der Hilbert - Transformation.
+Als bestes Verfahren hat sich deutlich das Z-Hit herausgestellt. Es brilliert mit sehr geringem Relativen Fehler, kaum Divergenz der Randbereiche, geringer Laufzeit und leicht zu berechnender Fehlerschranke.
+Das Z-Hit ist auch meine Empfehlung, um die Hilbert-Transformation zu Berechnen.
+
+
