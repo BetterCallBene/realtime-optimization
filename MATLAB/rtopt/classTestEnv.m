@@ -7,9 +7,23 @@ classdef classTestEnv < matlab.unittest.TestCase
     end
     
     methods
-        %numDiffObj 
-        function numdObj = numDiffObj(obj, func)   
+%         %numDiffObj 
+%         function numdObj = numDiffObj(func, epsilon)   
 %             %ToDo: Implementierung der numerischen Differentation
+%             %Plus epsilon shift
+%             
+%             
+%             for i = 
+%             hp = func(t+epsilon);
+% 
+%             %Minus epsilon shift
+%             hm = func(t-epsilon);
+% 
+%             %Calc difference
+%             numObj = (hp-hm)/2 / epsilon;
+%                
+%                
+
 %                         
 %               n   = length(obj.vec);
 %               vec = obj.vec;
@@ -36,9 +50,9 @@ classdef classTestEnv < matlab.unittest.TestCase
 % %                 % comparison numerical to analytical derivative
 % %                 
 %              end
-        end
-            % display result
-    end
+%         end
+%             % display result
+%     end
 
 
 % %second order
@@ -83,7 +97,7 @@ classdef classTestEnv < matlab.unittest.TestCase
 % end
 % % display result
 % disp(error_val)
-%    end
+   end
     
 end
 
