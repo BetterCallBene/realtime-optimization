@@ -22,6 +22,9 @@ classdef Quadrocopter < Model
     end
     
     methods
+        function res = Quadrocopter(varign)
+            
+        end
         function ret = get.I_1(cq)
             ret = [
                 [cq.I(1),         0,        0];

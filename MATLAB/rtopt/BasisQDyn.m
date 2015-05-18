@@ -93,7 +93,7 @@ classdef BasisQDyn < BasisGenQDyn
                 
                 J_ = obj.J;
                 res = zeros(13, 17);
-                for i = 1:length(J_)
+                for i = 1:size(J_, 1)
                     res(J_(i, 1), J_(i, 2)) = J_(i, ind + 2);
                 end
             else
@@ -107,7 +107,7 @@ classdef BasisQDyn < BasisGenQDyn
             if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
                 res = cell(1, 13);
                 H_ = obj.H;
-                for i = 1:length(H_)
+                for i = 1:size(H_, 1)
                     if isempty(res{H_(i, 1)})
                         res{H_(i, 1)} = zeros(17, 17);
                     end

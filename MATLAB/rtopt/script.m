@@ -6,7 +6,8 @@
 
 %TODO: options f�r fmincon festlegen
 options                 = optimoptions('fmincon');
-options.Algorithm       = 'interior-point';
+%options.Algorithm       = 'interior-point';
+options.Algorithm       = 'sqp';
 options.Display         = 'iter';
 options.GradObj         = 'on';
 options.GradConstr      = 'on';
@@ -23,7 +24,7 @@ xbc = [         ... Variablenname L�nge   Name
     0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
     0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
                 ... Endbedingung
-    0, 0, 5,    ...
+    0, 0, 0.5,    ...
     1, 0, 0, 0, ...
     0, 0, 0,    ...
     0, 0, 0     ...
@@ -31,7 +32,7 @@ xbc = [         ... Variablenname L�nge   Name
 
 env = Environment();
 env.xbc = xbc;
-env.setUniformMesh(uint8(n_int));
+env.setUniformMesh(uint16(n_int));
 
 cQ = Quadrocopter();
 

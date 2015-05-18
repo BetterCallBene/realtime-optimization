@@ -1,14 +1,14 @@
 classdef Environment < handle
     % ENVIRONMENT Diese Klasse speichert alle Parameter, die den Quadrocopter nicht intern beschreiben, also Nebenbedingungen, Mesh, Gravitation, Wind (später)
     properties
-        mesh            % time mesh (1xn) vector
-        xbc             % (mx2) matrix with boundary values for states
-        g = 9.81		% Gravitation
+        mesh;            % time mesh (1xn) vector
+        xbc;             % (mx2) matrix with boundary values for states
+        g = 9.81;		% Gravitation
     end
     
     properties(Dependent)
-        n_intervals     % number of intervals in mesh
-        n_timepoints    % number of discretization points in mesh
+        n_intervals;     % number of intervals in mesh
+        n_timepoints;    % number of discretization points in mesh
     end
     
     methods
