@@ -1,13 +1,10 @@
 
 %% Aufstellen des Problems
 
-%TODO: Klasse
-env = classEnvConstant();
-%TODO: Klasse
-cR = classQuadrocopter(env);
 
 
-%TODO: options für fmincon festlegen
+
+%TODO: options fï¿½r fmincon festlegen
 options                 = optimoptions('fmincon');
 options.Algorithm       = 'interior-point';
 options.Display         = 'iter';
@@ -18,39 +15,51 @@ options.HessFcn         = @hessianAdapter;
 
 %TODO: n_int auf einen sinnvollen Wert festlegen
 n_int = 50;
+% Quadrocopter soll 5 Meter hoch fliegen
+xbc = [         ... Variablenname Lï¿½nge   Name
+                ... Anfangsbedingung
+    0, 0, 0,    ...     r           3      Ortsvektor
+    1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
+    0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
+    0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
+                ... Endbedingung
+    0, 0, 5,    ...
+    1, 0, 0, 0, ...
+    0, 0, 0,    ...
+    0, 0, 0     ...
+];    
 
-%TODO: xbc=? Anfangs und Endbedingungen festlegen
+env = Environment();
+env.xbc = xbc;
+env.setUniformMesh(uint8(n_int));
 
-%TODO: Klasse, cDP fliegt raus 
-%cOCPp = classOCPparam(uint8(4),uint8(2),xbc,cDP);
-cOCPp.setUniformMesh(uint8(n_int));
+cQ = Quadrocopter();
 
-% TODO: Irgendwas besser für Startlösung als rand finden
-v0 = rand(cR.n_state_contr*(n_int+1),1);
+% TODO: Irgendwas besser fï¿½r Startlï¿½sung als rand finden
+v0 = rand(cQ.n_var*(n_int+1),1);
 
 % Initialisierung der Dynamik
 %TODO: Klasse
-cD = classQuadrocopterDyn(cR);
+cBQD = BasisQDyn(cQ, env);
+CBQD.state = rand(cQ.n_state, n_int+1);
+CBQD.contr = rand(cQ.n_contr, n_int+1);
 
 % Wahl des Integrators
-%TODO: Klasse anpassen
-cFE = classForwEuler(cD,cOCPp);
+cFE = ForwEuler(cBQD);
 
 % Initialisierung der Nebenbedingungen
 %TODO: Klasse
-cC = classConstraints(cFE,cOCPp);
-%TODO: irgendwas besseres als rand finden
-cC.vec = rand((n_int+1)*cR.n_state_contr,1);
+cC = Constraints(cFE);
 
 % Initialisierung Kostenfunktion
-cCost = classCosts(cOCPp);
+cCost = Costs(cBQD);
 
-%Variablen für fmincon verfügbar machen
-global objectCost objectConstr;
-objectCost = cCost;
-objectConstr = cC;
+%Variablen fï¿½r fmincon verfï¿½gbar machen
+%global objectCost objectConstr;
+%objectCost = cCost;
+%objectConstr = cC;
 
-%% Lösung des Problems
+%% Lï¿½sung des Problems
 tic;
 %TODO: Realtime Ansatz einbauen, bzw. fmincon ersetzen/erweitern
 v = fmincon(@costAdapter,v0,[],[],[],[],[],[],@constrAdapter, options);

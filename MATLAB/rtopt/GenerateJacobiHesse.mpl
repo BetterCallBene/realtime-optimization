@@ -18,7 +18,7 @@ T := proc (omega, u) options operator, arrow; (Vector(6, {(1) = 0, (2) = 0, (3) 
 dot := Vector([Multiply(R(q), xv[8 .. 10]), Q, Multiply(Minv, VectorCalculus:-`+`(T(omega, u), VectorCalculus:-`-`(Theta(q, v, omega))))]);
 
 
-dynM := dot;
+
 
 
 getNZeros := proc (M) local res, i, j, m, n; res := 0; i := 1; j := 1; m := 0; n := 0; m, n := Dimension(M); for i to m do for j to n do if M[i][j] <> 0 then res := res+1 end if end do end do; return res end proc;
@@ -29,11 +29,13 @@ getNZerosHesses := proc (M, y) local m, n, CountHesse, k; CountHesse := 0; k := 
 
 getArray := proc (F, x) local m, n, JBtmp, CountJacobi, CountHesse, J, H, i, j, tmp, l, tmp2, h, k; JBtmp := Jacobian(F, x); CountJacobi := getNZeros(JBtmp); CountHesse := getNZerosHesses(F, x); J := Matrix(CountJacobi, 3); H := Matrix(CountHesse, 4); m, n := Dimension(JBtmp); k := 1; h := 1; for i to m do if F[i] <> 0 then for j to n do tmp := diff(F[i], x[j]); if tmp <> 0 then J[k, 1] := i; J[k, 2] := j; J[k, 3] := tmp; for l to n do tmp2 := diff(tmp, x[l]); if tmp2 <> 0 then H[h, 1] := i; H[h, 2] := j; H[h, 3] := l; H[h, 4] := tmp2*ones; h := h+1 end if end do; k := k+1 end if end do end if end do; return J, H end proc;
 
-J, H := getArray(dynM, x);
+J, H := getArray(dot, x);
 
 tmpDir := TemporaryDirectory();
 currentdir(tmpDir);
 currentdir();
-if TEST = false then Matlab(dynM, optimize, defaulttype = integer, output = tmpRTOptFunction); VectorCalculus:-`*`(Matlab(eval(([codegen:-optimize])(J, tryhard)), defaulttype = integer, output = tmpRTOptJacobi), Matlab(eval(([codegen:-optimize])(H, tryhard)), defaulttype = integer, output = tmpRTOptHesse)) else Matlab(dynM, optimize, defaulttype = integer); Matlab(eval(([codegen:-optimize])(J, tryhard)), defaulttype = integer); Matlab(eval(([codegen:-optimize])(H, tryhard)), defaulttype = integer) end if;
+dynM := convert(dot, Matrix);
+if TEST = false then Matlab(eval(([codegen:-optimize])(dynM, tryhard)), defaulttype = integer, output = tmpRTOptFunction); VectorCalculus:-`*`(Matlab(eval(([codegen:-optimize])(J, tryhard)), defaulttype = integer, output = tmpRTOptJacobi), Matlab(eval(([codegen:-optimize])(H, tryhard)), defaulttype = integer, output = tmpRTOptHesse)) else Matlab(eval(([codegen:-optimize])(dynM, tryhard)), defaulttype = integer); Matlab(eval(([codegen:-optimize])(J, tryhard)), defaulttype = integer); Matlab(eval(([codegen:-optimize])(H, tryhard)), defaulttype = integer) end if;
+
 
 
