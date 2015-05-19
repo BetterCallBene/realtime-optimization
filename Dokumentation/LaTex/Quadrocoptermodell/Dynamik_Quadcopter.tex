@@ -210,14 +210,24 @@ Man beachte, dass $ M $ gar nicht von $ t $ abhängt, sondern für alle Zeiten k
 	\left[
 	\begin{matrix}   0 \\ 
 	                 0 \\ 
-                   \sum_{i = 1}^4 k_{T} _{M_i}\omega^2_{1,M_i} \\
-                   I_M _{1}\omega_{1, y} (- _{M_1}\omega_{1,M_1}+ _{M_2}\omega_{1,M_2} - _{M_3}\omega_{1,M_3} + _{M_4}\omega_{1,M_4}) + d k_{T} \left({_{M_2}\omega}^2_{1,M_2} - {_{M_4}\omega}^2_{1,M_4}\right) \\
-                   -I_M {_{1}} \omega_{1, x} ( -_{M_1}\omega_{1,M_1} + _{M_2}\omega_{1,M_2} - _{M_3}\omega_{1,M_3} + _{M_4}\omega_{1,M_4}) +d k_{T} \left({_{M_3}\omega}^2_{1,M_3} + {_{M_1}\omega}^2_{M_1}\right) \\
-                  k_{drag} \cdot \left(- {_{M_1}\omega}^2_{1,M_1} + {_{M_2}\omega}^2_{1,M_2}  - {_{M_3}\omega}^2_{1,M_3} +  {_{M_4}\omega}^2_{1,M_4}\right)  \end{matrix}
+                   \sum_{i = 1}^4 k_{T} {_{M_i}\omega^2_{1,M_i}} \\
+                   I_M {_{1}\omega_{1, y}} (- {_{M_1}\omega_{1,M_1}}+ {_{M_2}\omega_{1,M_2}} - {_{M_3}\omega_{1,M_3}} + {_{M_4}\omega_{1,M_4}}) + d k_{T} \left({_{M_2}\omega^2_{1,M_2}} - {_{M_4}\omega^2_{1,M_4}}\right) \\
+                   -I_M {_{1}\omega_{1, x}} ( -{_{M_1}\omega_{1,M_1}} + {_{M_2}\omega_{1,M_2}} - {_{M_3}\omega_{1,M_3}} + {_{M_4}\omega_{1,M_4}}) +d k_{T} \left({_{M_3}\omega^2_{1,M_3}} + {_{M_1}{\omega}^{2}_{M_1}}\right) \\
+                  k_{drag} \cdot \left(- {_{M_1}\omega^2_{1,M_1}} + {_{M_2}\omega^2_{1,M_2}}  - {_{M_3}\omega^2_{1,M_3}} +  {_{M_4}\omega^2_{1,M_4}}\right)  \end{matrix}
 	\right]
 \end{align*}
 
+Außerdem gelten folgende Ableitungsbeziehungen (die dann für das Optimalsteuerungsproblem gebraucht werden):
 
+\begin{align*}
+	_{0}\dot{r}_{1} &= \mathbf{R_{01}} _{1}v_{1} \\
+	\dot{q} &= \frac{1}{2} \dot q \otimes \begin{bmatrix} 0 \\ \omega \end{bmatrix} 
+					= \begin{pmatrix}	-q_2\omega_1 -q_3\omega_2 -q_4\omega_3 \\
+														q_1\omega_1 -q_4\omega_2 +q_3\omega_3 \\
+														q_4\omega_1 +p_1\omega_2 -q_2\omega_3 \\
+														-q_3\omega_1 +q_2\omega_2 +q_1\omega_3
+						\end{pmatrix}
+\end{align*}
 
 Für die optimal control Formulierung führe zusätzlich ein:
 \begin{itemize}
