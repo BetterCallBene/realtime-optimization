@@ -1,0 +1,262 @@
+\documentclass[12pt, a4paper]{scrartcl}
+\usepackage{fullpage}
+\usepackage[utf8]{inputenc} %Zeichensatzkodierung (auch Sonderzeichen -> ä,ö,ü)
+\usepackage[english, ngerman]{babel} %Sprache -> Silbentrennung, automatisch generierte Texte auf deutsch; ngerman -> NEUE deutsche Rechtschreibung
+\usepackage[T1]{fontenc} %Sonderzeichen allg
+\usepackage{lmodern} %PDF-optimierte Schrift
+
+\usepackage{amsmath, amssymb, amsbsy, amsthm} %Mathepakete ; amsthm: Theorem-Umgebung; muss nach amsmath eingebunden werden
+\usepackage{graphicx} % Grafiken einfügen
+%\usepackage{listings} % zum Einbinden von Code, ist bereits in "`mcode"' enthalten
+\usepackage{tabularx}
+%\usepackage{extarrows} % Pfeile mit Beschriftung, deren Länge automatisch angepasst wird
+
+\usepackage{setspace} % Zeilenabstand verändern
+
+\usepackage{bibgerm} % Für das Literaturverzeichnis
+
+\setlength{\parindent}{0pt}
+
+\newcommand{\R}{\mathbb{R}}
+
+
+\begin{document}
+
+%\section{Modelle}\label{Bla}
+%
+%\subsection{Mathematisches Modell für + Konfiguration}\label{sub:konfg_plus}
+%Mit \ref{sec:konfg_matrix} folgt für die + Konfiguration 
+%\begin{align}
+    %{_{0}\dot{r}_{1}} &= A_{0, 1} {_{1}v_{1}} \\
+    %m_{B_1} \frac{d_1}{dt} {_{1}v_{1}} &+ {_{1}\omega_{1}} \times m_{B_1} {_{1}v_{1}} = m_{B_1} A_{1, 0} \cdot \begin{pmatrix} 0 \\ 0 \\ -g \end{pmatrix} + \sum_{i = 1}^4 {\begin{pmatrix} 0 \\ 0 \\ F_i \end{pmatrix}} \\
+    %{{\dot{A}_{0, 1}}} &= {A_{0, 1}} \tilde{_{1} {\omega}_{1}}\\
+    %{_{1} I_{1}} {_{1} \dot{\omega}_{1}} &+ {_{1} {\omega}_{1}} \times {_{1} I_{1}} {_{1} {\omega}_{1}} + \sum_{i=1}^{4}{({_{1}{\omega}_{1}} \times e_z) \cdot I_{M} {_{M_i}\omega_{M_i}} } \\
+    %&= \begin{bmatrix} 0 \\ 0 \\ -\sum_{i = 1}^{4}{M_i} \end{bmatrix} + (\tau_{R} + \tau_{P}) = \begin{bmatrix} d(F_2 - F_4) \\ d(F_3 - F_1) \\ -\sum_{i = 1}^{4}{M_i} \end{bmatrix}
+%\end{align}
+%
+%Mit \ref{gl:MDrag} und \ref{gl:schub}
+%\begin{align}
+    %{_{0}\dot{r}_{1}} &= A_{0, 1} {_{1}v_{1}} \\
+    %m_{B_1} \frac{d_1}{dt} {_{1}v_{1}} &+ {_{1}\omega_{1}} \times m_{B_1} {_{1}v_{1}} = m_{B_1} A_{1, 0} \cdot \begin{pmatrix} 0 \\ 0 \\ -g \end{pmatrix} + {\begin{pmatrix} 0 \\ 0 \\ \sum_{i = 1}^4 k_{T} {_{M_i}\omega^2_{1, M_i}} \end{pmatrix}} \\
+    %{{\dot{A}_{0, 1}}} &= {A_{0, 1}} \tilde{_{1} {\omega}_{1}}\\
+    %{_{1} I_{1}} {_{1} \dot{\omega}_{1}} &+ {_{1} {\omega}_{1}} \times {_{1} I_{1}} {_{1} {\omega}_{1}} + \sum_{i=1}^{4}{({_{1}{\omega}_{1}} \times e_z) \cdot I_{M} {_{M_i}\omega_{M_i}} } \\
+    %&= \begin{bmatrix} 0              & d \cdot k_{T} & 0             & -d \cdot k_{T} \\ 
+                       %-d \cdot k_{T} & 0             & d \cdot k_{T} & 0  \\
+                       %-k_{drag}      & k_{drag}      & -k_{drag}    & k_{drag}
+       %\end{bmatrix}
+    %\cdot 
+    %\begin{bmatrix}
+      %{_{M_1} {\omega}^2_{M_1}} \\
+      %{_{M_2} {\omega}^2_{M_2}}\\
+      %{_{M_3} {\omega}^2_{M_3}}\\
+      %{_{M_4} {\omega}^2_{M_4}}
+    %\end{bmatrix}
+%\end{align}
+%\subsubsection{Quaternionen}\label{subsub:Quaternionen}
+%Mit $\dot q = \frac{1}{2} q \otimes \begin{bmatrix} 0 \\ \omega \end{bmatrix} $ gilt:
+%
+%\begin{align}
+    %{_{0}\dot{r}_{1}} &= \left[ q \otimes {_{1}v_{1}} \otimes \overline{q} \right]_{\left[1:3\right]} \\
+    %m_{B_1} \frac{d_1}{dt} {_{1}v_{1}} &+ {_{1}\omega_{1}} \times m_{B_1} {_{1}v_{1}} = m_{B_1} \left[\overline{q} \otimes \begin{pmatrix} 0 \\ 0 \\ -g \end{pmatrix} \otimes q \right]_{\left[1:3\right]} + {\begin{pmatrix} 0 \\ 0 \\ \sum_{i = 1}^4 k_{T} {_{M_i}\omega^2_{1, M_i}} \end{pmatrix}} \\
+    %\dot q &= \frac{1}{2} q \otimes \begin{bmatrix} 0 \\ \omega \end{bmatrix} \\
+    %{_{1} I_{1}} {_{1} \dot{\omega}_{1}} &+ {_{1} {\omega}_{1}} \times {_{1} I_{1}} {_{1} {\omega}_{1}} + \sum_{i=1}^{4}{({_{1}{\omega}_{1}} \times e_z) \cdot I_{M} {_{M_i}\omega_{M_i}} } \\
+    %&= \begin{bmatrix} 0              & d \cdot k_{T} & 0             & -d \cdot k_{T} \\ 
+                       %-d \cdot k_{T} & 0             & d \cdot k_{T} & 0  \\
+                       %-k_{drag}      & k_{drag}      & -k_{drag}    & k_{drag}
+       %\end{bmatrix}
+    %\cdot 
+    %\begin{bmatrix}
+      %{_{M_1} {\omega}^2_{M_1}} \\
+      %{_{M_1} {\omega}^2_{M_2}}\\
+      %{_{M_1} {\omega}^2_{M_3}}\\
+      %{_{M_1} {\omega}^2_{M_4}}
+    %\end{bmatrix}
+%\end{align}
+%
+%
+%\subsubsection{Rotationsmatrix}\label{subsub:Rotationsmatrix}
+%Mit $q = [q_0, q_1, q_2, q_3]^T$, $\dot q = \frac{1}{2} q \otimes \begin{bmatrix} 0 \\ \omega \end{bmatrix} $, $q_0^2 + q_1^2 + q_2^2 + q_3^2 = 1$ und \\
+%$R_{0, 1}(q) = \left[ \begin{matrix} 1-2(q_2^2 + q_3^2) &
+%-2q_0q_3+2q_1q_2 &
+%2q_0q_2+2q_1q_3 \\
+%
+%2q_0q_3+2q_1q_2 &
+%1-2(q_1^2 + q_3^2) &
+%-2q_0q_1+2q_2q_3 \\
+%
+%-2q_0q_2+2q_1q_3 &
+%2q_0q_1+2q_2q_3 &
+%1-2(q_1^2 + q_2^2)
+%\end{matrix}
+%\right]
+%$ 
+%
+%\begin{align}
+    %{_{0}\dot{r}_{1}} &= R_{0, 1}(q) {_{1}v_{1}} \\
+    %m_{B_1} \frac{d_1}{dt} {_{1}v_{1}} &+ {_{1}\omega_{1}} \times m_{B_1} {_{1}v_{1}} = R(q)^T \begin{pmatrix} 0 \\ 0 \\ -m_{B_1} \cdot g \end{pmatrix} + {\begin{pmatrix} 0 \\ 0 \\ \sum_{i = 1}^4 k_{T} {_{M_i}\omega^2_{1, M_i}} \end{pmatrix}} \\
+    %\dot q &= \frac{1}{2} q \otimes \begin{bmatrix} 0 \\ \omega \end{bmatrix} \\
+    %{_{1} I_{1}} {_{1} \dot{\omega}_{1}} &+ {_{1} {\omega}_{1}} \times {_{1} I_{1}} {_{1} {\omega}_{1}} + \sum_{i=1}^{4}{({_{1}{\omega}_{1}} \times e_z) \cdot I_{M} {_{M_i}\omega_{M_i}} } \\
+    %&= \begin{bmatrix} 0              & d \cdot k_{T} & 0             & -d \cdot k_{T} \\ 
+                       %-d \cdot k_{T} & 0             & d \cdot k_{T} & 0  \\
+                       %-k_{drag}      & k_{drag}      & -k_{drag}    & k_{drag}
+       %\end{bmatrix}
+    %\cdot 
+    %\begin{bmatrix}
+      %{_{M_1} {\omega}^2_{M_1}} \\
+      %{_{M_1} {\omega}^2_{M_2}}\\
+      %{_{M_1} {\omega}^2_{M_3}}\\
+      %{_{M_1} {\omega}^2_{M_4}}
+    %\end{bmatrix}
+%\end{align}
+\subsection{fehlt noch}
+
+\begin{itemize}
+	\item Literatur
+	\item Quaternionen-Multiplikation
+	\item Herleitung
+\end{itemize}
+
+\subsection{Variablen und Konstanten des Quadcopters}
+
+\textbf{Koordinatensysteme}
+Zu vereinfachten Betrachtung bestimmter Variablen werden in diesem Modell drei (bzw. sechs) verschiedene Koordinatensysteme verwendet:
+
+\begin{enumerate}
+	\item Inertialsystem $ \mathcal{I} $: Indizierung mit "`0"', unbewegtes Beobachtersystem
+	\item Körpersystem $ \mathcal{B}_1 $: Indizierung mit "`1"', alle "`nicht drehenden"' Teile des Quadcopters
+	\item vier Rotorsysteme $ \mathcal{B}_{M_i}, i=\{1,2,3,4\} $: Indizierung mit $ M_i $, z-Achse des Koordinatensystems entspricht der Drehachse des jeweiligen Rotors
+\end{enumerate}
+
+\textbf{Konstanten}
+
+\begin{itemize}
+	\item $ m_{ges} $: Gesamtmasse des Quadcopters
+	\item $ _{1}\mathbf{I}_{1} =
+		\begin{bmatrix} I_{xx} & 0 & 0 \\
+										0 & I_{yy} & 0 \\
+										0 & 0 & I_{zz}
+		\end{bmatrix} $: Trägheitsmatrix des Quadcopters bzgl. des Massenschwerpunkts im Körpersystem
+		\item $ I_{M} $: Trägheitsmatrix eines Motors (im Rotorsystem)
+		\item $ g $: Erdbeschleunigung
+		\item $ d $: Abstand der Drehachse eines Rotors zum Massenschwepunkt des Copters
+		\item $ k_T=C_T\rho_{Luft}A_{Rotor}r^2 $: Schubkonstante eines Motors; $ \rho_{Luft} $ ist die Luftdichte, $ C_T $ der Schubkoeffizient des Motors, $ A_{Rotor} $ die Fläche, die der Rotor bei einer Umdrehung überstreicht und $ r $ der Radius des Rotors
+		\item $ k_{drag} = \frac{1}{2}\rho_{Luft}A_{Rotor}r^2 $: Luftwiderstandskoeffizient eines Motors
+\end{itemize}
+
+\textbf{Variablen}
+
+\begin{itemize}
+	\item \( _{0}r_{1} \in \R^3 \): Position des Copters im Inertialsystem
+	\item \( q=( q_1, q_2, q_3, q_4) \in \R^4 \): Quaternion, welches die Drehung des Quadcopters bzgl. des Inertialsystems angibt
+	\item \( _{1}v_{1} \): Geschwindigkeit des Copters im Körpersystem
+	\item \( _{1}\omega_{1} \): Winkelgeschwindigkeit des Copters im Körpersystem
+	\item \( _{M_i}\omega_{1,M_1} \): Winkelgeschwindigkeit der einzelnen Rotoren; es gilt immer \( \omega_{M_1} > 0 \), die Vorzeichenänderung aufgrund der unterschiedlichen Drehrichtung der Rotoren wird direkt in den Gleichungen eingesetzt
+	\item $ R=R_{0,1}= \begin{bmatrix}
+														 1-2(q_3^2 + q_4^2) & -2q_1q_4 +2q_2q_3 & 2q_1 q_3+2q_2q_4 \\
+
+														 2q_1q_4+2q_2q_3 & 1-2(q_2^2 + q_4^2) & -2q_1q_2+2q_3q_4 \\
+
+														 -2q_1q_3+2q_2q_4 & 2q_1q_2+2q_3q_4 & 1-2(q_2^2 + q_3^2)
+											\end{bmatrix}
+				$: Drehmatrix vom Körpersystem ins Inertialsystem; es gilt $ R^{-1} = R^T $
+\end{itemize}
+
+
+\subsection{Newton-Euler Gleichungen}
+
+Es seien: \\
+$ \theta := \left[ \begin{matrix} {_{0}} r_{1}, & q \end{matrix} \right]^T \in \R^{7} $ \\
+$ \dot \theta := \left[ \begin{matrix} {_{1}} v_{1},&{_{1}} \omega_{1} \end{matrix}\right]^T \in \R^6 $ \\
+$ \ddot \theta := \left[ \begin{matrix} {_{1}}\dot v_{1},&{_{1}}\dot \omega_{1} \end{matrix} \right]^T \in \R^6 $ \\
+$ \omega_{M} = \left[\begin{matrix} _{M_1}\omega_{1,M_1}, & _{M_2}\omega_{1,M_2}, & _{M_3}\omega_{1,M_3}, & _{M_44}\omega_{1,M_4} \end{matrix}\right]^T \in \R^4$ \\
+
+Die Dynamik des Quadcopters kann somit als folgende Differentialgleichung dargestellt werden:
+
+\begin{align*}
+  M(\theta) \ddot\theta + \Theta (\theta, \dot \theta) = T(\dot \theta, \omega_M(t))
+\end{align*}
+
+mit 
+
+\begin{align*}
+	M(\theta(t)) &= 
+		\left[ 
+				\begin{array}{c@{}c@{}}
+						m_{ges} \cdot \mathbf{E_{3x3}}  & \quad \mathbf{0} \\
+						\mathbf{0} & \quad \mathbf{{_{1}I_{1}}} \\
+				\end{array}
+		\right] \in \R^{6x6}
+\end{align*}
+
+Hierbei ist $ \mathbf{E_{3x3}} $ die Einheitsmatrix in $ \R^3 $. \\
+Man beachte, dass $ M $ gar nicht von $ t $ abhängt, sondern für alle Zeiten konstant ist. Außerdem ist $ M $ eine Diagonalmatrix.
+	
+\begin{align*}	
+	\Theta(\theta, \dot \theta ) &=
+			\left[
+				\begin{matrix}
+					m_{ges} \left( {_{1}} \omega_{1, y} \cdot {_{1}} v_{1, z} -  {_{1}} \omega_{1, z} \cdot {_{1}} v_{1, y} + R_{1, 3}^T(q) \cdot g \right)\\
+					m_{ges} \left( {_{1}} \omega_{1, z} \cdot {_{1}} v_{1, x} -  {_{1}} \omega_{1, x} \cdot {_{1}} v_{1, z} + R_{2, 3}^T(q) \cdot g \right)\\
+					m_{ges} \left( {_{1}} \omega_{1, x} \cdot {_{1}} v_{1, y} -  {_{1}} \omega_{1, y} \cdot {_{1}} v_{1, x} + R_{3, 3}^T(q) \cdot g \right)\\
+					_{1}\omega_{1,y} \cdot _{1}\omega_{1,z}\left(I_{zz}-I_{yy}\right)  \\
+					_{1}\omega_{1,z} \cdot _{1}\omega_{1,z}\left(I_{xx}-I_{zz}\right)  \\
+					_{1}\omega_{1,x} \cdot _{1}\omega_{1,y}\left(I_{yy}-I_{xx}\right)  \\
+				\end{matrix}
+			\right] \\
+\end{align*}
+
+\begin{align*}		
+	T(\dot\theta, \omega_M(t))  &= 
+	\left[
+	\begin{matrix}   0 \\ 
+	                 0 \\ 
+                   \sum_{i = 1}^4 k_{T} {_{M_i}\omega^2_{1,M_i}} \\
+                   I_M {_{1}\omega_{1, y}} (- {_{M_1}\omega_{1,M_1}}+ {_{M_2}\omega_{1,M_2}} - {_{M_3}\omega_{1,M_3}} + {_{M_4}\omega_{1,M_4}}) + d k_{T} \left({_{M_2}\omega^2_{1,M_2}} - {_{M_4}\omega^2_{1,M_4}}\right) \\
+                   -I_M {_{1}\omega_{1, x}} ( -{_{M_1}\omega_{1,M_1}} + {_{M_2}\omega_{1,M_2}} - {_{M_3}\omega_{1,M_3}} + {_{M_4}\omega_{1,M_4}}) +d k_{T} \left({_{M_3}\omega^2_{1,M_3}} + {_{M_1}{\omega}^{2}_{M_1}}\right) \\
+                  k_{drag} \cdot \left(- {_{M_1}\omega^2_{1,M_1}} + {_{M_2}\omega^2_{1,M_2}}  - {_{M_3}\omega^2_{1,M_3}} +  {_{M_4}\omega^2_{1,M_4}}\right)  \end{matrix}
+	\right]
+\end{align*}
+
+Außerdem gelten folgende Ableitungsbeziehungen (die dann für das Optimalsteuerungsproblem gebraucht werden):
+
+\begin{align*}
+	_{0}\dot{r}_{1} &= \mathbf{R_{01}} _{1}v_{1} \\
+	\dot{q} &= \frac{1}{2} \dot q \otimes \begin{bmatrix} 0 \\ \omega \end{bmatrix} 
+					= \begin{pmatrix}	-q_2\omega_1 -q_3\omega_2 -q_4\omega_3 \\
+														q_1\omega_1 -q_4\omega_2 +q_3\omega_3 \\
+														q_4\omega_1 +p_1\omega_2 -q_2\omega_3 \\
+														-q_3\omega_1 +q_2\omega_2 +q_1\omega_3
+						\end{pmatrix}
+\end{align*}
+
+Für die optimal control Formulierung führe zusätzlich ein:
+\begin{itemize}
+	\item state: $x(t) =\left(\begin{matrix} \theta, &\dot \theta \end{matrix}\right)^T \in \R^{13}$
+	\item control: $u(t) = \omega_{M} \in \R^{4}$
+\end{itemize}
+
+Die ODE-Nebenbedingung für das Optimalsteuerungsproblem hat damit die Form:
+\begin{align}
+\frac{d}{dt} 
+  \left(
+      \begin{matrix}
+          x_{0:2}(t) \\
+          x_{3:6}(t) \\
+          x_{7:12}(t)  
+      \end{matrix}
+  \right)
+  = 
+  \left(
+      \begin{matrix}
+          \mathbf{R_{01}}(q)x_{7:9} \\
+          \frac{1}{2} x_{3:6} \otimes \left(\begin{matrix} 0, & x_{10:12} \end{matrix}\right)^T\\
+          M^{-1} (T(u(t), x(t)) - \Theta(x(t))
+      \end{matrix}
+  \right)
+\end{align}
+
+Dabei steht $ \otimes $ für die Quaternionenmultiplikation. 
+
+\subsubsection{Jacobian - und Hessematrix für $\Theta$}
+
+\end{document}
