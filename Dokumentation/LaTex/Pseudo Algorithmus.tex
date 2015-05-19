@@ -338,9 +338,9 @@
   \begin{align*}
   \begin{array}{rl}
   P_{i-1} = & Q_{i-1}+A_{i-1}^{T}P_i A_{i-1} -A_{i-1}^{T}P_i B_{i-1}
-  (R_{i-1}+B_{i-1}^{T}P_N B_{i-1})^{-1} B_{i-1}^{T}P_N A_{i-1} \\
-  \nabla_{s_{i-1}}^{*} = & \nabla_{s_{i-1}} + A_{i-1}^{T}P_i \nabla_{\lambda_{i}} + A_{i-1}^{T}\nabla_{s_{i}^{*}} \\
-   & - (R_{i-1}+B_{i-1}^{T}P_i B_{i-1})^{-1}(\nabla_{q_{i-1}} +B_{i-1}^{T}P_i \nabla_{\lambda_{i}} +B_{i-1}^{T}\nabla_{s_{i}^{*}})
+  (R_{i-1}+B_{i-1}^{T}P_i B_{i-1})^{-1} B_{i-1}^{T}P_i A_{i-1} \\
+  \nabla_{s_{i-1}}^{*} = & \nabla_{s_{i-1}} + A_{i-1}^{T}P_i \nabla_{\lambda_{i}} + A_{i-1}^{T}\nabla_{s_{i}}^{*} \\
+   & - (R_{i-1}+B_{i-1}^{T}P_i B_{i-1})^{-1}(\nabla_{q_{i-1}} +B_{i-1}^{T}P_i \nabla_{\lambda_{i}} +B_{i-1}^{T}\nabla_{s_{i}}^{*})
   \end{array}
   \end{align*}
   Schließlich ergibt sich
@@ -391,9 +391,21 @@
   \Delta q_{i}
   \end{pmatrix} \right] 
   \end{align*}
-  Berechne $ y^{k+1} = \prod ^{k+1}(y^{k} * \Delta y^{k})$ \\
+  Berechne $ y^{k+1} = \prod ^{k+1}(y^{k} + \Delta y^{k})$ \\
   \\
   Dieses Verfahren empfiehlt sich nicht wenn $ N $ zu groß ist.\\
-  Eine Alternative wäre, für große $N$, ein fixes $n$ zu wählen und das Verfahren darauf anzuwenden ohne kleiner werdenden Horizont.
+  Eine Alternative wäre, für große $N$, ein fixes $n$ zu wählen und das Verfahren darauf anzuwenden ohne kleiner werdenden Horizont.\\
+  \\
+  Für bestimmte Funktionen vereinfacht sich das Problem. Wenn man die Funktion $l_i(q_i) =q_i$ betrachtet, was einer Minimierung über die Steuerungssignale entspricht, vereinfacht sich $R_i$
+  \begin{align*}
+  R_i = 
+  \begin{pmatrix}
+  1 & 1 & \cdots & 1 \\
+  1 & 1 & &  \\
+  \vdots & & \ddots & \vdots \\
+  1 & & \cdots & 1
+  \end{pmatrix} \ \ \ \ \forall i=k, ..., N-1 \ \ \  \forall k=0,...N-1
+  \end{align*}
+  und muss nicht mehr für jeden Zeitschritt neu berechnet werden.
 
 \end{document}
