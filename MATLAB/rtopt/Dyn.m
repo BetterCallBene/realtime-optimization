@@ -64,38 +64,8 @@ classdef(Abstract) Dyn < handle  & TestEnv
     end
     
     methods
-        
-%         Overwrite from TestEnv as functions depend on state and contr
-%         function  [vec_old, n,m] = setup(obj, func)
-%             vec_old = [obj.state ; obj.contr];
-%             n = size(vec_old);
-%             n = n(1);
-%             m = size(func());
-%             m = m(1);
-%         end
-        
-        %Overwrite from TestEnv as functions depend on state and contr
-%         function func_p = plusEpsShift(obj,i,t,vec_old,func)
-%             vec_p = vec_old;
-%             vec_p(i,:) = vec_p(i,:) + obj.eps;
-%             obj.backdoor_state = vec_p(1:13,:);
-%             obj.contr = vec_p(14:17,:);
-%             func_p = func();
-%             obj.state = vec_old(1:13,:);
-%             obj.contr = vec_old(14:17,:);
-%         end
-        
-        %Overwrite from TestEnv as functions depend on state and contr
-%         function func_n = minusEpsShift(obj,i,t,vec_old,func)
-%             vec_n = vec_old;
-%             vec_n(i,:) = vec_n(i,:) - obj.eps;
-%             obj.backdoor_state = vec_n(1:13,:);
-%             obj.contr = vec_n(14:17,:);
-%             func_n = func();
-%             obj.state = vec_old(1:13,:);
-%             obj.contr = vec_old(14:17,:);
-%         end
-
+        %Overwrite function in TestEnv, because we don't want normed
+        %quaternios here.
         function func_p = plusEpsShift(obj,i,t,vec_old,func)
             vec_p = vec_old;
             vec_p((t-1)* obj.robot.n_var + i) = vec_p((t-1)* obj.robot.n_var + i) + obj.eps;
@@ -104,13 +74,15 @@ classdef(Abstract) Dyn < handle  & TestEnv
             obj.vec = vec_old;
         end
         
+        %Overwrite function in TestEnv, because we don't want normed
+        %quaternios here.
         function func_n = minusEpsShift(obj,i,t,vec_old,func)
             vec_n = vec_old;
             vec_n((t-1)* obj.robot.n_var + i) = vec_n((t-1)* obj.robot.n_var + i) - obj.eps;
             obj.backdoor_vec = vec_n;
             func_n = func();
             obj.vec = vec_old;
-        end 
+        end
         
         function setupTest(obj,n_intervals)
             % Quadrocopter soll 5 Meter hoch fliegen
@@ -138,6 +110,5 @@ classdef(Abstract) Dyn < handle  & TestEnv
             obj.contr=rand(4,n_intervals+1);
             
         end
-        
     end
 end

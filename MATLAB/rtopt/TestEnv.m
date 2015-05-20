@@ -56,8 +56,6 @@ classdef TestEnv < matlab.unittest.TestCase
             end
         end
         
-        
-        
         function numDiff = numDiff_nxnD(obj, timepoint, func)
             % NUMDIFFDNXND This method calculates numerically the
             % derivative of func, when func only depends on obj.vec and has
