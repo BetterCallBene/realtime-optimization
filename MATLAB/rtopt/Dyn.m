@@ -26,13 +26,13 @@ classdef(Abstract) Dyn < handle  & TestEnv
             n_intervals = 50;
             obj.setupTest(n_intervals);
             
-            for time_step = 1:(n_intervals+1)
+            for timepoint = 1:(n_intervals+1)
                 
-                func = @() obj.dot(time_step);
-                numDiff = obj.numDiff_nD(func);
+                func = @() obj.dot(timepoint);
+                numDiff = obj.numDiff_nD(timepoint,func);
                 
                 %Calculate analytic solution
-                ana_dotD = obj.dotD(time_step);
+                ana_dotD = obj.dotD(timepoint);
                 
                 %Assert that the result has the correct form
                 obj.assertSize(ana_dotD, [13,17]);
@@ -49,12 +49,12 @@ classdef(Abstract) Dyn < handle  & TestEnv
             obj.setupTest(n_intervals);
             
             
-            for time_step = 1:(n_intervals+1)
+            for timepoint = 1:(n_intervals+1)
                 
-                func = @() obj.dotD(time_step);
-                numDiff = obj.numDiff_nxnD(func);
+                func = @() obj.dotD(timepoint);
+                numDiff = obj.numDiff_nxnD(timepoint,func);
                 
-                ana_dotDD = obj.dotDD(time_step);
+                ana_dotDD = obj.dotDD(timepoint);
                 for j = 1:length(ana_dotDD)
                     num_dotDD = reshape(numDiff(j,:,:), [17 17] );
                     obj.assertLessThan(max(abs(ana_dotDD{j} - num_dotDD)),obj.tol);
@@ -65,36 +65,36 @@ classdef(Abstract) Dyn < handle  & TestEnv
     
     methods
         
-        %Overwrite from TestEnv as functions depend on state and contr
-        function  [vec_old, n,m] = setup(obj, func)
-            vec_old = [obj.state ; obj.contr];
-            n = size(vec_old);
-            n = n(1);
-            m = size(func());
-            m = m(1);
-        end
+%         Overwrite from TestEnv as functions depend on state and contr
+%         function  [vec_old, n,m] = setup(obj, func)
+%             vec_old = [obj.state ; obj.contr];
+%             n = size(vec_old);
+%             n = n(1);
+%             m = size(func());
+%             m = m(1);
+%         end
         
         %Overwrite from TestEnv as functions depend on state and contr
-        function func_p = plusEpsShift(obj,i,vec_old,func)
-            vec_p = vec_old;
-            vec_p(i,:) = vec_p(i,:) + obj.eps;
-            obj.backdoor_state = vec_p(1:13,:);
-            obj.contr = vec_p(14:17,:);
-            func_p = func();
-            obj.state = vec_old(1:13,:);
-            obj.contr = vec_old(14:17,:);
-        end
+%         function func_p = plusEpsShift(obj,i,t,vec_old,func)
+%             vec_p = vec_old;
+%             vec_p(i,:) = vec_p(i,:) + obj.eps;
+%             obj.backdoor_state = vec_p(1:13,:);
+%             obj.contr = vec_p(14:17,:);
+%             func_p = func();
+%             obj.state = vec_old(1:13,:);
+%             obj.contr = vec_old(14:17,:);
+%         end
         
         %Overwrite from TestEnv as functions depend on state and contr
-        function func_n = minusEpsShift(obj,i,vec_old,func)
-            vec_n = vec_old;
-            vec_n(i,:) = vec_n(i,:) - obj.eps;
-            obj.backdoor_state = vec_n(1:13,:);
-            obj.contr = vec_n(14:17,:);
-            func_n = func();
-            obj.state = vec_old(1:13,:);
-            obj.contr = vec_old(14:17,:);
-        end
+%         function func_n = minusEpsShift(obj,i,t,vec_old,func)
+%             vec_n = vec_old;
+%             vec_n(i,:) = vec_n(i,:) - obj.eps;
+%             obj.backdoor_state = vec_n(1:13,:);
+%             obj.contr = vec_n(14:17,:);
+%             func_n = func();
+%             obj.state = vec_old(1:13,:);
+%             obj.contr = vec_old(14:17,:);
+%         end
         
         function setupTest(obj,n_intervals)
             % Quadrocopter soll 5 Meter hoch fliegen
