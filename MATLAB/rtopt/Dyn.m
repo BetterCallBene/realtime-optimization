@@ -95,6 +95,22 @@ classdef(Abstract) Dyn < handle  & TestEnv
 %             obj.state = vec_old(1:13,:);
 %             obj.contr = vec_old(14:17,:);
 %         end
+
+        function func_p = plusEpsShift(obj,i,t,vec_old,func)
+            vec_p = vec_old;
+            vec_p((t-1)* obj.robot.n_var + i) = vec_p((t-1)* obj.robot.n_var + i) + obj.eps;
+            obj.backdoor_vec = vec_p;
+            func_p = func();
+            obj.vec = vec_old;
+        end
+        
+        function func_n = minusEpsShift(obj,i,t,vec_old,func)
+            vec_n = vec_old;
+            vec_n((t-1)* obj.robot.n_var + i) = vec_n((t-1)* obj.robot.n_var + i) - obj.eps;
+            obj.backdoor_vec = vec_n;
+            func_n = func();
+            obj.vec = vec_old;
+        end 
         
         function setupTest(obj,n_intervals)
             % Quadrocopter soll 5 Meter hoch fliegen
