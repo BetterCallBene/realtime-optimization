@@ -2,6 +2,7 @@ classdef(Abstract) Dyn < handle  & TestEnv
     % Dyn Diese Klasse repräsentiert die Dynamik
     
     
+    
     properties(SetAccess = public, GetAccess= public)
         environment; % in this object all outside parameters are stored, like gravity, wind, time mesh,...
         robot; % handle for a classRobot element providing the mass matrix and the coriolis terms
@@ -10,6 +11,7 @@ classdef(Abstract) Dyn < handle  & TestEnv
     properties(Abstract)
         state; % the state matrix [r, q, v, w] in R^(13xn) for all time instances
         contr; % the control matrix [u1, u2, u3, u4] in R^(4xn) for all time instances
+        backdoor_vec;
     end
     
     methods(Abstract)
@@ -64,6 +66,7 @@ classdef(Abstract) Dyn < handle  & TestEnv
     end
     
     methods
+        
         %Overwrite function in TestEnv, because we don't want normed
         %quaternios here.
         function func_p = plusEpsShift(obj,i,t,vec_old,func)
@@ -106,8 +109,10 @@ classdef(Abstract) Dyn < handle  & TestEnv
             model = Quadrocopter();
             obj.environment = env;
             obj.robot = model;
-            obj.state=rand(13,n_intervals+1);
-            obj.contr=rand(4,n_intervals+1);
+            %obj.state=rand(13,n_intervals+1);
+            %obj.contr=rand(4,n_intervals+1);
+            
+            obj.vec = rand(17* (n_intervals+1), 1);
             
         end
     end

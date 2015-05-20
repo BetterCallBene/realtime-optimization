@@ -1,12 +1,13 @@
 classdef BasisQDyn < BasisGenQDyn
     
     properties
-        backdoor_state; % the state matrix [r, q, v, w] in R^(13xn) for all time instances
-        contr; % the control matrix [u1, u2, u3, u4] in R^(4xn) for all time instances
+        backdoor_vec;
     end
     
     properties(Dependent)
         state;
+        contr;
+        vec;
     end
     
     methods
@@ -29,51 +30,80 @@ classdef BasisQDyn < BasisGenQDyn
             end
         end
         
-        function set.state(cq, state)
-            
-            if isempty(cq.environment.n_timepoints)
+        %set methods
+        function set.backdoor_vec(obj,vec)
+            % set new input vector 
+            % and pass information on th dode 
+            if (isempty(obj.backdoor_vec) || (norm(obj.backdoor_vec - vec)>1e-10))
+                obj.backdoor_vec = vec;
+                obj.emptyResults();
+            end
+        end
+        
+        function set.vec(obj, vec)
+            n_int = obj.environment.n_intervals;
+            n_state = obj.robot.n_state;
+            n_contr = obj.robot.n_contr;
+            if isempty(n_int)
                 error('Gitter ist noch nicht initialisiert');
             end
-            
-            %   if size(state, 1) == cq.robot.n_state && size(state, 2) == cq.environment.n_timepoints;
-            
-            n = size(state, 2);
-            for i=1:n
-                q = state(4:7, i);
-                state(4:7, i) = q./norm(q);
+            n_var = (n_state + n_contr);
+            n = (n_int + 1)*n_var;        
+            if size(vec, 1) == n
+                for i = 1:(n_int+1)
+                    q = vec((i-1)*n_var + 4:(i-1)*n_var + 7);
+                    vec((i-1)*n_var + 4:(i-1)*n_var + 7) = q./norm(q);
+                end
+                obj.backdoor_vec = vec;
+            else
+                error(strcat('Gr��e der State Matrix ist falsch. Erwartete Gr��e  ',int2str((n_int + 1)*(n_state + n_contr)),'xn'));
             end
-            
-            cq.backdoor_state = state;
-            cq.emptyResults();
-            %  else
-            %                 error(strcat('Gr��e der State Matrix ist falsch. Erwartete Gr��e  ',int2str(cq.n_state),'xn'));
-            % end
+        end
+        
+        function ret =  get.vec(obj)
+            ret = obj.backdoor_vec;
+        end
+                
+        % getter methods
+        function val = get.state(obj)
+           % get the current state values
+           % (if not yet stored, extract them from vec)
+           
+           n_int       = obj.environment.n_intervals;
+           n_state       = obj.robot.n_state;
+           n_contr     = obj.robot.n_contr;
+                
+           val        = zeros(n_state,n_int+1);
+
+           for i = 1:n_int+1
+                val(:,i) = obj.vec((i-1)*(n_state+n_contr)+1:...
+                                (i-1)*(n_state+n_contr)+n_state);
+           end
+           
         end
         
         
-        function set.backdoor_state(cq, state)
-            cq.backdoor_state = state;
-        end
-        
-        function res = get.state(cq)
-            res = cq.backdoor_state;
-        end
-        
-        function set.contr(cq, cntrl)
-            
-            if isempty(cq.environment.n_timepoints)
-                error('Gitter ist noch nicht initialisiert');
+        function val = get.contr(obj)
+           % get the current control values
+           % (if not yet stored, extract them from vec)            
+           
+            n_int       = obj.environment.n_intervals;
+            n_var       = obj.robot.n_state;
+            n_contr     = obj.robot.n_contr;
+
+            val        = zeros(n_contr,n_int+1);
+
+            for i = 1:n_int+1
+                val(:,i) = obj.vec((i-1)*(n_var+n_contr)+n_var + 1:...
+                           i*(n_var+n_contr));
             end
-            
-            %   if size(cntrl, 1) == cq.robot.n_contr && size(cntrl, 2) == cq.environment.n_timepoints
-            
-            cq.contr = cntrl;
-            cq.emptyResults();
-            
-            %else
-            %     error(strcat('Gr��e der State Matrix ist falsch. Erwartete Gr��e  ',int2str(cq.n_contr),'xn'));
-            %end
         end
+        
+        %function res = get.state(cq)
+        %    res = cq.backdoor_state;
+        %end
+        
+        
         
         function res = dot(obj,ind) % Rechte Seite der ODE aus (Quadrocoptermodell.pdf: (1.46))
             % compute the right hand side of the ode for a given time
@@ -119,7 +149,7 @@ classdef BasisQDyn < BasisGenQDyn
     end
     methods(Test)
         function testInitBasisQDyn(obj)
-            n_int_ = uint8(50);
+            n_int_ = uint16(50);
             obj.environment = Environment();
             obj.environment.setUniformMesh(n_int_);
             
@@ -127,14 +157,16 @@ classdef BasisQDyn < BasisGenQDyn
             n_state_ = obj.robot.n_state;
             n_contr_ = obj.robot.n_contr;
             
-            obj.state = rand(n_state_, n_int_+1);
-            obj.contr = rand(n_contr_, n_int_+1);
+            n_var = n_state_ + n_contr_;
+            obj.vec = rand(n_var * (n_int_ + 1), 1);
+            %obj.state = rand(n_state_, n_int_+1);
+            %obj.contr = rand(n_contr_, n_int_+1);
             
-            for ind=1:n_int_
-                var1 = obj.dot(ind);
-                var2 = obj.dotD(ind);
-                var3 = obj.dotDD(ind);
-            end
+            %for ind=1:n_int_
+            %    var1 = obj.dot(ind);
+            %    var2 = obj.dotD(ind);
+            %    var3 = obj.dotDD(ind);
+            %end
         end
     end
 end
