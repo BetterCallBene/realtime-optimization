@@ -1,35 +1,34 @@
-classdef Constraints < handle
+classdef Constraints < GenConstraints & TestEnv
 % classConstraints providing discretized ODE constraint using forward euler
 
     properties
-        vec;    % optimization vector combining all control and state values
-        dode;   % handle for the classForwEuler element providing the discretization of the ode
         
-        dyn;    % Dynamik
     end
     
     methods
         %constructor
         function cC = Constraints(varargin)
-            % constructor based on two input values
-            % a classForwEuler element and a classOCPparam element
-            if (nargin == 1)
+            dode = [];
+            dyn = [];
+            if(nargin == 0)
+                global TEST;
+                if ~(~isempty(TEST) && TEST == true)
+                    error('wrong number of inputs');
+                end
+            elseif (nargin == 1)
                 if (isa(varargin{1},'ForwEuler'))
-                    cC.dode = varargin{1};
-                    cC.dyn = cC.dode.dyn; % Initializierung von Dynamik
+                    dode = varargin{1};
+                    dyn = cGC.dode.dyn; % Initializierung von Dynamik
                 else
                     error('wrong class type for discretized ode');
                 end
             else
                 error('wrong number of inputs');     
             end
+            cC@GenConstraints(dode, dyn);
         end
         
-        %set methods
-        function set.vec(obj,vec)
-            % set new input vector
-            obj.vec = vec;
-        end
+        
         
         % other functions
         function [ineq_con,eq_con,ineq_conD,eq_conD] = constr(obj)
@@ -41,28 +40,36 @@ classdef Constraints < handle
             ineq_conD   = [];
             eq_conD     = obj.get_eq_conD();
         end
-        
+        %BB: Nebenbedingung: (Norm(q))^2 = 1 hinzugefügt
         function eq_con = get_eq_con(obj)
             % the equality constraint of the ocp
             % combine the discretized ode with the boundary conditions
+            
             xbc         = obj.dyn.environment.xbc;
             state_mat   = obj.dyn.state;
-
-            eq_con      = [obj.dode.h(); state_mat(:,1) - xbc(:,1); ...
-                                state_mat(:,end) - xbc(:,end)];
+            
+            eq_con      = [obj.dode.h(); 
+                                state_mat(:,1) - xbc(:,1); ...
+                                state_mat(:,end) - xbc(:,end); ...
+                                obj.EqCon ...
+                          ];
         end
         
         function eq_conD = get_eq_conD(obj)
             % the Jacobian of the equality contraints of the ocp
-            [n_int, n_state, n_contr] = getParams(obj);
+            [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
 
+            %q           = state_mat(4:7, :);
+            
             srow        = 1:2*n_state;
             scol        = [1:n_state,...
                 n_int*(n_state+n_contr)+1:n_int*(n_state+n_contr)+n_state];
             sval        = ones(1,2*n_state);
 
             eq_conD     = [obj.dode.hD(); sparse(srow,scol,sval,...
-                                2*n_state,(n_int+1)*(n_state+n_contr))]';
+                                2*n_state,(n_int+1)*(n_state+n_contr)); ...
+                                obj.EqConD ...
+                          ]';
 
         end
         
@@ -73,7 +80,7 @@ classdef Constraints < handle
             % provided, the function returns the Hessian of the Lagrangian
             if (nargin == 1)
                 obj         = varargin{1};
-                [n_int, n_state, n_contr] = getParams(obj);
+                [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
             
                 eq_conDD = [obj.dode.hDD(); cell(2*n_state,1)];
                 for i=0:2*n_state-1
@@ -95,13 +102,8 @@ classdef Constraints < handle
             else 
                 eq_conDD = cell(1,1);
             end
-        end
+        end        
         
-        function [n_int, n_state, n_contr] = getParams(obj)
-            n_int       = obj.dyn.environment.n_intervals;
-            n_state     = obj.dyn.robot.n_state;
-            n_contr     = obj.dyn.robot.n_contr;
-        end
         
         % general type get functions -> interace for testing
         function f = get_func(obj)
@@ -124,6 +126,43 @@ classdef Constraints < handle
                 H = [];
             end
         end
- 
+    end
+    
+    methods(Test)
+        function test_get_eq_conD(obj)
+            n_int_ = uint16(50);
+            % Quadrocopter soll 5 Meter hoch fliegen
+            xbc = [         ... Variablenname Lï¿½nge   Name
+                ... Anfangsbedingung
+                0, 0, 0.5,  ...     r           3      Ortsvektor
+                1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
+                0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
+                0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
+                ... Endbedingung
+                0, 0, 0,    ...
+                1, 0, 0, 0, ...
+                0, 0, 0,    ...
+                0, 0, 0     ...
+                ];    
+
+            env = Environment();
+            env.xbc = xbc;
+            env.setUniformMesh(n_int_);
+            
+            robot = Quadrocopter();
+            n_state_ = robot.n_state;
+            n_contr_ = robot.n_contr;
+            
+            n_var = n_state_ + n_contr_;
+            
+            dyn_ = BasisQDyn(robot, env);
+            dyn_.vec = rand(n_var * (n_int_ + 1), 1);
+            
+            obj.dode = ForwEuler(dyn_);
+            obj.dyn = obj.dode.dyn;
+            
+            val0 = obj.get_eq_con();
+            val1 = obj.get_eq_conD();
+        end
     end
 end
