@@ -12,6 +12,7 @@
 \usepackage{tikz}
 \usetikzlibrary{plotmarks}
 \usetikzlibrary{arrows, positioning}
+\usepackage{lmodern}
 
 \usepackage{float}
 \usepackage{color}
@@ -23,13 +24,16 @@
 \usepackage{sidecap}
 \usepackage[ngerman]{babel}
 
+%\setbeamertamplate[circle]
+
+
 
 \newcommand{\lk}{\left}
 \newcommand{\rk}{\right}
 \newcommand{\rel}{\sqsubseteq}
 \newcommand{\rhn}{\mathds{R}^n}
  
-% \usetheme{default}
+\usetheme{Madrid} % Antibes, Berlin, darmstadt, default, Frankfurt; JuanLesPins
 %\usetheme{
 %	AnnArbor | Antibes | Bergen |
 %	Berkeley | Berlin | Boadilla |
@@ -82,6 +86,10 @@
 % \titlegraphic{\pgfimage[width=1cm,height=1cm]{MA_Web}}
 %\logo{\pgfimage[width=1.2cm,height=1.2cm]{MA_Web}}
 
+\beamertemplatenavigationsymbolsempty
+% kleine Symbole zur Nvigation wegmachen
+
+\setcounter{MaxMatrixCols}{20}
 
 %\AtBeginSection[]{
 %	\frame{
@@ -103,5 +111,7 @@
 %Der Befehl \include{datei} setzt dann hier die Datei datei.tex ,welche im selben Ordner liegt ein. Diese darf keinen Header enthalten
 %\include{datei}
 
+\input{Modell}
+\input{rtSQP}
 
 \end{document}
