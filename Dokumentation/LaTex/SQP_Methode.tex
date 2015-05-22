@@ -1,0 +1,224 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[german]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+
+\setcounter{MaxMatrixCols}{20}
+
+
+\begin{document}
+
+
+  Problemstellung:
+  \begin{align*}
+     \min_{u(\cdot), x(\cdot)} f(x,u) \ \ \ \ \
+     s.t. \ 
+     \left\lbrace   \begin{array}{c} g(x,u) \leq 0\\ h(x,u) = 0 \end{array} \right.
+  \end{align*}
+  mit Zielfunktion $f$, Ungleichheitsbedingung $g$ und Gleichheitsbedingung $h$
+  \begin{align*}
+     f:R^{n_{x}}\times R^{n_{u}} \rightarrow R \\
+     g:R^{n_{x}}\times R^{n_{u}} \rightarrow R \\
+     h:R^{n_{x}}\times R^{n_{u}} \rightarrow R
+  \end{align*}
+  Zur einfacheren Rechnung fassen wir x und u zu einer gemeinsamen Variable zusammen:  
+  \begin{align*}
+     v := (x, u)^{T} \ \ \ \ v\in R^{n_{x} + n_{u}}
+  \end{align*}
+  Lagrangefunktion:
+  \begin{align*}
+     L(v,\lambda,\mu) := f(v) - \lambda^{T}g(v) - \mu^{T}h(v)
+  \end{align*}
+  Das SQP-Verfahren beginnt bei einem Startwert $ y_{0} = (v_{0},\lambda_{0},\mu_{0}) $ und jede weiter Iterirte ergibt sich
+  \begin{align*}
+  y_{k+1} = y_{k} + \alpha_{k} \Delta y_{k}
+  \end{align*}
+  mit $ \alpha_{k} \in (0,1] $ und
+  \begin{align*}
+  \Delta y_{k} = 
+  \left( \begin{array}{c} \Delta v_{k} \\ \Delta \lambda_{k} \\ \Delta \mu_{k} \end{array} \right) := 
+  \left( \begin{array}{c} \Delta v_{k} \\ \tilde{\lambda}_{k}- \lambda_{k} \\ \tilde{\mu}_{k} -  \mu_{k} \end{array} \right)
+  \end{align*}
+  wird erhalten durch den Lösungspunkt $ ( \Delta_{k} ,\tilde{\lambda}_{k}, \tilde{\mu}_{k} )  $ des folgenden quadratischen Problems
+  
+  \begin{align*}
+  \min_{\Delta v \in \Omega_{k}} \dfrac{1}{2} \Delta v^{T} A_{k} \Delta v + \nabla_{v} f(v_{k})^{T} \Delta v \\
+  s.t. \ 
+     \left\lbrace   \begin{array}{c} g(v_{k}) + \nabla_{v} g(v_{k})^{T} \Delta v \leq 0\\ h(v_{k}) + \nabla_{v} h(v_{k})^{T} \Delta v = 0 \end{array} \right.
+  \end{align*}
+  Die existierenden SQP-Verfahren unterscheiden sich hauptsächlich in der Wahl der Schrittlänge $ \alpha_{k} $, der Hesse-Matrix $ A_{k} $ und des Bereichs $ \Omega_{k}\subset R^{n_{v}} $. Die entstehenden Iterierten $ y_{k} $ formen eine Reihe, von der erwartet wird, dass sie zu einem KKT-Punkt $ y^{*} = (v^{*},\lambda^{*},\mu^{*} ) $ konvergiert. In der Praxis wird die Iteration abgebrochen, wenn ein entsprechendes Konvergenzkriterium erreicht ist.
+  \\
+  
+  \begin{large}
+  \textbf{Full Step Exact Hessian SQP Method}
+  \end{large} \\
+  In diesem Verfahren verwendet man  $ \alpha_{k} := 1 $,$ \Omega_{k} := R^{n_{v}} $ und am wichtigsten
+  \begin{align*}
+  A_{k} := \nabla^{2}_{v} L(v_{k},\lambda_{k},\mu_{k}).
+  \end{align*}
+  Veranschaulicht wird diese Wahl im folgenden Beispiel eines Gleichheitsproblems. In diesem Fall sind die nötigen Optimalitätsbedingungen für die QP Lösung $ ( \Delta v_{k} ,\tilde{\mu}_{k} ) $
+  \begin{align*}
+  \nabla ^{2}_{v} L(v_{k},\mu_{k}) \Delta v_{k} + \nabla_{v} f(v_{k}) - \nabla_{v} h(v_{k}) \tilde{\mu}_{k} = 0, \\
+  h(v_{k}) + \nabla_{v} h(v_{k})^{T} \Delta v_{k} = 0.
+  \end{align*}
+  Durch substituiere $ \tilde{\mu}_{k} = \mu_{k} - \Delta \mu_{k} $ können wir equivalent schreiben
+  \begin{align*}
+  \nabla_{v} L(v_{k},\mu_{k}) + \nabla ^{2}_{v} L(v_{k},\mu_{k})  \Delta v_{k} - \nabla_{v} h(v_{k}) \Delta \mu_{k} = 0, \\
+  h(v_{k}) + \nabla_{v} h(v_{k})^{T} \Delta v_{k} = 0.
+  \end{align*}
+  was der Newton-Raphson-Iterationsregel entspricht
+  \begin{align*}
+  \left( \begin{array}{c} \nabla_{v} L(v_{k},\mu_{k}) \\ h(v_{k}) \end{array} \right) + \dfrac{\partial}{\partial (v,\mu)}
+  \left( \begin{array}{c} \nabla_{v} L(v_{k},\mu_{k}) \\ h(v_{k}) \end{array} \right) 
+  \left( \begin{array}{c} \Delta v_{k} \\ \Delta \mu_{k}  \end{array} \right) = 0,
+  \end{align*}
+  für die Lösung des KKT Systems
+  \begin{align*}
+  \left( \begin{array}{c} \nabla_{v} L(v,\mu) \\ h(v) \end{array} \right) = 
+  \left( \begin{array}{c} \nabla_{v} f(v) - \nabla_{v} h(v) \mu \\ h(v) \end{array} \right) = 0.
+  \end{align*}
+  Daraus ergibt sich dann für $ ( \Delta v_{k} , \Delta \mu_{k} ) $
+  \begin{align*} 
+  \left( \begin{array}{c} \Delta v_{k} \\ \Delta \mu_{k}  \end{array} \right) = - \left(  \dfrac{\partial}{\partial (v,\mu)}
+  \left( \begin{array}{c} \nabla_{v} L(v_{k},\mu_{k}) \\ h(v_{k}) \end{array} \right) \right) ^{-1}
+  \left( \begin{array}{c} \nabla_{v} L(v_{k},\mu_{k}) \\ h(v_{k}) \end{array} \right)  
+  \end{align*}
+  wenn die Ableitung in diesem Punkt regulär ist. Die Inverse sollte nicht berechnet werden, da dies zu aufwändig wird.
+  \\
+  \\
+  \begin{large}
+  \textbf{Vorbereitung}
+  \end{large} \\
+  Diskretisieren wir nun unser Optimierungsproblem. Für jeden Zeitschritt $k$ erhalten wir ein Problem $ P^k (x_k) $
+  \begin{align*}
+  \min_{\begin{array}{c} s_{k},...,s_{N}\\ q_{k},...,q_{N} \end{array}} \sum_{i=k}^{N-1} f_{i}(s_{i},q_{i}) \ \  
+  s.t. \ \left\lbrace \begin{array}{c}
+  x_{k} - s_{k} = 0 \\
+  h_i (s_i ,q_i ) - s_{i+1} = 0 \ \ \forall i = k, ... , N-1 \end{array} \right. 
+  \end{align*}
+  Mit 
+  \begin{align*}
+  h_i (s_i ,q_i ) = s_{i} + \Delta t g_{i}(s_{i},q_{i})
+  \end{align*}
+  In diesem Fall steht $ g $ für die diskretisierte ODE
+  \begin{align*}
+  \dot{x}_{i} = g_{i} (s_{i},q_{i})
+  \end{align*}
+  Die zu den Problemen $ P^{k}(x_{k}) $ gehörenden Lagrangegleichungen lauten wie folgt:
+  \begin{align*}
+  L^{k}(y) = \sum_{i=k}^{N-1} f_{i}(s_{i},q_{i})
+  + \lambda_{k}^{T}(x_{k} - s_{k})
+  + \sum_{i=k}^{N-1} \lambda_{i+1}^{T} (h_i (s_i ,q_i ) - s_{i+1})
+  \end{align*}
+  In dieser Lagrangegleichung wird $ y := (\lambda_{k},s_{k},q_{k},\lambda_{k+1},s_{k+1},q_{k+1}, ...,\lambda_{N},s_{N}) $ verwendet. Aus dieser Wahl für $ y $ ergibt sich eine praktische Diagonalform der Hesse-Matrix.
+  Mit dieser Lagrangegleichung ergibt sich die KKT-Bedingung
+  \begin{align*}
+  \nabla_{y} L^{k}(y)  = 0
+  \end{align*}
+  und das exakt Newton-Raphson-Verfahren
+  \begin{align*}
+  y_{i+1} = y_i + \Delta y_i
+  \end{align*}
+  bei dem jedes $ \Delta y_i $ die Lösung des linearen Systems
+  \begin{align*} 
+  \nabla_{y} L^{k}(y_{i}) + \nabla_{y}^{2} L^{k}(y_{i}) \Delta y_{i} = 0
+  \end{align*}
+  ist.
+  Für den im Diehlpaper vorgestellten Algorithmus verwendet man das oben vorgestellte Newton-Raphson-Verfahren nicht exakt. Die zweite Ableitung $ \nabla^{2}_{y} L^{k} $ besser gesagt die Hesse-Matrix $ \nabla^{2}_{q,s} L^{k} $ wird ersetzt durch eine (symmetrische) Approximierung. Die Approximierung von $ \nabla^{2}_{y} L^{k}(y) $ wird im folgenden mit $ J^{k}(y) $ bezeichnet. Ebenso wird das Newton-Type-Verfahren approximiert:
+  \begin{align*} 
+  \nabla_{y} L^{k}(y_{i}) + J^{k}(y_{i}) \Delta y_{i} = 0
+  \end{align*}
+  $ J^{k} $ wird auch als Karush-Kuhn-Tucker Matrix bezeichnet.\\
+  \begin{align*} 
+  \nabla_{y}^{2} L^{k}(y) =
+  \begin{pmatrix}
+    & -E  &     &     &     &     &     &     &     &     &     \\
+-E  & Q_k & M_k & A_k^{T} &  &    &     &     &     &     &     \\
+    & M_k^{T} & R_k & B_k^{T} &   &    &    &    &    &   &     \\
+    & A_k & B_k &     & -E  &     &     &     &     &     &     \\
+    &  &  & -E  & Q_{k+1} & M_{k+1} & A_{k+1}^{T} &  &  &  &  \\
+    &  &  &     & M_{k+1}^{T} & R_{k+1} & B_{k+1}^{T} &  &  &  &  \\
+    &  &  &     & A_{k+1} & B_{k+1} &    &    &     &     &     \\
+    &  &  &     &    &    &   & \ddots &     &     &     \\
+    &  &  &   &  &  & \ddots & Q_{N-1} & M_{N-1} & A_{N-1}^{T} &  \\
+    &  &  &   &  &  &    & M_{N-1}^{T} & R_{N-1} & B_{N-1}^{T} &  \\
+    &  &  &   &  &  &    & A_{N-1}     & B_{N-1} &    & -E \\
+    &  &  &     &    &    &     &      &     & -E &  Q_N 
+\end{pmatrix}
+  \end{align*}
+  \\
+  Mit $ A_i := \dfrac{\partial h_i}{\partial s_i} $, 
+  $ B_i := \dfrac{\partial h_i}{\partial q_i} $,
+  $
+  \begin{pmatrix}
+  Q_i & M_i \\
+  M_i^{T} & R_i
+  \end{pmatrix} := \nabla_{s_i,q_i}^{2}L^{k} $ und 
+  $ Q_N := \nabla_{s_N}^{2}L^{k} $ .\\
+  \\
+  In der Approximierung werden $ Q_i $,$ R_i $ und $ M_i $ ersetzt durch $ Q_i^{H}(s_i,q_i,\lambda_{k+1}) $,$ R_i^{H}(s_i,q_i,\lambda_{k+1}) $ und $ M_i^{H}(s_i,q_i,\lambda_{k+1}) $.\\
+  Wir sehen, wenn wir $ y = (\lambda_k, s_k,q_k, \tilde{y}) $ betrachten, dass $\tilde{y}$ direkt zum nächsten Problem $ P_{k+1}(x_{k+1} $ gehört.
+  \begin{align*} 
+  \nabla_{y}^{2} L^{k}(y) =
+  \left(   
+  \begin{array}{ccc|ccc}
+    & -E      &     &         &     &           \\
+-E  & Q_k     & M_k & A_k^{T} &     &           \\
+    & M_k^{T} & R_k & B_k^{T} &     &           \\ \hline
+    & A_k     & B_k &         &     &           \\
+    &         &     &     & \nabla_{\tilde{y}}^{2} L^{k}(\tilde{y}) &   \\
+    &         &     &         &    &     
+  \end{array} \right) 
+  \end{align*}
+  Im Paper wird erwähnt, dass diese vorteilhafte Form von $\nabla_{y}^{2} L^{k}(y) $ bzw. $ J^{k}(y) $ eine effiziente Lösung der Gleichung $ J^{k}(y)x = b $ durch die Riccati Recursion ermöglicht.\\
+  \\
+  \newpage
+  \begin{large}
+  \textbf{Approximieren}
+  \end{large} \\
+  Ein wichtiger Spezialfall der Newton-Type Verfahren ist die Constrained Gauss-Newton Methode welches sich auf die LEAST SQUARES Form der Funktion
+  \begin{align*}
+  \sum_{i = k}^{N-1}\frac{1}{2}\Vert l_i (s_i , q_i )\Vert_{2}^{2} +\frac{1}{2}\Vert e (s_N )\Vert_{2}^{2}
+  \end{align*}
+  anwenden lässt. In diesem Fall lässt sich die Approximierung wie folgt berechnen.
+  \begin{align*}
+  \begin{pmatrix}
+  Q_i^{H} & M_i^{H} \\
+  (M_i^{H})^{T} & R_i^{H}
+  \end{pmatrix} :=
+  \left( 
+  \dfrac{\partial l_i (s_i,q_i)}{\partial (s_i,q_i)}
+  \right) ^{T}
+  \left( 
+  \dfrac{\partial l_i (s_i,q_i)}{\partial (s_i,q_i)}
+  \right)
+  , \ \ 
+  Q_N :=
+  \left( 
+  \dfrac{\partial e (s_N)}{\partial s_N}
+  \right) ^{T}
+  \left( 
+  \dfrac{\partial e (s_N)}{\partial s_N}
+  \right)
+  \end{align*}
+  \begin{large}
+  \textbf{Algorithmus}
+  \end{large} \\
+  Wir starten mit einem passend gewählten $ y^{0}\in R^{n_0} $ für das Problem $ P_0 (\cdot) $. Der Iterationsindes $k$ wird auf Null gesetzt und wir starten mit den Schritten: \\
+  
+  1. Vorbereitung. Basierend auf dem Wert $ y^{k} \in R^{n_k}$ wird $ \nabla_{y^{k}} L^{k}(y^{k})$ und $ J^{k}(y^{k})$ berechnet. Beachte, dass $ J^{k}(y^{k})$ nicht von $ x_k $ abhängt und bei $ \nabla_y L^{k}(y^{k})$ nur die erste Komponente $( \nabla_{\lambda_k} L^{k}= x_k - s_k ) $. Diese wird nur im 2. Schritt benötig, daher berechne $ (J^{k}(y^{k}))^{-1} \nabla_{y_k} L^{k}(y^{k}) $ soweit es geht ohne den Wert $ x_k $.
+  
+  2. Feedback. Zu dem Zeitpunkt an dem $ x_k $ bekannt ist beende die Berechnung von $ \Delta y^{k} = (J^{k}(y^{k}))^{-1} \nabla_{y_k} L^{k}(y^{k}) $ und gib dem System den Steuerungsimpuls $ u_k := q_k + \Delta q_k $.
+  
+  3. Anpassen. Wenn k = N-1 STOP, ansonsten berechne den nächsten Startwert $ y^{k+1} $. Verwende die Projektion $ (\prod ^{k+1} y = \tilde{y} )$ und wende sie auf den Startwert zu dem der Iterationsschritt addiert wurde an. In etwa so:
+  \begin{align*}
+  y^{k+1} := \prod \ ^{k+1} ( y^{k} + \Delta y^{k} )
+  \end{align*}
+  Setzte $ k = k + 1 $ und gehe zu Schritt 1  
+  
+
+\end{document}
