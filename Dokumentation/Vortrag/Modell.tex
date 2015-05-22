@@ -5,7 +5,7 @@
 
 \usepackage{enumerate, amsmath, amssymb,amsthm, amstext,color}
 \usepackage[ngerman]{babel}
-\usepackage[utf8]{inputenc}   
+\usepackage[latin1]{inputenc}   
 \usepackage{dsfont}
 \usepackage{geometry}
 \usepackage{fancyhdr}
@@ -99,6 +99,68 @@
 \begin{frame}
 \tableofcontents
 \end{frame}
+
+\begin{frame}
+		\section{Model}
+			\begin{figure}[p]
+				\centering
+				%\includegraphics[width=0.8\textwidth]{image.png}
+				%\caption{Awesome Image}
+				\label{fig:awesome_image}
+		\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Newton-Euler Equations}
+	Forces \\
+	\[ F_{ext} = F_{g} + \sum_{i=1}^{4}{F_{i}} \]
+	
+	Torques \\
+	\[ \tau_{ext} = \sum_{i=1}^{4}{\tau_{i}}+(\tau_{\phi}+\tau_{\theta}) \]
+	
+	% Picture of Copter with forces (small) missing
+	\end{frame}
+		
+	\begin{frame}
+		\begin{figure}[p]
+			\centering
+			%\includegraphics[width=0.8\textwidth]{image.png}
+			%\caption{Awesome Image}
+			\label{fig:awesome_image2}
+		\end{figure}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Quaternions}
+			\[ q = a + \textup{i}b+\textup{j}c+\textup{k}d \qquad a, b, c, d \in \mathbb{R} \]
+			
+			representing rotation \( \Leftrightarrow \) \( \Vert q \Vert = 1 \) \\
+			
+			Advantage \(\rightarrow\) no singularities \\
+			Problem \(\rightarrow\) \( \Vert q \Vert = 1 \) additional coontraint
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Dynamics}
+		\[ T(x, u) = M \cdot \begin{pmatrix} \dot{x}_{8} \\ \vdots \\ \dot{x}_{13} \end{pmatrix} + \Theta(x) \]
+		
+		\[ \frac{\textup{d}}{\textup{d}t} 
+			\begin{pmatrix}
+						  x_{1} \\ \vdots \\ x_{7} \\ x_{8} \\ \vdots \\ x_{13}
+			\end{pmatrix}
+			=
+			\begin{pmatrix}
+							\dot{x}_{1} \\ \vdots \\ \dot{x}_{7} \\ M^{-1}(T(x,u)-\Theta(x))
+			\end{pmatrix}
+		\]
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Prospect}
+		Refinement of Model \\
+			wind \\
+			aerodynamical forces \\
+		\end{frame}
 
 %Der Befehl \include{datei} setzt dann hier die Datei datei.tex ,welche im selben Ordner liegt ein. Diese darf keinen Header enthalten
 %\include{datei}
