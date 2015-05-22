@@ -1,4 +1,4 @@
-classdef ForwEuler < handle
+classdef ForwEuler < TestEnv
     %   FORWEULER providing discretized ODE constraint using forward euler
     %   Use the multiple shooting approach to rewrite the ode constraint of the
     %   ocp as a number of equality constraints. This version here is based on
@@ -8,12 +8,25 @@ classdef ForwEuler < handle
         dyn;   % handle for the classDyn object providing the right hand side of the ODE
     end
     
+    
+    
     methods
         %constructor
         function fE = ForwEuler(varargin)
-            % constructor based on two input values
-            % a classDyn element and a classOCPparam element
-            if (nargin == 1)
+            
+            if(nargin == 0)
+                global TEST;
+                
+                if ~(~isempty(TEST) && TEST == true)
+                    error('wrong number of inputs');
+                end
+                
+                
+                
+                
+                % constructor based on two input values
+                % a classDyn element and a classOCPparam element
+            elseif (nargin == 1)
                 if (isa(varargin{1},'Dyn'))
                     fE.dyn = varargin{1};
                 else
@@ -125,9 +138,79 @@ classdef ForwEuler < handle
         
         function [n_int, n_state, n_contr, mesh] = getParams(obj)
             n_int       = obj.dyn.environment.n_intervals;
-            n_state       = obj.dyn.robot.n_state;
+            n_state     = obj.dyn.robot.n_state;
             n_contr     = obj.dyn.robot.n_contr;
             mesh        = obj.dyn.environment.mesh;
+        end
+        
+        function setupTest(obj,n_intervals)
+            % Quadrocopter soll 5 Meter hoch fliegen
+            xbc = [         ... Variablenname L�nge   Name
+                ... Anfangsbedingung
+                0, 0, 0,    ...     r           3      Ortsvektor
+                1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
+                0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
+                0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
+                ... Endbedingung
+                0, 0, 5,    ...
+                1, 0, 0, 0, ...
+                0, 0, 0,    ...
+                0, 0, 0     ...
+                ];
+            
+            env = Environment();
+            env.xbc = xbc;
+            env.setUniformMesh(uint8(n_intervals));
+            
+            model = Quadrocopter();
+            
+            cBQD = BasisQDyn(model, env);
+            cBQD.vec = rand(model.n_var * (n_intervals+1));
+            obj.dyn = cBQD;
+            
+        end
+        
+        function [vec_old, n,m,n_timepoints] = setup(obj,func)
+            vec_old = obj.dyn.vec;
+            n_timepoints = obj.dyn.environment.n_timepoints;
+            n = obj.dyn.robot.n_var;
+            m = size(func());
+            m=m(1);
+        end
+        
+        function func_p = plusEpsShift(obj, i ,t ,vec_old,func)
+            vec_p = vec_old;
+            vec_p((t-1) * obj.dyn.robot.n_var + i ) = vec_p((t-1) * obj.dyn.robot.n_var + i) + obj.eps;
+            obj.dyn.backdoor_vec = vec_p;
+            func_p = func();
+            obj.dyn.vec = vec_old;
+        end
+        
+        function func_n = minusEpsShift(obj, i ,t ,vec_old,func)
+            vec_n = vec_old;
+            vec_n((t-1) * obj.dyn.robot.n_var + i ) = vec_n((t-1) * obj.dyn.robot.n_var + i) - obj.eps;
+            obj.dyn.backdoor_vec = vec_n;
+            func_n = func();
+            obj.dyn.vec = vec_old;
+        end
+    end
+    
+    methods(Test)
+        function testhD(obj)
+            %TESTHD This method derives numerically obj.h and compares it
+            %with obj.hD
+            n_intervals = 50;
+            obj.setupTest(n_intervals);
+            [n_int, n_state, n_contr, mesh] = getParams(obj);
+            
+            func = @() obj.h;
+            numDiff = obj.numDiff_nD_AllT(func);
+            anaDiff = obj.hD();
+            
+            obj.assertSize(anaDiff, size(numDiff) );
+            obj.assertSize(anaDiff, [n_intervals * 13 , (n_intervals+1)* 17 ]);
+            obj.assertLessThan(max(abs(anaDiff - numDiff)), obj.tol);
+            
         end
         
     end

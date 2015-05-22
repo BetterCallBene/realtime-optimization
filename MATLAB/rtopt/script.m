@@ -42,8 +42,7 @@ v0 = rand(cQ.n_var*(n_int+1),1);
 % Initialisierung der Dynamik
 %TODO: Klasse
 cBQD = BasisQDyn(cQ, env);
-cBQD.state = rand(cQ.n_state, n_int+1);
-cBQD.contr = rand(cQ.n_contr, n_int+1);
+cBQD.vec = rand(cQ.n_var * (n_int+1));
 
 % Wahl des Integrators
 cFE = ForwEuler(cBQD);
