@@ -1,0 +1,208 @@
+\documentclass{beamer}
+
+\usepackage{pgfpages} %This is needed for notes presentation!
+%\setbeameroption{}
+
+\usepackage{enumerate, amsmath, amssymb,amsthm, amstext,color}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}   
+\usepackage{dsfont}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{plotmarks}
+\usetikzlibrary{arrows, positioning}
+
+\usepackage{float}
+\usepackage{color}
+\usepackage{hyperref}
+% \usepackage{algorithmicx}
+% \usepackage{algpseudocode}
+\usepackage{fancybox}
+\usepackage{float}
+\usepackage{sidecap}
+\usepackage[ngerman]{babel}
+
+
+\newcommand{\lk}{\left}
+\newcommand{\rk}{\right}
+\newcommand{\rel}{\sqsubseteq}
+\newcommand{\rhn}{\mathds{R}^n}
+ 
+  \usetheme{Berlin}
+%\usetheme{
+%	AnnArbor | Antibes | Bergen |
+%	Berkeley | Berlin | Boadilla |
+%	boxes | CambridgeUS | Copenhagen |
+%	Darmstadt | default | Dresden |
+%	Frankfurt | Goettingen |Hannover |
+%	Ilmenau | JuanLesPins | Luebeck |
+%	Madrid | Malmoe | Marburg |
+%	Montpellier | PaloAlto | Pittsburgh |
+%	Rochester | Singapore | Szeged |
+%	Warsaw
+%}
+\usecolortheme{beaver}
+% \usecolortheme{
+% 	albatross | beaver | beetle |
+% 	crane | default | dolphin |
+% 	dove | fly | lily | orchid |
+% 	rose |seagull | seahorse |
+% 	sidebartab | structure |
+% 	whale | wolverine
+% }
+
+\useinnertheme{rounded}
+% \useinnertheme{
+% 	circles | default | inmargin |
+% 	rectangles | rounded
+% }
+
+\useoutertheme{infolines}
+% \useoutertheme{
+% 	default | infolines | miniframes |
+% 	shadow | sidebar | smoothbars |
+% 	smoothtree | split | tree
+% }
+
+\usefonttheme{default}
+% \usefonttheme{
+% 	default | professionalfonts | serif |
+% 	structurebold | structureitalicserif |
+% 	structuresmallcapsserif
+% }
+
+% Seitenzahlen
+\setbeamertemplate{footline}[frame number]
+
+\title{Mid-term presentation}
+\author{The Quadrocopters}
+\institute{Technische Universität München}
+\date{\today}
+% \titlegraphic{\pgfimage[width=1cm,height=1cm]{MA_Web}}
+%\logo{\pgfimage[width=1.2cm,height=1.2cm]{MA_Web}}
+
+
+%\AtBeginSection[]{
+%	\frame{
+%	\frametitle{\"Ubersicht}
+%	\tableofcontents[current, currentSection]}
+%
+%}
+
+\setcounter{MaxMatrixCols}{20}
+\begin{document}
+
+
+\begin{frame}
+\maketitle
+\end{frame}
+
+\begin{frame}
+\tableofcontents
+\end{frame}
+
+\section{Realtime Optimization Approach}
+\begin{frame}{Realtime}
+$y, s, q$ erklären
+\end{frame}
+
+\begin{frame}{Minimization Problem}
+\begin{block}{ }
+\begin{align*}
+  \min_{\begin{array}{c} s_{k},...,s_{N}\\ q_{k},...,q_{N-1} \end{array}} \sum_{i=k}^{N-1} F_{i}(s_{i},q_{i}) \ \  
+  s.t. \ \left\lbrace \begin{array}{c}
+  x_{k} - s_{k} = 0 \\
+  h_i (s_i ,q_i ) - s_{i+1} = 0 \ \ \forall i = k, ... , N-1 \end{array} \right. 
+\end{align*}
+\end{block}
+\begin{tabular}{l l}
+  $F_i(s_i, q_i)$ &  discretized goal function \\
+$x_k - s_k = 0$ & expected state should be the real state at time $k$ \\
+$h_i (s_i ,q_i )$ & solution of the ODE at time $i$ \\
+\end{tabular}
+\end{frame}
+
+\begin{frame}{The Lagrangian}
+\begin{block}{ }
+\begin{align*}
+  L^{k}(y) = \sum_{i=k}^{N-1} F_{i}(s_{i},q_{i})
+  + \lambda_{k}^{T}(x_{k} - s_{k})
+  + \sum_{i=k}^{N-1} \lambda_{i+1}^{T} (h_i (s_i ,q_i ) - s_{i+1})
+\end{align*}
+\end{block}
+\begin{center}
+We are looking for $y^*$ satisfying the KKT conditions. \\
+
+$\Rightarrow \nabla_{y} L^{k}(y^*)  = 0 $ 
+
+\end{center}
+\end{frame}
+
+\begin{frame}{The SQP method}
+How do we find $y^*$?
+\begin{align*}
+  y_{k+1} = y_{k} + \alpha_{k} \Delta y_{k}
+\end{align*}
+\begin{align*}
+\Downarrow
+\end{align*}
+\begin{align*}
+\min_{\Delta y} = \frac{1}{2} \Delta y^T A_k \Delta y + \nabla_y F(y_k)^T \Delta y
+\end{align*}
+\begin{align*}
+\Downarrow
+\end{align*}
+\begin{align*}
+A_{k} := \nabla^{2}_{y_k} L(y_k).
+\end{align*}
+  
+\end{frame}
+
+\begin{frame}{Newton-Raphson}
+\begin{block}{}
+\begin{gather*}
+y_{k+1} = y_k + \Delta y_k \\
+\nabla_{y} L^{k}(y_{k}) + J^{k}(y_{k}) \Delta y_{k} = 0
+\end{gather*}
+\end{block}
+\begin{tabular}{l l}
+  $J^k(y_k)$ & Approximated Hessian $\nabla^{2}_{y_k} L(y_k)$ \\
+  $\alpha_k = 1$ & 
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Riccati Recursion}
+This formulation still depends on $x_t$ ...
+\begin{align*} 
+  J^{k}(y^{k}) =
+  \begin{pmatrix}
+    & -E  &     &     &     &     &     &     &     &     &     \\
+-E  & Q_k^{H} & M_k^{H} & A_k^{T} &  &    &     &     &     &     &     \\
+    & (M_k^{T})^{H} & R_k^{H} & B_k^{T} &   &    &    &    &    &   &     \\
+    & A_k & B_k &     & -E  &     &     &     &     &     &     \\
+    &  &  & -E  & Q_{k+1}^{H} & M_{k+1}^{H} & A_{k+1}^{T} &  &  &  &  \\
+    &  &  &     & (M_{k+1}^{T})^{H} & R_{k+1}^{H} & B_{k+1}^{T} &  &  &  &  \\
+    &  &  &     & A_{k+1} & B_{k+1} &    &    &     &     &     \\
+    &  &  &     &    &    &   & \ddots &     &     &     \\
+    &  &  &   &  &  & \ddots & Q_{N-1}^{H} & M_{N-1}^{H} & A_{N-1}^{T} &  \\
+    &  &  &   &  &  &    & (M_{N-1}^{T})^{H} & R_{N-1}^{H} & B_{N-1}^{T} &  \\
+    &  &  &   &  &  &    & A_{N-1}     & B_{N-1} &    & -E \\
+    &  &  &     &    &    &     &      &     & -E &  Q_N^{H} 
+\end{pmatrix}
+  \end{align*}
+
+\end{frame}
+
+\begin{frame}{Finite Horizon}
+\begin{itemize}
+how to choose $N$?
+\item $N=t_{end}$ problem gets smaller every time 
+\item $N=t+n$ problem size is constant
+\item
+\item
+\item
+\end{itemize}
+
+\end{frame}
+\end{document}
