@@ -87,20 +87,23 @@ classdef Constraints < GenConstraints & TestEnv
                     eq_conDD{end-i} = sparse((n_int+1)*(n_state+n_contr),...
                         (n_int+1)*(n_state+n_contr));
                 end
-            elseif (nargin == 2)
-                lambda      = varargin{2}; 
-                H           = varargin{1}.dode.hDD();
-                
-                if (~isempty(lambda))
-                    eq_conDD    = {lambda(1)*H{1}};
-                    for i=2:length(lambda)
-                        eq_conDD{1} = eq_conDD{1} + lambda(i)*H{i}; 
-                    end
-                else
-                    eq_conDD = cell(1,1);
-                end
+                eq_conDD = [eq_conDD; obj.EqConDD];
+%             elseif (nargin == 2)
+%                 lambda      = varargin{2}; 
+%                 H           = varargin{1}.dode.hDD();
+%                 
+%                 if (~isempty(lambda))
+%                     eq_conDD    = {lambda(1)*H{1}};
+%                     for i=2:length(lambda)
+%                         eq_conDD{1} = eq_conDD{1} + lambda(i)*H{i}; 
+%                     end
+%                 else
+%                     eq_conDD = cell(1,1);
+%                 end
+%             else 
+%                 eq_conDD = cell(1,1);
             else 
-                eq_conDD = cell(1,1);
+                error('Error: Not yet implemented');
             end
         end        
         
@@ -129,7 +132,27 @@ classdef Constraints < GenConstraints & TestEnv
     end
     
     methods(Test)
+        function test_get_eq_con(obj)
+            
+            obj.setupTest();
+            val0 = obj.get_func();
+        end
+        
         function test_get_eq_conD(obj)
+            
+            obj.setupTest();
+            val0 = obj.get_jac();
+        end
+        
+        function test_get_eq_conDD(obj)
+            
+            obj.setupTest();
+            val0 = obj.get_hess();
+        end
+    end
+    
+    methods
+        function setupTest(obj)
             n_int_ = uint16(50);
             % Quadrocopter soll 5 Meter hoch fliegen
             xbc = [         ... Variablenname L�nge   Name
@@ -161,8 +184,6 @@ classdef Constraints < GenConstraints & TestEnv
             obj.dode = ForwEuler(dyn_);
             obj.dyn = obj.dode.dyn;
             
-            val0 = obj.get_eq_con();
-            val1 = obj.get_eq_conD();
         end
     end
 end

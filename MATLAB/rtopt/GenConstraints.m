@@ -1,17 +1,16 @@
 classdef(Abstract) GenConstraints < handle
-    %BASISGENQDYN wird von MAPLE/PYTHON generiert und enthält die
+    %BASISGENQDYN wird von MAPLE/PYTHON generiert und enthaelt die
     %Berechnung der Ableitungen
     
     properties
-        vec;    % optimization vector combining all control and state values
         dode;   % handle for the ForwEuler element providing the discretization of the ode
-        
         dyn;    % Dynamik
     end
     
     properties
         EqCon;
-        EqConD;    
+        EqConD; 
+        EqConDD;
     end
     
     properties(GetAccess=private, SetAccess = protected)
@@ -26,12 +25,6 @@ classdef(Abstract) GenConstraints < handle
             % a classForwEuler element and a classOCPparam element
             cGC.dode = dode;
             cGC.dyn = dyn;
-        end
-        
-        %set methods
-        function set.vec(obj,vec)
-            % set new input vector
-            obj.vec = vec;
         end
         
         function res = get.EqCon(obj)
@@ -70,6 +63,31 @@ classdef(Abstract) GenConstraints < handle
             end
             
             res = sparse(srow, scol, sval, CountConstraints * (n_int + 1), (n_int+1)*(n_state+n_contr));
+        end
+        
+        function res = get.EqConDD(obj)
+            [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
+            
+            CountConstraints = 1;
+ %CountConstraints
+            t1 = [1 4 4 2; 1 5 5 2; 1 6 6 2; 1 7 7 2;];
+ %HesseMatrix
+            
+            res = cell(uint16((n_int+1)*CountConstraints), 1);
+            
+            n_var = n_state+n_contr;
+            
+            for timestep=1:(n_int +1)
+                for ConstraintStep = 1:CountConstraints
+                    
+                    tmp = t1(uint16(t1(:, 1)) == ConstraintStep, :);
+                    
+                    srow = (tmp(:, 2) + (timestep-1)*n_var);
+                    scol = (tmp(:, 3) + (timestep-1)*n_var);
+                    sval = tmp(:, 4);
+                    res{timestep * ConstraintStep} = sparse(srow, scol, sval,(n_int+1) * n_var,(n_int+1)*n_var);
+                end
+            end
         end
         
         function [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj)
