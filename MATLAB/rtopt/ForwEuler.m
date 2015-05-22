@@ -111,7 +111,7 @@ classdef ForwEuler < TestEnv
         
         function val = hDD(obj)
             % compute the Hessian the equality constraints using forward euler
-            [n_int, n_state, n_contr, mesh] = getParams(obj)
+            [n_int, n_state, n_contr, mesh] = getParams(obj);
             
             if ((size(obj.dyn.contr,2)==n_int+1) && (size(obj.dyn.state,2)==n_int+1)...
                     &&(n_state == size(obj.dyn.state,1)) ...
