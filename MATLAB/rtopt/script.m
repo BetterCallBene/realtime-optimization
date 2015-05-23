@@ -6,8 +6,8 @@
 
 %TODO: options f�r fmincon festlegen
 options                 = optimoptions('fmincon');
-%options.Algorithm       = 'interior-point';
-options.Algorithm       = 'sqp';
+options.Algorithm       = 'interior-point';
+%options.Algorithm       = 'sqp';
 options.Display         = 'iter';
 options.GradObj         = 'on';
 options.GradConstr      = 'on';
@@ -42,7 +42,7 @@ v0 = rand(cQ.n_var*(n_int+1),1);
 % Initialisierung der Dynamik
 %TODO: Klasse
 cBQD = BasisQDyn(cQ, env);
-cBQD.vec = rand(cQ.n_var * (n_int+1));
+cBQD.vec = rand(cQ.n_var * (n_int+1), 1);
 
 % Wahl des Integrators
 cFE = ForwEuler(cBQD);

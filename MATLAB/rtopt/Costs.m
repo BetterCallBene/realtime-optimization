@@ -6,12 +6,11 @@ classdef Costs < handle
     %   multiplied by the interval widths.
     
     properties
-        vec;    % optimization vector combining all control and state values
         dyn; % Dynamik
     end
     
     properties  (Dependent)
-        contr;  % matrix of control values extracted from vec
+        vec;  % optimization vector combining all control and state values
     end
     
     methods
@@ -31,27 +30,10 @@ classdef Costs < handle
         end
         
         %set methods
-        function set.vec(obj,vec)
+        function set.vec(obj, vec_)
             % set new input vector
-            obj.vec = vec;
+            obj.dyn.backdoor_vec = vec_;
         end
-        
-        %get methods
-        function val = get.contr(obj)
-            % get the current control values
-            % (if not yet stored, extract them from vec)
-            if ((~isempty(obj.environment)))
-                [n_int, n_tp, n_state, n_contr] = getParams(obj);
-                
-                val        = zeros(n_contr,n_int+1);
-                
-                for i = 1:n_int+1
-                    val(:,i) = obj.vec((i-1)*(n_state+n_contr)+n_state + 1:...
-                        i*(n_state+n_contr));
-                end
-            end
-        end
-        
         
         % other functions
         function c_val = get_cost(obj)

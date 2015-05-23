@@ -13,6 +13,17 @@ classdef(Abstract) GenConstraints < handle
         EqConDD;
     end
     
+    properties(Dependent)
+        vec;
+    end
+    
+    %setter;
+    methods
+        function set.vec(obj, vec_)
+            obj.dyn.backdoor_vec = vec_;
+        end
+    end
+    
     properties(GetAccess=private, SetAccess = protected)
         %isEmptyF;
         %isEmptyJ;
@@ -20,11 +31,11 @@ classdef(Abstract) GenConstraints < handle
     end
     
     methods
-        function cGC = GenConstraints(dode, dyn)
+        function cGC = GenConstraints(dode)
             % constructor based on two input values
             % a classForwEuler element and a classOCPparam element
             cGC.dode = dode;
-            cGC.dyn = dyn;
+            cGC.dyn = dode.dyn;
         end
         
         function res = get.EqCon(obj)

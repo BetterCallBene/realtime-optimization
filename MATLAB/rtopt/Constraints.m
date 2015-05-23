@@ -1,15 +1,10 @@
 classdef Constraints < GenConstraints & TestEnv
 % classConstraints providing discretized ODE constraint using forward euler
 
-    properties
-        
-    end
-    
     methods
         %constructor
         function cC = Constraints(varargin)
             dode = [];
-            dyn = [];
             if(nargin == 0)
                 global TEST;
                 if ~(~isempty(TEST) && TEST == true)
@@ -18,17 +13,14 @@ classdef Constraints < GenConstraints & TestEnv
             elseif (nargin == 1)
                 if (isa(varargin{1},'ForwEuler'))
                     dode = varargin{1};
-                    dyn = cGC.dode.dyn; % Initializierung von Dynamik
                 else
                     error('wrong class type for discretized ode');
                 end
             else
                 error('wrong number of inputs');     
             end
-            cC@GenConstraints(dode, dyn);
+            cC@GenConstraints(dode);
         end
-        
-        
         
         % other functions
         function [ineq_con,eq_con,ineq_conD,eq_conD] = constr(obj)
@@ -107,7 +99,6 @@ classdef Constraints < GenConstraints & TestEnv
             end
         end        
         
-        
         % general type get functions -> interace for testing
         function f = get_func(obj)
             % interfacing get_eq_con
@@ -133,27 +124,40 @@ classdef Constraints < GenConstraints & TestEnv
     
     methods(Test)
         function test_get_eq_con(obj)
-            
-            obj.setupTest();
+            n_intervals = uint16(50);
+            obj.setupTest(n_intervals);
             val0 = obj.get_func();
         end
         
-        function test_get_eq_conD(obj)
+        function test_get_jac(obj)
+            %TEST_GET_JAC This method derives numerically get_func and compares it
+            %with get_jac
             
-            obj.setupTest();
-            val0 = obj.get_jac();
+            n_intervals = uint16(20);
+            obj.setupTest(n_intervals);
+            
+            func = @() obj.get_func;
+            numDiff = obj.numDiff_nD_AllT(func);
+            anaDiff = obj.get_jac()';
+            
+            obj.assertSize(anaDiff, size(numDiff) );
+            obj.assertSize(anaDiff, [(n_intervals * 13 + 2*13 + n_intervals +1), (n_intervals+1)* 17 ]);
+            obj.assertLessThan(max(abs(anaDiff - numDiff)), obj.tol);
+            
+        
         end
         
         function test_get_eq_conDD(obj)
             
-            obj.setupTest();
+            n_intervals = uint16(50);
+            obj.setupTest(n_intervals);
             val0 = obj.get_hess();
         end
     end
     
     methods
-        function setupTest(obj)
-            n_int_ = uint16(50);
+        function setupTest(obj, n_intervals)
+            n_int_ = n_intervals;
             % Quadrocopter soll 5 Meter hoch fliegen
             xbc = [         ... Variablenname L�nge   Name
                 ... Anfangsbedingung
@@ -185,5 +189,32 @@ classdef Constraints < GenConstraints & TestEnv
             obj.dyn = obj.dode.dyn;
             
         end
+        
+        
+        function [vec_old, n,m,n_timepoints] = setup(obj,func)
+            vec_old = obj.dyn.vec;
+            n_timepoints = obj.dyn.environment.n_timepoints;
+            n = obj.dyn.robot.n_var;
+            m = size(func());
+            m=m(1);
+        end
+        
+        function func_p = plusEpsShift(obj, i ,t ,vec_old,func)
+            vec_p = vec_old;
+            vec_p((t-1) * obj.dyn.robot.n_var + i ) = vec_p((t-1) * obj.dyn.robot.n_var + i) + obj.eps;
+            obj.dyn.backdoor_vec = vec_p;
+            func_p = func();
+            obj.dyn.vec = vec_old;
+        end
+        
+        function func_n = minusEpsShift(obj, i ,t ,vec_old,func)
+            vec_n = vec_old;
+            vec_n((t-1) * obj.dyn.robot.n_var + i ) = vec_n((t-1) * obj.dyn.robot.n_var + i) - obj.eps;
+            obj.dyn.backdoor_vec = vec_n;
+            func_n = func();
+            obj.dyn.vec = vec_old;
+        end
     end
+    
+    
 end
