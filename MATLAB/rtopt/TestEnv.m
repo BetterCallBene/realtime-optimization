@@ -9,20 +9,6 @@ classdef TestEnv < matlab.unittest.TestCase
     
     methods
         
-        function numDiff = numDiff_1D(obj,timepoint, func)
-            % NUMDIFF1D This method calculates numerically the derivative numDiff
-            % of func, when func only depends on obj.vec and has 1 dim output
-            [vec_old, n,m] = obj.setup(func);
-            numDiff = zeros(m,1);
-            for i=1:n
-                func_p = obj.plusEpsShift(i,timepoint,vec_old,func);
-                func_n = obj.minusEpsShift(i,timepoint,vec_old,func);
-                
-                %Central difference
-                numDiff(i) = (func_p - func_n)/2/obj.eps;
-            end
-        end
-        
         function numDiff = numDiff_nD(obj,timepoint, func)
             % NUMDIFFDND This method calculates numerically the derivative
             % of func at timepoint t, when func only depends on obj.vec and has m dim output
@@ -50,15 +36,14 @@ classdef TestEnv < matlab.unittest.TestCase
                     func_n = obj.minusEpsShift(i,timepoint,vec_old, func);
                     
                     %Central difference
-                    numDiff( : , ((timepoint-1) * n) + i) ... 
+                    numDiff( : , ((timepoint-1) * n) + i) ...
                         = (func_p - func_n)/2/obj.eps;
                 end
-                disp(strcat('Calculating Timepoint : ', int2str(timepoint)));
             end
         end
         
         function numDiff = numDiff_nxnD(obj, timepoint, func)
-            % NUMDIFFDNXND This method calculates numerically the
+            % NUMDIFF_DNXND This method calculates numerically the
             % derivative of func, when func only depends on obj.vec and has
             % n times n dimensional output
             [vec_old, n, m] = obj.setup(func);
@@ -71,8 +56,25 @@ classdef TestEnv < matlab.unittest.TestCase
                 numDiff(:,i,:) = (func_p - func_n )/2/obj.eps;
             end
         end
-                
-        %Some help functions
+        
+        function numDiff = numDiff_nxnD_AllT(obj, func)
+            % NUMDIFF_NXND_ALLT This method calculates numerically the
+            % derivative of func, when func only depends on obj.vec and has
+            % n times n dimensional output
+            [vec_old, n , m, n_timepoints ] = obj.setup(func);
+            numDiff  = zeros( m , n*n_timepoints,n*n_timepoints);
+            for timepoint = 1:n_timepoints
+                for i = 1:n
+                    func_p = obj.plusEpsShift(i, timepoint, vec_old, func);
+                    func_n = obj.minusEpsShift(i, timepoint, vec_old, func);
+                    
+                    %Central difference
+                    numDiff(:,(timepoint -1 ) * n + i, : ) = (func_p - func_n)/2/obj.eps;
+                end
+            end
+        end
+        
+        %Some help functions (typically overwritten in subclasses)
         function [vec_old, n, m, n_timepoints] = setup(obj, func)
             vec_old = obj.vec;
             n_timepoints = obj.environment.n_timepoints;
@@ -95,7 +97,7 @@ classdef TestEnv < matlab.unittest.TestCase
             obj.vec = vec_n;
             func_n = func();
             obj.vec = vec_old;
-        end 
+        end
     end
 end
 

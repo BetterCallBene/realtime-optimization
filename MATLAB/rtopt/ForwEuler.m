@@ -165,7 +165,7 @@ classdef ForwEuler < TestEnv
             model = Quadrocopter();
             
             cBQD = BasisQDyn(model, env);
-            cBQD.vec = rand(model.n_var * (n_intervals+1));
+            cBQD.vec = rand(model.n_var * (n_intervals+1),1);
             obj.dyn = cBQD;
             
         end
@@ -197,9 +197,9 @@ classdef ForwEuler < TestEnv
     
     methods(Test)
         function testhD(obj)
-            %TESTHD This method derives numerically obj.h and compares it
+            % TESTHD This method derives numerically obj.h and compares it
             %with obj.hD
-            n_intervals = 50;
+            n_intervals = 25;
             obj.setupTest(n_intervals);
             [n_int, n_state, n_contr, mesh] = getParams(obj);
             
@@ -213,5 +213,23 @@ classdef ForwEuler < TestEnv
             
         end
         
+        function testhDD(obj)
+            % TESTHDD This methods derives numerically obj.hd and compares
+            % it with obj.hDD
+            n_intervals = 25;
+            obj.setupTest(n_intervals);
+            [n_int, n_state, n_contr, mesh] = getParams(obj);
+            
+            func = @() obj.hD;
+            numDiff = obj.numDiff_nxnD_AllT(func);
+            anaDiff = obj.hDD();
+            
+            size_nDiff_i = (n_state + n_contr) * (n_intervals +1 );
+            for i = 1:(n_intervals * n_state)
+                numDiff_i = reshape(numDiff(i,:,:), [size_nDiff_i size_nDiff_i]);
+                obj.assertSize(anaDiff{1}, size(numDiff_i));
+                obj.assertLessThan(max(abs(anaDiff{i} - numDiff_i)), obj.tol);
+            end
+        end
     end
 end
