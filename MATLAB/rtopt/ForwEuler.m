@@ -13,17 +13,12 @@ classdef ForwEuler < TestEnv
     methods
         %constructor
         function fE = ForwEuler(varargin)
-            
             if(nargin == 0)
                 global TEST;
                 
                 if ~(~isempty(TEST) && TEST == true)
                     error('wrong number of inputs');
                 end
-                
-                
-                
-                
                 % constructor based on two input values
                 % a classDyn element and a classOCPparam element
             elseif (nargin == 1)
