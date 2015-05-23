@@ -10,15 +10,18 @@ TEST = true;
 
 %Create Suite from SolverTest Class
 %The fromClass method creates a suite from all Test methods in the SolverTest class.
-
+% 
 suiteBasisQDyn = TestSuite.fromClass(?BasisQDyn);
 resultDyn = run(suiteBasisQDyn);
 
-suiteConstraints = TestSuite.fromClass(?Constraints);
-resultConstraints = run(suiteConstraints);
+% suiteConstraints = TestSuite.fromClass(?Constraints);
+% resultConstraints = run(suiteConstraints);
 
 suiteForwEuler = TestSuite.fromClass(?ForwEuler);
 resultForwEuler = run(suiteForwEuler);
+
+suiteCosts = TestSuite.fromClass(?Costs);
+resultCosts = run(suiteCosts);
 
 %Create Suite from SolverTest Class Definition File
 %The fromFile method creates a suite using the name of the file to identify the class.

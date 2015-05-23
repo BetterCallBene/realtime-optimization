@@ -177,11 +177,22 @@ classdef Costs < TestEnv
             numDiff = obj.numDiff_nD_AllT(func);
             
             obj.assertSize(anaDiff, size(numDiff));
+            obj.assertLessThan(max(abs(numDiff - anaDiff)),obj.tol);
             
         end
         
-        function testcostDD(obj)
+        function testget_costDD(obj)
+            n_intervals = 50;
+            obj.setupTest(n_intervals);
             
+            func = @() obj.get_costD();
+            anaDiff = obj.get_costDD();
+            numDiff = obj.numDiff_nD_AllT(func);
+            
+            obj.assertSize(anaDiff, [1 1]);
+            anaDiff = anaDiff{1};
+            obj.assertSize(anaDiff, size(numDiff));
+            obj.assertLessThan(max(abs(numDiff - anaDiff)), obj.tol);
         end
     end
 end
