@@ -9,7 +9,7 @@ classdef(Abstract) GenConstraints < handle
     
     properties
         EqCon;
-        EqConD; 
+        EqConD;
         EqConDD;
     end
     
@@ -34,32 +34,35 @@ classdef(Abstract) GenConstraints < handle
         function cGC = GenConstraints(dode)
             % constructor based on two input values
             % a classForwEuler element and a classOCPparam element
+            global TEST;
             cGC.dode = dode;
-            cGC.dyn = dode.dyn;
+            if(~TEST)
+                cGC.dyn = dode.dyn;
+            end
         end
         
         function res = get.EqCon(obj)
             %if obj.isEmptyF
-                [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int] = getParams(obj);
+            [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int] = getParams(obj);
+            
+            CountConstraints = 1;
+            %CountConstraints
+            res = zeros((n_int+ 1) * CountConstraints, 1);
+            
+            for timestep = 1:n_int+1
+                t1 = [q(1, timestep) .^ 2 + q(2, timestep) .^ 2 + q(3, timestep) .^ 2 + q(4, timestep) .^ 2 - 1;];
                 
-                CountConstraints = 1;
- %CountConstraints
-                res = zeros((n_int+ 1) * CountConstraints, 1);
-                
-                for timestep = 1:n_int+1
-                    t1 = [q(1, timestep) .^ 2 + q(2, timestep) .^ 2 + q(3, timestep) .^ 2 + q(4, timestep) .^ 2 - 1;];
-
-                    res(CountConstraints * (timestep-1)+1:CountConstraints * timestep) = t1;
-                end
+                res(CountConstraints * (timestep-1)+1:CountConstraints * timestep) = t1;
+            end
         end
         
         function res = get.EqConD(obj)
             [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
             
             CountConstraints = 1;
- %CountConstraints
+            %CountConstraints
             CountJacobi = 4;
- %CountJacobi
+            %CountJacobi
             
             srow = zeros(CountJacobi * (n_int+1), 1);
             scol = zeros(CountJacobi * (n_int+1), 1);
@@ -67,7 +70,7 @@ classdef(Abstract) GenConstraints < handle
             
             for timestep=1:(n_int+1)
                 t1 = [1 4 2 .* q(1, timestep); 1 5 2 .* q(2, timestep); 1 6 2 .* q(3, timestep); 1 7 2 .* q(4, timestep);];
-
+                
                 srow(CountJacobi* (timestep-1)+1:CountJacobi * timestep)= uint16(t1(:, 1) + (timestep-1)*CountConstraints);
                 scol(CountJacobi* (timestep-1)+1:CountJacobi * timestep) = uint16(t1(:, 2) + (timestep-1)*(n_state+n_contr));
                 sval(CountJacobi* (timestep-1)+1:CountJacobi * timestep) = t1(:, 3);
@@ -80,9 +83,9 @@ classdef(Abstract) GenConstraints < handle
             [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
             
             CountConstraints = 1;
- %CountConstraints
+            %CountConstraints
             t1 = [1 4 4 2; 1 5 5 2; 1 6 6 2; 1 7 7 2;];
- %HesseMatrix
+            %HesseMatrix
             
             res = cell(uint16((n_int+1)*CountConstraints), 1);
             
@@ -107,7 +110,7 @@ classdef(Abstract) GenConstraints < handle
             v   = obj.dyn.state(8:10   , :);
             omega   = obj.dyn.state(11:13  , :);
             u   = obj.dyn.contr;
-            n_int = obj.dyn.environment.n_intervals; 
+            n_int = obj.dyn.environment.n_intervals;
             n_state = obj.dyn.robot.n_state;
             n_contr = obj.dyn.robot.n_contr;
             

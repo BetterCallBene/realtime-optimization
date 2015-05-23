@@ -32,7 +32,7 @@ classdef Constraints < GenConstraints & TestEnv
             ineq_conD   = [];
             eq_conD     = obj.get_eq_conD();
         end
-        %BB: Nebenbedingung: (Norm(q))^2 = 1 hinzugefügt
+        %BB: Nebenbedingung: (Norm(q))^2 = 1 hinzugefï¿½gt
         function eq_con = get_eq_con(obj)
             % the equality constraint of the ocp
             % combine the discretized ode with the boundary conditions
