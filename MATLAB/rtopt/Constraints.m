@@ -147,11 +147,22 @@ classdef Constraints < GenConstraints & TestEnv
         
         end
         
-        function test_get_eq_conDD(obj)
-            
-            n_intervals = uint16(50);
+        function test_get_hess(obj)
+            % TEST_GET_HESS This method derives numerically get_jac and
+            % compares it with get_hess
+            n_intervals = uint16(20);
             obj.setupTest(n_intervals);
-            val0 = obj.get_hess();
+            
+            func = @() obj.get_jac()'; %TODO: passt das?
+            anaDiff = obj.get_hess();
+            numDiff = obj.numDiff_nxnD_AllT(func);
+            
+            size_nDiff_i = (obj.dyn.robot.n_var) * (n_intervals +1 );
+            for i = 1:length(anaDiff)
+                numDiff_i = reshape(numDiff(i,:,:), [size_nDiff_i size_nDiff_i]);
+                obj.assertSize(anaDiff{1}, size(numDiff_i));
+                obj.assertLessThan(max(abs(anaDiff{i} - numDiff_i)), obj.tol);
+            end
         end
     end
     
