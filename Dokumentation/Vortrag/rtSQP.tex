@@ -109,13 +109,15 @@ $y, s, q$ erklären
 
 \begin{frame}{Minimization Problem}
 \begin{block}{ }
+\small{
 \begin{align*}
   \min_{\begin{array}{c} s_{k},...,s_{N}\\ q_{k},...,q_{N-1} \end{array}} \sum_{i=k}^{N-1} F_{i}(s_{i},q_{i}) \ \  
   s.t. \ \left\lbrace \begin{array}{c}
   x_{k} - s_{k} = 0 \\
   h_i (s_i ,q_i ) - s_{i+1} = 0 \ \ \forall i = k, ... , N-1 \end{array} \right. 
-\end{align*}
+\end{align*}}
 \end{block}
+\vspace{1em}
 \begin{tabular}{l l}
   $F_i(s_i, q_i)$ &  discretized goal function \\
 $x_k - s_k = 0$ & expected state should be the real state at time $k$ \\
@@ -131,6 +133,7 @@ $h_i (s_i ,q_i )$ & solution of the ODE at time $i$ \\
   + \sum_{i=k}^{N-1} \lambda_{i+1}^{T} (h_i (s_i ,q_i ) - s_{i+1})
 \end{align*}
 \end{block}
+%\vspace{1em}
 \begin{center}
 We are looking for $y^*$ satisfying the KKT conditions. \\
 
@@ -163,9 +166,10 @@ A_{k} := \nabla^{2}_{y_k} L(y_k).
 \begin{block}{}
 \begin{gather*}
 y_{k+1} = y_k + \Delta y_k \\
-\nabla_{y} L^{k}(y_{k}) + J^{k}(y_{k}) \Delta y_{k} = 0
+\nabla_{y} L^{k}(y_{k}) + J^{k}(y_{k}) \Delta y_{k} = 0 \\
 \end{gather*}
 \end{block}
+\vspace{1em}
 \begin{tabular}{l l}
   $J^k(y_k)$ & Approximated Hessian $\nabla^{2}_{y_k} L(y_k)$ \\
   $\alpha_k = 1$ & 
@@ -201,10 +205,6 @@ how to choose $N$?
 \begin{itemize}
 \item $N=t_{end}$ problem gets smaller every time 
 \item $N=t+n$ problem size is constant
-\item .
-\item .
-\item .
 \end{itemize}
-
 \end{frame}
 % \end{document}

@@ -1,28 +1,33 @@
-\documentclass{beamer}
+\documentclass[12pt]{beamer}
 
 \usepackage{pgfpages} %This is needed for notes presentation!
 %\setbeameroption{}
 
 \usepackage{enumerate, amsmath, amssymb,amsthm, amstext,color}
-\usepackage[ngerman]{babel}
+\usepackage[english]{babel}
 \usepackage[utf8]{inputenc}   
-\usepackage{dsfont}
-\usepackage{geometry}
-\usepackage{fancyhdr}
-\usepackage{tikz}
-\usetikzlibrary{plotmarks}
-\usetikzlibrary{arrows, positioning}
+%\usepackage{dsfont}
+%\usepackage{geometry}
+%\usepackage{fancyhdr}
+%\usepackage{tikz}
+%\usetikzlibrary{plotmarks}
+%\usetikzlibrary{arrows, positioning}
 \usepackage{lmodern}
+%\usepackage{textcomp}
 
-\usepackage{float}
-\usepackage{color}
-\usepackage{hyperref}
+\usepackage{textpos}
+%\usepackage{setspace}
+
+
+
+%\usepackage{float}
+%\usepackage{color}
+%\usepackage{hyperref}
 % \usepackage{algorithmicx}
 % \usepackage{algpseudocode}
-\usepackage{fancybox}
-\usepackage{float}
-\usepackage{sidecap}
-\usepackage[ngerman]{babel}
+%\usepackage{fancybox}
+%\usepackage{float}
+%\usepackage{sidecap}
 
 %\setbeamertamplate[circle]
 
@@ -56,13 +61,13 @@
 % 	whale | wolverine
 % }
 
-\useinnertheme{rounded}
+\useinnertheme{circles}
 % \useinnertheme{
 % 	circles | default | inmargin |
 % 	rectangles | rounded
 % }
 
-\useoutertheme{infolines}
+\useoutertheme{default}
 % \useoutertheme{
 % 	default | infolines | miniframes |
 % 	shadow | sidebar | smoothbars |
@@ -79,7 +84,7 @@
 % Seitenzahlen
 \setbeamertemplate{footline}[frame number]
 
-\title{Mid-term presentation}
+\title{Midterm Presentation}
 \author{The Quadrocopters}
 \institute{Technische Universität München}
 \date{\today}
@@ -111,7 +116,16 @@
 %Der Befehl \include{datei} setzt dann hier die Datei datei.tex ,welche im selben Ordner liegt ein. Diese darf keinen Header enthalten
 %\include{datei}
 
+\input{Motivation}
 \input{Modell}
-\input{rtSQP}
+%\input{rtSQP}
+
+
+\cite{Diebel2006}
+\cite{buschmann2014}
+\cite{Garcia2013}
+\bibliography{Literaturliste}
+\bibliographystyle{abbrvdin}
+
 
 \end{document}

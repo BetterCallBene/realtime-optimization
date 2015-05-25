@@ -1,151 +1,63 @@
-%\documentclass{beamer}
-%
-%\usepackage{pgfpages} %This is needed for notes presentation!
-%%\setbeameroption{}
-%
-%\usepackage{enumerate, amsmath, amssymb,amsthm, amstext,color}
-%\usepackage[ngerman]{babel}
-%\usepackage[latin1]{inputenc}   
-%\usepackage{dsfont}
-%\usepackage{geometry}
-%\usepackage{fancyhdr}
-%\usepackage{tikz}
-%\usetikzlibrary{plotmarks}
-%\usetikzlibrary{arrows, positioning}
-%
-%\usepackage{float}
-%\usepackage{color}
-%\usepackage{hyperref}
-%% \usepackage{algorithmicx}
-%% \usepackage{algpseudocode}
-%\usepackage{fancybox}
-%\usepackage{float}
-%\usepackage{sidecap}
-%\usepackage[ngerman]{babel}
-%
-%
-%\newcommand{\lk}{\left}
-%\newcommand{\rk}{\right}
-%\newcommand{\rel}{\sqsubseteq}
-%\newcommand{\rhn}{\mathds{R}^n}
- %
-%% \usetheme{default}
-%%\usetheme{
-%%	AnnArbor | Antibes | Bergen |
-%%	Berkeley | Berlin | Boadilla |
-%%	boxes | CambridgeUS | Copenhagen |
-%%	Darmstadt | default | Dresden |
-%%	Frankfurt | Goettingen |Hannover |
-%%	Ilmenau | JuanLesPins | Luebeck |
-%%	Madrid | Malmoe | Marburg |
-%%	Montpellier | PaloAlto | Pittsburgh |
-%%	Rochester | Singapore | Szeged |
-%%	Warsaw
-%%}
-%\usecolortheme{beaver}
-%% \usecolortheme{
-%% 	albatross | beaver | beetle |
-%% 	crane | default | dolphin |
-%% 	dove | fly | lily | orchid |
-%% 	rose |seagull | seahorse |
-%% 	sidebartab | structure |
-%% 	whale | wolverine
-%% }
-%
-%\useinnertheme{rounded}
-%% \useinnertheme{
-%% 	circles | default | inmargin |
-%% 	rectangles | rounded
-%% }
-%
-%\useoutertheme{infolines}
-%% \useoutertheme{
-%% 	default | infolines | miniframes |
-%% 	shadow | sidebar | smoothbars |
-%% 	smoothtree | split | tree
-%% }
-%
-%\usefonttheme{default}
-%% \usefonttheme{
-%% 	default | professionalfonts | serif |
-%% 	structurebold | structureitalicserif |
-%% 	structuresmallcapsserif
-%% }
-%
-%% Seitenzahlen
-%\setbeamertemplate{footline}[frame number]
-%
-%\title{Midterm presentation}
-%\author{The Quadrocopters}
-%\institute{Technische Universität München}
-%\date{\today}
-%% \titlegraphic{\pgfimage[width=1cm,height=1cm]{MA_Web}}
-%%\logo{\pgfimage[width=1.2cm,height=1.2cm]{MA_Web}}
-%
-%\beamertemplatenavigationsymbolsempty
-%% kleine Symbole zur Nvigation wegmachen
-%
-%%\AtBeginSection[]{
-%%	\frame{
-%%	\frametitle{\"Ubersicht}
-%%	\tableofcontents[current, currentSection]}
-%%
-%%}
-%
-%
-%\begin{document}
-%\begin{frame}
-%\maketitle
-%\end{frame}
-%
-%\begin{frame}
-%\tableofcontents
-%\end{frame}
 
 \begin{frame}
 		\section{Model}
+		\frametitle{Coordinate systems}
 			\begin{figure}[p]
 				\centering
-				%\includegraphics[width=0.8\textwidth]{image.png}
-				%\caption{Awesome Image}
-				\label{fig:awesome_image}
+				\includegraphics[width=0.8\textwidth]{images/Koordinatensysteme.pdf}
+				\label{fig:Koordinatensysteme}
 		\end{figure}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Newton-Euler Equations}
-	Forces \\
-	\[ F_{ext} = F_{g} + \sum_{i=1}^{4}{F_{i}} \]
-	
-	Torques \\
-	\[ \tau_{ext} = \sum_{i=1}^{4}{\tau_{i}}+(\tau_{\phi}+\tau_{\theta}) \]
-	
-	% Picture of Copter with forces (small) missing
-	\end{frame}
-		
-	\begin{frame}
+		\frametitle{Forces and Torques}
 		\begin{figure}[p]
 			\centering
-			%\includegraphics[width=0.8\textwidth]{image.png}
-			%\caption{Awesome Image}
-			\label{fig:awesome_image2}
+			\includegraphics[width=0.8\textwidth]{images/Kraefte.pdf}
+			\label{fig:Kraefte}
 		\end{figure}
 	\end{frame}
+
+\begin{frame}
+	\frametitle{Newton-Euler Equations}
+	\begin{columns}[T] % align columns
+\begin{column}{0.70\textwidth}
+		Forces \\
+		\[ F_{ext} = F_{g} + \sum_{i=1}^{4}{F_{i}} \]
+		Torques \\
+		\[ \tau_{ext} = \sum_{i=1}^{4}{\tau_{i}}+(\tau_{\phi}+\tau_{\theta}) \]
+\end{column}
+\hfill
+\begin{column}{.25\textwidth}
+	\begin{textblock}{0}(-2,1)
+    \includegraphics[width=5cm]{images/Kraefte.pdf}
+		\label{fig:Kraefte klein}
+  \end{textblock}
+\end{column}
+\end{columns}
+		
+\end{frame}
+		
 	
 	\begin{frame}
 		\frametitle{Quaternions}
+		\begin{block}{}
 			\[ q = a + \textup{i}b+\textup{j}c+\textup{k}d \qquad a, b, c, d \in \mathbb{R} \]
-			
+			\end{block}
+			\vspace{1em}
 			representing rotation \( \Leftrightarrow \) \( \Vert q \Vert = 1 \) \\
-			
+			\vspace{1em}			
 			Advantage \(\rightarrow\) no singularities \\
-			Problem \(\rightarrow\) \( \Vert q \Vert = 1 \) additional coontraint
+			\vspace{1em}
+			Problem \(\rightarrow\) \( \Vert q \Vert = 1 \) additional constraint
 	\end{frame}
 	
 	\begin{frame}
 		\frametitle{Dynamics}
+		Equations representing dynamics...
 		\[ T(x, u) = M \cdot \begin{pmatrix} \dot{x}_{8} \\ \vdots \\ \dot{x}_{13} \end{pmatrix} + \Theta(x) \]
 		
+		...expressed as system of differential equations
 		\[ \frac{\textup{d}}{\textup{d}t} 
 			\begin{pmatrix}
 						  x_{1} \\ \vdots \\ x_{7} \\ x_{8} \\ \vdots \\ x_{13}
@@ -159,9 +71,11 @@
 	
 	\begin{frame}
 		\frametitle{Prospect}
-		Refinement of Model \\
-			wind \\
-			aerodynamical forces \\
+			Refinement of the model \\
+			\vspace{1em}
+			\(\rightarrow\) wind \\
+			\vspace{1em}
+			\(\rightarrow\) aerodynamical forces \\
 		\end{frame}
 
 %Der Befehl \include{datei} setzt dann hier die Datei datei.tex ,welche im selben Ordner liegt ein. Diese darf keinen Header enthalten
