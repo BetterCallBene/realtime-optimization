@@ -1,5 +1,4 @@
 
-
 \begin{frame}
 		\frametitle{Forces and Torques}
 		\begin{figure}[p]
@@ -30,7 +29,7 @@
 		
 	\begin{frame}
 		\section{Model}
-		\frametitle{Coordinate systems}
+		\frametitle{Coordinate Systems}
 			\begin{figure}[p]
 				\centering
 				\includegraphics[width=0.8\textwidth]{images/Koordinatensysteme.pdf}
@@ -43,21 +42,23 @@
 		\frametitle{Quaternions}
 		\begin{block}{}
 			\[ q = a + \textup{i}b+\textup{j}c+\textup{k}d \qquad a, b, c, d \in \mathbb{R} \]
+			\vspace{.1ex}
 			\end{block}
-			\vspace{1em}
-			representing rotation \( \Leftrightarrow \) \( \Vert q \Vert = 1 \) \\
-			\vspace{1em}			
-			Advantage \(\rightarrow\) no singularities \\
-			\vspace{1em}
-			Problem \(\rightarrow\) \( \Vert q \Vert = 1 \) additional constraint
+			
+			\vspace{1ex}
+			\onslide<2-> representing rotation \( \Leftrightarrow \) \( \Vert q \Vert = 1 \) \\
+			\vspace{1ex}			
+			\onslide<3-> advantage \(\rightarrow\) no singularities \\
+			\vspace{1ex}
+			\onslide<4-> problem \(\rightarrow\) \( \Vert q \Vert = 1 \) additional constraint
 	\end{frame}
 	
 	\begin{frame}
 		\frametitle{Dynamics}
 		Equations representing dynamics...
 		\[ T(x, u) = M \cdot \begin{pmatrix} \dot{x}_{8} \\ \vdots \\ \dot{x}_{13} \end{pmatrix} + \Theta(x) \]
-		
-		...expressed as system of differential equations
+		\onslide<2->
+		...expressed as system of differential equations:
 		\[ \frac{\textup{d}}{\textup{d}t} 
 			\begin{pmatrix}
 						  x_{1} \\ \vdots \\ x_{7} \\ x_{8} \\ \vdots \\ x_{13}
@@ -71,15 +72,12 @@
 	
 	\begin{frame}
 		\frametitle{Prospect}
-			Refinement of the model \\
-			\vspace{1em}
+			Refinement of the model
+			\vspace{1ex}
 			\(\rightarrow\) wind \\
-			\vspace{1em}
+			\vspace{1ex}
 			\(\rightarrow\) aerodynamical forces \\
-		\end{frame}
+	\end{frame}
 
 %Der Befehl \include{datei} setzt dann hier die Datei datei.tex ,welche im selben Ordner liegt ein. Diese darf keinen Header enthalten
 %\include{datei}
-
-
-%\end{document}

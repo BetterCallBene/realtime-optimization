@@ -91,17 +91,17 @@
 %%}
 %
 %\setcounter{MaxMatrixCols}{20}
-
+%
 %\begin{document}
 
-\definecolor{green}{RGB}{0,190,0};
-\definecolor{red}{RGB}{190,0,0};
-\definecolor{blue}{RGB}{0,0,190};
+\definecolor{green}{RGB}{0,190,0}
+\definecolor{red}{RGB}{190,0,0}
+\definecolor{blue}{RGB}{0,0,190}
 
 %\begin{frame}
 %\maketitle
 %\end{frame}
-
+%
 %\begin{frame}
 %\tableofcontents
 %\end{frame}
@@ -139,55 +139,60 @@
 \end{tikzpicture}
 \end{figure}
 $y, s, q$ erklären
+
+
+
 \end{frame}
-%
-%\begin{frame}{Minimization Problem}
-%\begin{block}{ }
-%%\small{
-%\begin{align*}
-  %\min_{\begin{array}{c} s_{t},...,s_{N}\\ q_{t},...,q_{N-1} \end{array}} \sum_{i=t}^{N-1} F_{i}(s_{i},q_{i}) \ \  
-  %s.t. \ \left\lbrace \begin{array}{c}
-  %x_{t} - s_{t} = 0 \\
-  %h_i (s_i ,q_i ) - s_{i+1} = 0 \ \ \forall i = t, ... , N-1 %\end{array} 
-	%\right. 
-%\end{align*}
-%\end{block}
-%\vspace{1em}
-%\begin{tabular}{l l}
-  %$F_i(s_i, q_i)$ &  discretized goal function \\
-%$x_t - s_t = 0$ & expected state should be the real state at time $t$ \\
-%$h_i (s_i ,q_i )$ & solution of the ODE at time $i$ 
-%\end{tabular}
-%\end{frame}
+
+\begin{frame}{Minimization Problem}
+\begin{block}{}
+\small{
+\begin{align*}
+  \min_{\begin{array}{c} s_{t},...,s_{N}\\ q_{t},...,q_{N-1} \end{array}} \sum_{i=t}^{N-1} J_{i}(s_{i},q_{i}) \ \  
+  s.t. \ \left\lbrace \begin{array}{c}
+  x_{t} - s_{t} = 0 \\
+  h_i (s_i ,q_i ) - s_{i+1} = 0 \ \ \forall i = t, ... , N-1 \end{array} \right. 
+\end{align*}}
+\end{block}
+\vspace{1ex}
+\begin{tabular}{l l}
+  $J_i(s_i, q_i)$ &  discretized goal function 
+  \vspace{1ex} \\
+$x_t - s_t = 0$ & expected state should be the real state at time $t$
+  \vspace{1ex} \\
+$h_i (s_i ,q_i )$ & solution of the ODE at time $i$ \\
+\end{tabular}
+\end{frame}
 
 \begin{frame}{The Lagrangian}
 \begin{block}{ }
 \begin{align*}
-  L^{t}(y) = \sum_{i=t}^{N-1} F_{i}(s_{i},q_{i})
+  L^{t}(y) = \sum_{i=t}^{N-1} J_{i}(s_{i},q_{i})
   + \lambda_{t}^{T}(x_{t} - s_{t})
-  + \sum_{i=t}^{N-1} \lambda_{i+1}^{T} (h_i (s_i ,q_i ) - s_{i+1})
+  + \sum_{i=t}^{N-1} \lambda_{i+1}^{T} (h_i (s_i ,q_i ) - s_{i+1}) 
 \end{align*}
+\vspace{.1ex}
 \end{block}
-%\vspace{1em}
-\begin{center}
-We are looking for $y^*$ satisfying the KKT conditions. \\
+\vspace{1ex}
+We are looking for $y^*$ satisfying the KKT conditions: \\
 
-$\Rightarrow \nabla_{y} L^{t}(y^*)  = 0 $ 
+\[ \Rightarrow \nabla_{y} L^{t}(y^*)  = 0 \]
 
-\end{center}
 \end{frame}
 
-\begin{frame}{The SQP method}
-How do we find $y^*$?
+\begin{frame}{The SQP Method}
+How to find $y^*$?
 \begin{align*}
   y_{k+1} = y_{k} + \alpha_{k} \Delta y_{k}
 \end{align*}
+\onslide<2->
 \begin{align*}
 \Downarrow
 \end{align*}
 \begin{align*}
-\min_{\Delta y} = \frac{1}{2} \Delta y^T A_k \Delta y + \nabla_y F(y_k)^T \Delta y
+\min_{\Delta y} = \frac{1}{2} \Delta y^T A_k \Delta y + \nabla_y J(y_k)^T \Delta y
 \end{align*}
+\onslide<3->
 \begin{align*}
 \Downarrow
 \end{align*}
@@ -200,22 +205,21 @@ A_{k} := \nabla^{2}_{y_k} L(y_k).
 \begin{frame}{Newton-Raphson}
 \begin{block}{}
 \begin{gather*}
-
 y_{t+1} = y_t + \Delta y_t \\
-\nabla_{y_t} L^{t}(y_{t}) + J^{t}(y_{t}) \Delta y_{t} = 0
-\end{gather*}
+\nabla_{y_t} L^{t}(y_{t}) + H^{t}(y_{t}) \Delta y_{t} = 0
+\end{gather*} \vspace{.1ex}
 \end{block}
-\vspace{1em}
+\vspace{1ex}
 \begin{tabular}{l l}
-  $J^t(y_t)$ & Approximated Hessian $\nabla^{2}_{y_t} L(y_t)$ \\
+  $H^t(y_t)$ & approximated Hessian $\nabla^{2}_{y_t} L(y_t)$ \vspace{1ex} \\
   $\alpha_t = 1$ & 
 \end{tabular}
 \end{frame}
 
 \begin{frame}{Riccati Recursion}
-This formulation still depends on $x_t$ ...
+Approximated Hessian:
 \begin{align*} 
-  \scriptstyle{J^{t}(y^{t})} =
+  \scriptstyle{H^{t}(y^{t})} =
   \tiny{
 	\begin{pmatrix}
 		& -E  &     &     &     &     &     &     &     &     &     \\ \\
@@ -259,17 +263,21 @@ What happens in interval $ [ t_{k-1} , t_k ] $ ?
 \end{figure}
 
 \begin{enumerate}
-\item<2-> {\color{red} Calculate control $u_{k-1}$}
-\item<3-> {\color{green} Calculate $y_k$ ( Riccati Part II)}
-\item<4-> {\color{blue} Prepare $u_k$ (SQP \& Riccati Part I)} 
+\item<2-> {\color{red} calculate control $u_{k-1}$ (Riccati Part II)}
+\item<3-> {\color{green} calculate $y_k$ (Riccati Part II)}
+\item<4-> {\color{blue} prepare $u_k$ (Newton \& Riccati Part I)} 
 \end{enumerate}
 \end{frame}
 
 \begin{frame}{Finite Horizon}
-how to choose $N$?
+How to choose $N$?
 \begin{itemize}
-\item $N=t_{end}$ problem gets smaller every time 
-\item $N=t+n$ problem size is constant
+\item $N=t_{end} \rightarrow $ problem gets smaller every time 
+\item $N=t+n \rightarrow $ problem size is constant
+\item .
+\item .
+\item .
 \end{itemize}
+
 \end{frame}
 %\end{document}

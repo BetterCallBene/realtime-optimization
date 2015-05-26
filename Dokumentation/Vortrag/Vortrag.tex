@@ -4,7 +4,7 @@
 %\setbeameroption{}
 
 \usepackage{enumerate, amsmath, amssymb,amsthm, amstext,color}
-\usepackage[english]{babel}
+\usepackage[ngerman]{babel}
 \usepackage[utf8]{inputenc}   
 \usepackage{dsfont}
 \usepackage{geometry}
@@ -14,20 +14,20 @@
 \usetikzlibrary{arrows, positioning}
 \usepackage{lmodern}
 \usepackage{textcomp}
-
 \usepackage{textpos}
-%\usepackage{setspace}
-
-
 
 \usepackage{float}
 \usepackage{color}
 \usepackage{hyperref}
- \usepackage{algorithmicx}
- \usepackage{algpseudocode}
+% \usepackage{algorithmicx}
+% \usepackage{algpseudocode}
 \usepackage{fancybox}
 \usepackage{float}
 \usepackage{sidecap}
+\usepackage[ngerman]{babel}
+
+%\setbeamertamplate[circle]
+
 
 
 \newcommand{\lk}{\left}
@@ -58,13 +58,13 @@
 % 	whale | wolverine
 % }
 
-\useinnertheme{circles}
+\useinnertheme{rounded}
 % \useinnertheme{
 % 	circles | default | inmargin |
 % 	rectangles | rounded
 % }
 
-\useoutertheme{default}
+\useoutertheme{infolines}
 % \useoutertheme{
 % 	default | infolines | miniframes |
 % 	shadow | sidebar | smoothbars |
@@ -81,7 +81,7 @@
 % Seitenzahlen
 \setbeamertemplate{footline}[frame number]
 
-\title{Midterm Presentation}
+\title{Midterm presentation}
 \author{The Quadrocopters}
 \institute{Technische Universität München}
 \date{\today}
@@ -93,20 +93,23 @@
 
 \setcounter{MaxMatrixCols}{20}
 
-%\AtBeginSection[]{
-%	\frame{
-%	\frametitle{\"Ubersicht}
-%	\tableofcontents[current, currentSection]}
-%
+%\AtBeginSection[]
+%{
+%	\begin{frame}
+%	\frametitle{Overview}
+%	\tableofcontents[currentsection]
+%	\end{frame}
 %}
 
 
 \begin{document}
+
+
 \begin{frame}
 \maketitle
 \end{frame}
 
-\begin{frame}
+\begin{frame}{Overview}
 \tableofcontents
 \end{frame}
 
@@ -114,15 +117,25 @@
 %\include{datei}
 
 \input{Motivation}
+\begin{frame}{ }
+\begin{block}{ }
+\centering
+\LARGE
+ \vspace{1ex}
+Model \\
+\vspace{1ex}
+\end{block}
+\end{frame}
 \input{Modell}
+\begin{frame}{ }
+\begin{block}{ }
+\centering
+\LARGE
+ \vspace{1ex}
+Realtime Optimization Approach\\
+\vspace{1ex}
+\end{block}
+\end{frame}
 \input{rtSQP}
-
-
-\cite{Diebel2006}
-\cite{buschmann2014}
-\cite{Garcia2013}
-\bibliography{Literaturliste}
-\bibliographystyle{abbrvdin}
-
 
 \end{document}
