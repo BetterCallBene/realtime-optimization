@@ -7,12 +7,18 @@ print 'Building - MATLAB - File'
 
 pathTmp = tempfile.gettempdir() + '/%s'
 files = [
-		'tmpRTConstraintsFunction', 
-		'tmpRTConstraintsJacobi', 
-		'tmpRTConstraintsHesse', 
-		'tmpRTConstraintsJacobiCount',
-		'tmpRTConstraintsCount',
-		'tmpRTConstraintsHesseCount',
+		'tmpRTEqConstraintsFunction',   # 0
+		'tmpRTEqConstraintsJacobi',     # 1
+		'tmpRTEqConstraintsHesse',      # 2
+		'tmpRTEqCountConstraintsJacobi',# 3
+		'tmpRTEqCountConstraints',      # 4
+		'tmpRTEqCountConstraintsHesse', # 5
+		'tmpRTInEqConstraintsFunction', # 6
+		'tmpRTInEqConstraintsJacobi',   # 7
+		'tmpRTInEqConstraintsHesse',    # 8
+		'tmpRTInEqCountConstraintsJacobi', # 9
+		'tmpRTInEqCountConstraints',    # 10
+		'tmpRTInEqCountConstraintsHesse', # 11
 		]
 
 template = 'template_GenConstraints.m'

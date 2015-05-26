@@ -27,11 +27,25 @@ classdef Constraints < GenConstraints & TestEnv
             % provide the equality and inequality constraints (along
             % with their jacobians by calling get_eq_con and 
             % get_eq_conD
-            ineq_con    = [];
+            ineq_con    = obj.get_ineq_con();
             eq_con      = obj.get_eq_con();
-            ineq_conD   = [];
+            ineq_conD   = obj.get_ineq_conD();
             eq_conD     = obj.get_eq_conD();
         end
+        
+        
+        function ineq_con = get_ineq_con(obj)
+            ineq_con = obj.InEqCon;
+        end
+        
+        function ineq_conD = get_ineq_conD(obj)
+            ineq_conD = obj.InEqConD';
+        end
+        
+        function ineq_conDD = get_ineq_conDD(obj)
+            ineq_conDD = obj.InEqConDD;
+        end
+        
         %BB: Nebenbedingung: (Norm(q))^2 = 1 hinzugef�gt
         function eq_con = get_eq_con(obj)
             % the equality constraint of the ocp
@@ -100,17 +114,28 @@ classdef Constraints < GenConstraints & TestEnv
         end        
         
         % general type get functions -> interace for testing
-        function f = get_func(obj)
+        function f = get_eqfunc(obj)
             % interfacing get_eq_con
             f = get_eq_con(obj);
         end
         
-        function g = get_jac(obj)
+        % general type get functions -> interace for testing
+        function f = get_ineqfunc(obj)
+            % interfacing get_eq_con
+            f = get_ineq_con(obj);
+        end
+        
+        function g = get_eqjac(obj)
             % interfacing get_eq_conD
             g = get_eq_conD(obj);
         end
         
-        function H = get_hess(varargin)
+        function g = get_ineqjac(obj)
+            % interfacing get_eq_conD
+            g = get_ineq_conD(obj);
+        end
+        
+        function H = get_eqhess(varargin)
             % interfacing get_eq_conDD
             if (nargin == 1)
                 H = get_eq_conDD(varargin{1});
@@ -120,25 +145,57 @@ classdef Constraints < GenConstraints & TestEnv
                 H = [];
             end
         end
+        
+        function H = get_ineqhess(varargin)
+            % interfacing get_eq_conDD
+            if (nargin == 1)
+                H = get_ineq_conDD(varargin{1});
+            else
+                H = [];
+            end
+        end
     end
     
     methods(Test)
         function test_get_eq_con(obj)
-            n_intervals = uint16(50);
+            n_intervals = uint16(10);
             obj.setupTest(n_intervals);
-            val0 = obj.get_func();
+            val0 = obj.get_eqfunc();
         end
         
-        function test_get_jac(obj)
-            %TEST_GET_JAC This method derives numerically get_func and compares it
-            %with get_jac
+        function test_get_ineq_con(obj)
+            n_intervals = uint16(10);
+            obj.setupTest(n_intervals);
+            val0 = obj.get_ineqfunc();
+        end
+        
+        function test_get_eqjac(obj)
+            %TEST_GET_EQJAC This method derives numerically get_eqfunc and compares it
+            %with get_eqjac
             
-            n_intervals = uint16(20);
+            n_intervals = uint16(10);
             obj.setupTest(n_intervals);
             
-            func = @() obj.get_func;
+            func = @() obj.get_eqfunc;
             numDiff = obj.numDiff_nD_AllT(func);
-            anaDiff = obj.get_jac()';
+            anaDiff = obj.get_eqjac()';
+            
+            obj.assertSize(anaDiff, size(numDiff) );
+            %obj.assertSize(anaDiff, [(n_intervals * 13 + 2*13 + n_intervals +1), (n_intervals+1)* 17 ]);
+            obj.assertLessThan(max(abs(anaDiff - numDiff)), obj.tol);
+            
+        end
+        
+        function test_get_ineqjac(obj)
+            %TEST_GET_INEQJAC This method derives numerically get_ineqfunc and compares it
+            %with get_ineqjac
+            
+            n_intervals = uint16(10);
+            obj.setupTest(n_intervals);
+            
+            func = @() obj.get_ineqfunc;
+            numDiff = obj.numDiff_nD_AllT(func);
+            anaDiff = obj.get_ineqjac()';
             
             obj.assertSize(anaDiff, size(numDiff) );
             %obj.assertSize(anaDiff, [(n_intervals * 13 + 2*13 + n_intervals +1), (n_intervals+1)* 17 ]);
@@ -147,14 +204,32 @@ classdef Constraints < GenConstraints & TestEnv
         
         end
         
-        function test_get_hess(obj)
-            % TEST_GET_HESS This method derives numerically get_jac and
-            % compares it with get_hess
-            n_intervals = uint16(20);
+        function test_get_eqhess(obj)
+            % TEST_GET_EQHESS This method derives numerically get_eqjac and
+            % compares it with get_eqhess
+            n_intervals = uint16(10);
             obj.setupTest(n_intervals);
             
-            func = @() obj.get_jac()'; %TODO: passt das?
-            anaDiff = obj.get_hess();
+            func = @() obj.get_eqjac()'; %TODO: passt das?
+            anaDiff = obj.get_eqhess();
+            numDiff = obj.numDiff_nxnD_AllT(func);
+            
+            size_nDiff_i = (obj.dyn.robot.n_var) * (n_intervals +1 );
+            for i = 1:length(anaDiff)
+                numDiff_i = reshape(numDiff(i,:,:), [size_nDiff_i size_nDiff_i]);
+                obj.assertSize(anaDiff{1}, size(numDiff_i));
+                obj.assertLessThan(max(abs(anaDiff{i} - numDiff_i)), obj.tol);
+            end
+        end
+        
+        function test_get_ineqhess(obj)
+            % TEST_GET_INEQHESS This method derives numerically get_ineqjac and
+            % compares it with get_ineqhess
+            n_intervals = uint16(10);
+            obj.setupTest(n_intervals);
+            
+            func = @() obj.get_ineqjac()'; %TODO: passt das?
+            anaDiff = obj.get_ineqhess();
             numDiff = obj.numDiff_nxnD_AllT(func);
             
             size_nDiff_i = (obj.dyn.robot.n_var) * (n_intervals +1 );

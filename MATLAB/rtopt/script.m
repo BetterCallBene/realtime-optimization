@@ -65,6 +65,8 @@ objectConstr = cC;
 tic;
 %TODO: Realtime Ansatz einbauen, bzw. fmincon ersetzen/erweitern
 v = fmincon(@costAdapter,v0,[],[],[],[],[],[],@constrAdapter, options);
+t = linspace(0, 1, n_int + 1);
+save('../visualization/Circle.mat', 't', 'v')
 toc;
 
 %% Vorlage von Sebastian
