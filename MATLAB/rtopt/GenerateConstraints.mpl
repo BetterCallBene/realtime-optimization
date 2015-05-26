@@ -4,10 +4,11 @@ with(VectorCalculus);
 with(CodeGeneration);
 with(FileTools);
 TEST := false;
+R := 3;
 # State und Control Vektor
 x := [r[1], r[2], r[3], q[1], q[2], q[3], q[4], v[1], v[2], v[3], omega[1], omega[2], omega[3], u[1], u[2], u[3], u[4]];
 
-eq := Vector([q[1]^2+q[2]^2+q[3]^2+q[4]^2-1]);
+eq := Vector(Vector(2, {(1) = q[1]^2+q[2]^2+q[3]^2+q[4]^2-1, (2) = r[1]^2+r[2]^2-R^2}));
 eqMatrix := convert(eq, Matrix);
 
 getNZeros := proc (M) local res, i, j, m, n; res := 0; i := 1; j := 1; m := 0; n := 0; m, n := Dimension(M); for i to m do for j to n do if M[i][j] <> 0 then res := res+1 end if end do end do; return res end proc;
@@ -33,6 +34,6 @@ currentdir();
 # Optimieren in MATLAB und exportieren.
 ConstraintsCount, m := Dimension(eqMatrix);
 
-if TEST = false then Matlab(ConstraintsCount, resultname = "CountConstraints", defaulttype = integer, output = tmpRTConstraintsCount); Matlab(CountJacobi, resultname = "CountJacobi", defaulttype = integer, output = tmpRTConstraintsJacobiCount); Matlab(CountHesse, resultname = "CountHesse", defaulttype = integer, output = tmpRTConstraintsHesseCount); Matlab(eval(([codegen:-optimize])(eqMatrix, tryhard)), defaulttype = integer, output = tmpRTConstraintsFunction); Matlab(eval(([codegen:-optimize])(J, tryhard)), defaulttype = integer, output = tmpRTConstraintsJacobi)*Matlab(eval(([codegen:-optimize])(H, tryhard)), defaulttype = integer, output = tmpRTConstraintsHesse) else Matlab(eval(([codegen:-optimize])(eqMatrix, tryhard)), defaulttype = integer) end if;
+if TEST = false then Matlab(ConstraintsCount, resultname = "CountConstraints", defaulttype = integer, output = tmpRTConstraintsCount); Matlab(CountJacobi, resultname = "CountJacobi", defaulttype = integer, output = tmpRTConstraintsJacobiCount); Matlab(CountHesse, resultname = "CountHesse", defaulttype = integer, output = tmpRTConstraintsHesseCount); Matlab(eval(([codegen:-optimize])(eqMatrix, tryhard)), defaulttype = integer, output = tmpRTConstraintsFunction); VectorCalculus:-`*`(Matlab(eval(([codegen:-optimize])(J, tryhard)), defaulttype = integer, output = tmpRTConstraintsJacobi), Matlab(eval(([codegen:-optimize])(H, tryhard)), defaulttype = integer, output = tmpRTConstraintsHesse)) else Matlab(eval(([codegen:-optimize])(eqMatrix, tryhard)), defaulttype = integer) end if;
 
 # 

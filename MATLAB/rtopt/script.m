@@ -1,4 +1,6 @@
-
+clear
+global TEST;
+TEST = false;
 %% Aufstellen des Problems
 
 
@@ -15,16 +17,16 @@ options.Hessian         = 'user-supplied';
 options.HessFcn         = @hessianAdapter;
 
 %TODO: n_int auf einen sinnvollen Wert festlegen
-n_int = 50;
+n_int = 100;
 % Quadrocopter soll 5 Meter hoch fliegen
 xbc = [         ... Variablenname L�nge   Name
                 ... Anfangsbedingung
-    0, 0, 0.5,  ...     r           3      Ortsvektor
+    3, 0, 0,  ...     r           3      Ortsvektor
     1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
     0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
     0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
                 ... Endbedingung
-    0, 0, 0,    ...
+    -3, 0, 5,    ...
     1, 0, 0, 0, ...
     0, 0, 0,    ...
     0, 0, 0     ...

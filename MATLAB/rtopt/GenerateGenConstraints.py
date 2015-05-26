@@ -19,6 +19,9 @@ template = 'template_GenConstraints.m'
 file_to = 'GenConstraints.m'
 
 string_to_replace = [
+					['r(1)', 'r(1, timestep)'],
+					['r(2)', 'r(2, timestep)'],
+					['r(3)', 'r(3, timestep)'],
 					['q(1)', 'q(1, timestep)'],
 					['q(2)', 'q(2, timestep)'],
 					['q(3)', 'q(3, timestep)'],

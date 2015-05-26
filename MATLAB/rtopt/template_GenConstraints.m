@@ -35,24 +35,26 @@ classdef(Abstract) GenConstraints < handle
             % constructor based on two input values
             % a classForwEuler element and a classOCPparam element
             cGC.dode = dode;
-            cGC.dyn = dode.dyn;
+            if ~isempty(cGC.dode)
+                cGC.dyn = dode.dyn;
+            end
         end
         
         function res = get.EqCon(obj)
             %if obj.isEmptyF
-                [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int] = getParams(obj);
+            [r, q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int] = getParams(obj);
                 
-                $4$ %CountConstraints
-                res = zeros((n_int+ 1) * CountConstraints, 1);
+            $4$ %CountConstraints
+            res = zeros((n_int+ 1) * CountConstraints, 1);
                 
-                for timestep = 1:n_int+1
-                    $0$
-                    res(CountConstraints * (timestep-1)+1:CountConstraints * timestep) = t1;
-                end
+            for timestep = 1:n_int+1
+                $0$
+                res(CountConstraints * (timestep-1)+1:CountConstraints * timestep) = t1;
+            end
         end
         
         function res = get.EqConD(obj)
-            [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
+            [r, q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
             
             $4$ %CountConstraints
             $3$ %CountJacobi
@@ -72,7 +74,7 @@ classdef(Abstract) GenConstraints < handle
         end
         
         function res = get.EqConDD(obj)
-            [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
+            [r, q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
             
             $4$ %CountConstraints
             $2$ %HesseMatrix
@@ -80,7 +82,7 @@ classdef(Abstract) GenConstraints < handle
             res = cell(uint16((n_int+1)*CountConstraints), 1);
             
             n_var = n_state+n_contr;
-            
+            ind = 1;
             for timestep=1:(n_int +1)
                 for ConstraintStep = 1:CountConstraints
                     
@@ -89,13 +91,15 @@ classdef(Abstract) GenConstraints < handle
                     srow = (tmp(:, 2) + (timestep-1)*n_var);
                     scol = (tmp(:, 3) + (timestep-1)*n_var);
                     sval = tmp(:, 4);
-                    res{timestep * ConstraintStep} = sparse(srow, scol, sval,(n_int+1) * n_var,(n_int+1)*n_var);
+                    res{ind} = sparse(srow, scol, sval,(n_int+1) * n_var,(n_int+1)*n_var);
+                    ind = ind + 1;
                 end
             end
         end
         
-        function [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj)
+        function [r, q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj)
             
+            r   = obj.dyn.state(1:3    , :);
             q   = obj.dyn.state(4:7    , :);
             v   = obj.dyn.state(8:10   , :);
             omega   = obj.dyn.state(11:13  , :);
