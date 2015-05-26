@@ -64,12 +64,23 @@
 
 @Book{Garcia2013,
   Title                    = {Quad Rotorcraft Control},
-  Author                   = {Garcia Carrillo, Luis Rodolfo and Dzul López, Alejandro Enrique and Lozano, Rogelio and Pégard, Claude},
+  Author                   = {Garcia Carrillo, Luis Rodolfo and Dzul Lopez, Alejandro Enrique and Lozano, Rogelio and Pegard, Claude},
   Publisher                = {Springer-Verlag London},
   Year                     = {2013},
 
   Owner                    = {as},
   Timestamp                = {2015.05.19}
+}
+
+@Electronic{Hartmann2014,
+  Title                    = {Quadcopter Dynamic Modeling and Simulation (Quad-Sim) v1.00},
+  Author                   = {D. Hartmann and K. Landis and M. Mehrer and S. Moreno and J. Kim},
+  HowPublished             = {Git},
+  Url                      = {https://github.com/dch33/Quad-Sim},
+  Year                     = {2014},
+
+  Owner                    = {as},
+  Timestamp                = {2015.05.26}
 }
 
 @Article{Reyes-Valeria2013,

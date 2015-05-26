@@ -44,5 +44,6 @@ slprj/
 *.mtc1
 *.out
 *.synctex.gz
+*.synctex
 *.snm
 *.nav
