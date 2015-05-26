@@ -138,10 +138,6 @@
 \draw<3->[red, fill=red] (0,2.1) circle (1pt) node[anchor=north]{\footnotesize $x_{t}$};
 \end{tikzpicture}
 \end{figure}
-$y, s, q$ erklären
-
-
-
 \end{frame}
 
 \begin{frame}{Minimization Problem}
@@ -158,7 +154,7 @@ $y, s, q$ erklären
 \begin{tabular}{l l}
   $J_i(s_i, q_i)$ &  discretized goal function 
   \vspace{1ex} \\
-$x_t - s_t = 0$ & expected state should be the real state at time $t$
+$x_t - s_t = 0$ & expected state $=$ real state
   \vspace{1ex} \\
 $h_i (s_i ,q_i )$ & solution of the ODE at time $i$ \\
 \end{tabular}
@@ -173,6 +169,8 @@ $h_i (s_i ,q_i )$ & solution of the ODE at time $i$ \\
 \end{align*}
 \vspace{.1ex}
 \end{block}
+\vspace{1ex}
+$$ y := (\lambda_{t},s_{t},q_{t},\lambda_{t+1},s_{t+1},q_{t+1}, ...,\lambda_{N},s_{N}) $$
 \vspace{1ex}
 We are looking for $y^*$ satisfying the KKT conditions: \\
 
