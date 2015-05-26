@@ -118,8 +118,8 @@
 %Draw time line
 \draw[ thick, ->] (-2.5,0) -- (2,0) node[anchor=west] {time};
 \foreach  \t in  {-2, -1, +1}
-	\draw[thick]  (\t cm, 1pt)  -- (\t cm, -1pt) node[anchor=north] {$t_{k \t  }$ };
-\draw[thick]  (0cm , 1pt)  -- (0 cm, -1pt) node[anchor=north] {$t_k$ };
+	\draw[thick]  (\t cm, 1pt)  -- (\t cm, -1pt) node[anchor=north] {$t \t $ };
+\draw[thick]  (0cm , 1pt)  -- (0 cm, -1pt) node[anchor=north] {$t$ };
 
 %draw known controls
 \draw<2-> (2,1) node[anchor=west] {control};
@@ -133,9 +133,9 @@
 
 %Draw exact states
 \draw<2-> (2,2) node[anchor=west] {state};
-\draw<2->[green, fill=green] (-2, 2.2) circle (1pt) node[anchor=north]{\footnotesize $x_{k-2}$};
-\draw<2->[green, fill=green] (-1, 1.9) circle (1pt) node[anchor=north]{\footnotesize $x_{k-1}$};
-\draw<3->[red, fill=red] (0,2.1) circle (1pt) node[anchor=north]{\footnotesize $x_{k}$};
+\draw<2->[green, fill=green] (-2, 2.2) circle (1pt) node[anchor=north]{\footnotesize $x_{t-2}$};
+\draw<2->[green, fill=green] (-1, 1.9) circle (1pt) node[anchor=north]{\footnotesize $x_{t-1}$};
+\draw<3->[red, fill=red] (0,2.1) circle (1pt) node[anchor=north]{\footnotesize $x_{t}$};
 \end{tikzpicture}
 \end{figure}
 $y, s, q$ erklären
@@ -182,38 +182,36 @@ We are looking for $y^*$ satisfying the KKT conditions: \\
 
 \begin{frame}{The SQP Method}
 How to find $y^*$?
-\begin{align*}
-  y_{k+1} = y_{k} + \alpha_{k} \Delta y_{k}
-\end{align*}
+\begin{block}{ }
+\begin{gather*}
+y_{k+1} = y_{k} + \alpha_{k} \Delta y_{k}  \\ 
+\min_{\Delta y_k} = \frac{1}{2} \Delta y_k^T A_k \Delta y_k + \nabla_{y_k} J(y_k)^T \Delta y_k
+\end{gather*} \vspace{.1ex}
+\end{block}
 \onslide<2->
-\begin{align*}
-\Downarrow
-\end{align*}
-\begin{align*}
-\min_{\Delta y} = \frac{1}{2} \Delta y^T A_k \Delta y + \nabla_y J(y_k)^T \Delta y
-\end{align*}
-\onslide<3->
-\begin{align*}
-\Downarrow
-\end{align*}
-\begin{align*}
-A_{k} := \nabla^{2}_{y_k} L(y_k).
-\end{align*}
-  
+\vspace{1ex}
+Special case: \\
+\vspace{1ex}
+\begin{tabular}{l l}
+$ A_{k} = H(y_k)$ & approximated Hessian $\nabla^{2}_{y_k} L(y_k)$ \vspace{1ex} \\
+$\alpha_k = 1$ & 
+\end{tabular}
 \end{frame}
 
 \begin{frame}{Newton-Raphson}
+Find $\Delta y_k$ with:
 \begin{block}{}
 \begin{gather*}
-y_{t+1} = y_t + \Delta y_t \\
-\nabla_{y_t} L^{t}(y_{t}) + H^{t}(y_{t}) \Delta y_{t} = 0
+\nabla_{y_k} L(y_{k}) + H(y_{k}) \Delta y_{k} = 0
 \end{gather*} \vspace{.1ex}
 \end{block}
-\vspace{1ex}
-\begin{tabular}{l l}
-  $H^t(y_t)$ & approximated Hessian $\nabla^{2}_{y_t} L(y_t)$ \vspace{1ex} \\
-  $\alpha_t = 1$ & 
-\end{tabular}
+\onslide<2->
+There is only time for 1 SQP step:
+\begin{block}{ }
+\begin{gather*}
+y_{t+1} = y_1 = y_0 + \Delta y_0 \\
+\end{gather*}
+\end{block}
 \end{frame}
 
 \begin{frame}{Riccati Recursion}
@@ -250,8 +248,8 @@ What happens in interval $ [ t_{k-1} , t_k ] $ ?
 %Draw time line
 \draw[ thick, ->] (-.5,-2pt) -- (5.5,-2pt);
 
-\draw[thick]  (5 cm, -1pt)  -- (5 cm, -3pt) node[anchor=north] {$t_{k }$ };
-\draw[thick]  (0cm , -1pt)  -- (0 cm, -3pt) node[anchor=north] {$t_{k-1}$ };
+\draw[thick]  (5 cm, -1pt)  -- (5 cm, -3pt) node[anchor=north] {$t$ };
+\draw[thick]  (0cm , -1pt)  -- (0 cm, -3pt) node[anchor=north] {$t-1$ };
 
 %Solve for control in t_k-1
 \draw<2->[red,fill=red] (0,0) rectangle (0.05, 1);
@@ -270,14 +268,31 @@ What happens in interval $ [ t_{k-1} , t_k ] $ ?
 \end{frame}
 
 \begin{frame}{Finite Horizon}
-How to choose $N$?
-\begin{itemize}
-\item $N=t_{end} \rightarrow $ problem gets smaller every time 
-\item $N=t+n \rightarrow $ problem size is constant
-\item .
-\item .
-\item .
-\end{itemize}
+
+%\begin{itemize}
+%\item $N=t_{end} \rightarrow $ problem gets smaller every time 
+%\item $N=t+n \rightarrow $ problem size is constant
+%\item .
+%\item .
+%\item .
+%\end{itemize}
+\begin{block}{}
+\small{
+\begin{align*}
+  \min_{\begin{array}{c} s_{t},...,s_{N}\\ q_{t},...,q_{N-1} \end{array}} \sum_{i=t}^{N-1} J_{i}(s_{i},q_{i}) \ \  
+  s.t. \ \left\lbrace \begin{array}{c}
+  x_{t} - s_{t} = 0 \\
+  h_i (s_i ,q_i ) - s_{i+1} = 0 \ \ \forall i = t, ... , N-1 \end{array} \right. 
+\end{align*}}
+\end{block}
+\vspace{1ex}
+How to choose $N$? \\
+\vspace{1ex}
+\begin{tabular}{l l}
+$N=t_{end} $ &$ \rightarrow $ problem size decreasing \\ \vspace{1ex}
+\onslide<2->
+$N=t+n $ & $\rightarrow $ problem size constant \\
+\end{tabular}
 
 \end{frame}
 %\end{document}
