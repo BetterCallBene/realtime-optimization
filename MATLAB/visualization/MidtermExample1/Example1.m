@@ -1,4 +1,9 @@
 clear
+
+currentpath = cd('..');
+addpath(pwd)
+cd(currentpath)
+
 load Circle.mat
 
 global visualization
