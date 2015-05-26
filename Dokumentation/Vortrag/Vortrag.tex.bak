@@ -1,10 +1,10 @@
-\documentclass[12pt]{beamer}
+\documentclass{beamer}
 
 \usepackage{pgfpages} %This is needed for notes presentation!
 %\setbeameroption{}
 
 \usepackage{enumerate, amsmath, amssymb,amsthm, amstext,color}
-\usepackage[english]{babel}
+\usepackage[ngerman]{babel}
 \usepackage[utf8]{inputenc}   
 \usepackage{dsfont}
 \usepackage{geometry}
@@ -13,21 +13,19 @@
 \usetikzlibrary{plotmarks}
 \usetikzlibrary{arrows, positioning}
 \usepackage{lmodern}
-\usepackage{textcomp}
-
-\usepackage{textpos}
-%\usepackage{setspace}
-
-
 
 \usepackage{float}
 \usepackage{color}
 \usepackage{hyperref}
- \usepackage{algorithmicx}
- \usepackage{algpseudocode}
+% \usepackage{algorithmicx}
+% \usepackage{algpseudocode}
 \usepackage{fancybox}
 \usepackage{float}
 \usepackage{sidecap}
+\usepackage[ngerman]{babel}
+
+%\setbeamertamplate[circle]
+
 
 
 \newcommand{\lk}{\left}
@@ -58,13 +56,13 @@
 % 	whale | wolverine
 % }
 
-\useinnertheme{circles}
+\useinnertheme{rounded}
 % \useinnertheme{
 % 	circles | default | inmargin |
 % 	rectangles | rounded
 % }
 
-\useoutertheme{default}
+\useoutertheme{infolines}
 % \useoutertheme{
 % 	default | infolines | miniframes |
 % 	shadow | sidebar | smoothbars |
@@ -81,7 +79,7 @@
 % Seitenzahlen
 \setbeamertemplate{footline}[frame number]
 
-\title{Midterm Presentation}
+\title{Mid-term presentation}
 \author{The Quadrocopters}
 \institute{Technische Universität München}
 \date{\today}
@@ -113,16 +111,7 @@
 %Der Befehl \include{datei} setzt dann hier die Datei datei.tex ,welche im selben Ordner liegt ein. Diese darf keinen Header enthalten
 %\include{datei}
 
-\input{Motivation}
 \input{Modell}
 \input{rtSQP}
-
-
-\cite{Diebel2006}
-\cite{buschmann2014}
-\cite{Garcia2013}
-\bibliography{Literaturliste}
-\bibliographystyle{abbrvdin}
-
 
 \end{document}
