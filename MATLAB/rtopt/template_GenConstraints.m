@@ -80,7 +80,7 @@ classdef(Abstract) GenConstraints < handle
             res = cell(uint16((n_int+1)*CountConstraints), 1);
             
             n_var = n_state+n_contr;
-            
+            ind = 1;
             for timestep=1:(n_int +1)
                 for ConstraintStep = 1:CountConstraints
                     
@@ -89,7 +89,8 @@ classdef(Abstract) GenConstraints < handle
                     srow = (tmp(:, 2) + (timestep-1)*n_var);
                     scol = (tmp(:, 3) + (timestep-1)*n_var);
                     sval = tmp(:, 4);
-                    res{timestep * ConstraintStep} = sparse(srow, scol, sval,(n_int+1) * n_var,(n_int+1)*n_var);
+                    res{ind} = sparse(srow, scol, sval,(n_int+1) * n_var,(n_int+1)*n_var);
+                    ind = ind + 1;
                 end
             end
         end
