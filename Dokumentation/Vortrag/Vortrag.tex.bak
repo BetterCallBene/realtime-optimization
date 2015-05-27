@@ -1,4 +1,4 @@
-\documentclass{beamer}
+\documentclass[12pt]{beamer}
 
 \usepackage{pgfpages} %This is needed for notes presentation!
 %\setbeameroption{}
@@ -13,6 +13,8 @@
 \usetikzlibrary{plotmarks}
 \usetikzlibrary{arrows, positioning}
 \usepackage{lmodern}
+\usepackage{textcomp}
+\usepackage{textpos}
 
 \usepackage{float}
 \usepackage{color}
@@ -79,7 +81,7 @@
 % Seitenzahlen
 \setbeamertemplate{footline}[frame number]
 
-\title{Mid-term presentation}
+\title{Midterm presentation}
 \author{The Quadrocopters}
 \institute{Technische Universität München}
 \date{\today}
@@ -91,27 +93,85 @@
 
 \setcounter{MaxMatrixCols}{20}
 
-%\AtBeginSection[]{
-%	\frame{
-%	\frametitle{\"Ubersicht}
-%	\tableofcontents[current, currentSection]}
-%
+%\AtBeginSection[]
+%{
+%	\begin{frame}
+%	\frametitle{Overview}
+%	\tableofcontents[currentsection]
+%	\end{frame}
 %}
 
 
 \begin{document}
+
+
 \begin{frame}
 \maketitle
 \end{frame}
 
-\begin{frame}
+\begin{frame}{Overview}
 \tableofcontents
 \end{frame}
 
 %Der Befehl \include{datei} setzt dann hier die Datei datei.tex ,welche im selben Ordner liegt ein. Diese darf keinen Header enthalten
 %\include{datei}
 
+\input{Motivation}
+\begin{frame}{ }
+\begin{block}{ }
+\centering
+\LARGE
+ \vspace{1ex}
+Model \\
+\vspace{1ex}
+\end{block}
+\end{frame}
 \input{Modell}
+\begin{frame}{ }
+\begin{block}{ }
+\centering
+\LARGE
+ \vspace{1ex}
+Realtime Optimization Approach\\
+\vspace{1ex}
+\end{block}
+\end{frame}
 \input{rtSQP}
 
+\section{Results}
+\begin{frame}{ }
+\begin{block}{ }
+\centering
+\LARGE
+ \vspace{1ex}
+Results\\
+\vspace{1ex}
+\end{block}
+\end{frame}
+
+\begin{frame}{ }
+\begin{block}{ }
+\centering
+\LARGE
+ \vspace{1ex}
+Questions? \\
+\vspace{1ex}
+\end{block}
+\end{frame}
+
+\nocite{Boyd2009}
+\nocite{Diehl2001}
+\nocite{Diehl2002}
+\nocite{Diehl2005}
+\nocite{Diebel2006}
+\nocite{Garcia2013}
+\nocite{Richter-Gebert2009}
+\nocite{Reyes-Valeria2013}
+\nocite{Hartmann2014}
+
+%\begin{frame}
+% \frametitle{References}
+	\bibliography{Literaturliste}
+	\bibliographystyle{abbrvnat}
+%\end{frame}
 \end{document}

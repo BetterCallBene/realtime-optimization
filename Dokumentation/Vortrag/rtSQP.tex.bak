@@ -28,8 +28,8 @@
 %\newcommand{\rk}{\right}
 %\newcommand{\rel}{\sqsubseteq}
 %\newcommand{\rhn}{\mathds{R}^n}
- %
-  %\usetheme{Berlin}
+% 
+%  \usetheme{Berlin}
 %%\usetheme{
 %%	AnnArbor | Antibes | Bergen |
 %%	Berkeley | Berlin | Boadilla |
@@ -91,9 +91,13 @@
 %%}
 %
 %\setcounter{MaxMatrixCols}{20}
+%
 %\begin{document}
-%
-%
+
+\definecolor{green}{RGB}{0,190,0}
+\definecolor{red}{RGB}{190,0,0}
+\definecolor{blue}{RGB}{0,0,190}
+
 %\begin{frame}
 %\maketitle
 %\end{frame}
@@ -101,24 +105,57 @@
 %\begin{frame}
 %\tableofcontents
 %\end{frame}
-%
+
 \section{Realtime Optimization Approach}
-\begin{frame}{Realtime}
-$y, s, q$ erklären
+\begin{frame}{Setting}
+
+\begin{figure}
+\begin{tikzpicture}[scale=1.2]
+
+%Draw bounding box
+\draw (-2.75,-1.75) rectangle (3.75,3.25);
+
+%Draw time line
+\draw[ thick, ->] (-2.5,0) -- (2,0) node[anchor=west] {time};
+\foreach  \t in  {-2, -1, +1}
+	\draw[thick]  (\t cm, 1pt)  -- (\t cm, -1pt) node[anchor=north] {$t \t $ };
+\draw[thick]  (0cm , 1pt)  -- (0 cm, -1pt) node[anchor=north] {$t$ };
+
+%draw known controls
+\draw<2-> (2,1) node[anchor=west] {control};
+\draw<2->[->,green] (-2.5, 0.8) -- (-2,0.8) ;
+\draw<2->[->,green] (-2, 1.2) -- (-1,1.2) ;
+\draw<2->[->,green] (-1, 0.9) -- (0,0.9) ;
+\draw<4->[->,red,thick] (0, 1.1) -- (1,1.1) ;
+
+%Draw actual time
+\draw[dashed] (-.8,3) -- (-.8,-1) node[anchor=north] {$t_{act}$};
+
+%Draw exact states
+\draw<2-> (2,2) node[anchor=west] {state};
+\draw<2->[green, fill=green] (-2, 2.2) circle (1pt) node[anchor=north]{\footnotesize $x_{t-2}$};
+\draw<2->[green, fill=green] (-1, 1.9) circle (1pt) node[anchor=north]{\footnotesize $x_{t-1}$};
+\draw<3->[red, fill=red] (0,2.1) circle (1pt) node[anchor=north]{\footnotesize $x_{t}$};
+\end{tikzpicture}
+\end{figure}
 \end{frame}
 
 \begin{frame}{Minimization Problem}
-\begin{block}{ }
+\begin{block}{}
+\small{
 \begin{align*}
-  \min_{\begin{array}{c} s_{t},...,s_{N}\\ q_{t},...,q_{N-1} \end{array}} \sum_{i=t}^{N-1} F_{i}(s_{i},q_{i}) \ \  
+  \min_{\begin{array}{c} s_{t},...,s_{N}\\ q_{t},...,q_{N-1} \end{array}} \sum_{i=t}^{N-1} J_{i}(s_{i},q_{i}) \ \  
   s.t. \ \left\lbrace \begin{array}{c}
   x_{t} - s_{t} = 0 \\
   h_i (s_i ,q_i ) - s_{i+1} = 0 \ \ \forall i = t, ... , N-1 \end{array} \right. 
-\end{align*}
+\end{align*}}
 \end{block}
+\vspace{1ex}
 \begin{tabular}{l l}
-  $F_i(s_i, q_i)$ &  discretized goal function \\
-$x_t - s_t = 0$ & expected state should be the real state at time $t$ \\
+  $J_i(s_i, q_i)$ &  discretized goal function 
+  \vspace{1ex} \\
+$x_t - s_t = 0$ & expected state $=$ real state
+  \vspace{1ex} \\
 $h_i (s_i ,q_i )$ & solution of the ODE at time $i$ \\
 \end{tabular}
 \end{frame}
@@ -126,56 +163,59 @@ $h_i (s_i ,q_i )$ & solution of the ODE at time $i$ \\
 \begin{frame}{The Lagrangian}
 \begin{block}{ }
 \begin{align*}
-  L^{t}(y) = \sum_{i=t}^{N-1} F_{i}(s_{i},q_{i})
+  L^{t}(y) = \sum_{i=t}^{N-1} J_{i}(s_{i},q_{i})
   + \lambda_{t}^{T}(x_{t} - s_{t})
-  + \sum_{i=t}^{N-1} \lambda_{i+1}^{T} (h_i (s_i ,q_i ) - s_{i+1})
+  + \sum_{i=t}^{N-1} \lambda_{i+1}^{T} (h_i (s_i ,q_i ) - s_{i+1}) 
 \end{align*}
+\vspace{.1ex}
 \end{block}
-\begin{center}
-We are looking for $y^*$ satisfying the KKT conditions. \\
+\vspace{1ex}
+$$ y := (\lambda_{t},s_{t},q_{t},\lambda_{t+1},s_{t+1},q_{t+1}, ...,\lambda_{N},s_{N}) $$
+\vspace{1ex}
+We are looking for $y^*$ satisfying the KKT conditions: \\
 
-$\Rightarrow \nabla_{y} L^{t}(y^*)  = 0 $ 
+\[ \Rightarrow \nabla_{y} L^{t}(y^*)  = 0 \]
 
-\end{center}
 \end{frame}
 
-\begin{frame}{The SQP method}
-How do we find $y^*$?
-\begin{align*}
-  y_{k+1} = y_{k} + \alpha_{k} \Delta y_{k}
-\end{align*}
-\begin{align*}
-\Downarrow
-\end{align*}
-\begin{align*}
-\min_{\Delta y} = \frac{1}{2} \Delta y^T A_k \Delta y + \nabla_y F(y_k)^T \Delta y
-\end{align*}
-\begin{align*}
-\Downarrow
-\end{align*}
-\begin{align*}
-A_{k} := \nabla^{2}_{y_k} L(y_k).
-\end{align*}
-  
-\end{frame}
-
-\begin{frame}{Newton-Raphson}
-\begin{block}{}
+\begin{frame}{The SQP Method}
+How to find $y^*$?
+\begin{block}{ }
 \begin{gather*}
-y_{t+1} = y_t + \Delta y_t \\
-\nabla_{y_t} L^{t}(y_{t}) + J^{t}(y_{t}) \Delta y_{t} = 0
-\end{gather*}
+y_{k+1} = y_{k} + \alpha_{k} \Delta y_{k}  \\ 
+\min_{\Delta y_k}  \frac{1}{2} \Delta y_k^T A_k \Delta y_k + \nabla_{y_k} J(y_k)^T \Delta y_k
+\end{gather*} \vspace{.1ex}
 \end{block}
+\onslide<2->
+\vspace{1ex}
+Special case: \\
+\vspace{1ex}
 \begin{tabular}{l l}
-  $J^t(y_t)$ & Approximated Hessian $\nabla^{2}_{y_t} L(y_t)$ \\
-  $\alpha_t = 1$ & 
+$ A_{k} = H(y_k)$ & approximated Hessian $\nabla^{2}_{y_k} L(y_k)$ \vspace{1ex} \\
+$\alpha_k = 1$ & 
 \end{tabular}
 \end{frame}
 
+\begin{frame}{Newton-Raphson}
+Find $\Delta y_k$ with:
+\begin{block}{}
+\begin{gather*}
+\nabla_{y_k} L(y_{k}) + H(y_{k}) \Delta y_{k} = 0
+\end{gather*} \vspace{.1ex}
+\end{block}
+\onslide<2->
+There is only time for 1 SQP step:
+\begin{block}{ }
+\begin{gather*}
+y_{t+1} = y_1 = y_0 + \Delta y_0 \\
+\end{gather*}
+\end{block}
+\end{frame}
+
 \begin{frame}{Riccati Recursion}
-This formulation still depends on $x_t$ ...
+Approximated Hessian:
 \begin{align*} 
-  \scriptstyle{J^{t}(y^{t})} =
+  \scriptstyle{H^{t}(y^{t})} =
   \tiny{
 	\begin{pmatrix}
 		& -E  &     &     &     &     &     &     &     &     &     \\ \\
@@ -196,15 +236,61 @@ This formulation still depends on $x_t$ ...
 
 \end{frame}
 
+\begin{frame}{Summary}
+What happens in interval $ [ t-1 , t ] $ ?
+\begin{figure}
+\begin{tikzpicture}
+%Draw bounding box
+\draw[white] (-1,-.5) rectangle (6,1.2);
+
+%Draw time line
+\draw[ thick, ->] (-.5,-2pt) -- (5.5,-2pt);
+
+\draw[thick]  (5 cm, -1pt)  -- (5 cm, -3pt) node[anchor=north] {$t$ };
+\draw[thick]  (0cm , -1pt)  -- (0 cm, -3pt) node[anchor=north] {$t-1$ };
+
+%Solve for control in t_k-1
+\draw<2->[red,fill=red] (0,0) rectangle (0.05, 1);
+% Calculcate start value for t_k
+\draw<3->[green, fill=green] (0.05,0) rectangle (1, 1);
+%Prepare for t_k
+\draw<4->[blue,fill=blue] (1,0) rectangle (5,1);
+\end{tikzpicture}
+\end{figure}
+
+\begin{enumerate}
+\item<2-> {\color{red} calculate control $u_{t-1}$ (Riccati Part II)}
+\item<3-> {\color{green} calculate $y$ (Riccati Part II)}
+\item<4-> {\color{blue} prepare $u_t$ (Newton \& Riccati Part I)} 
+\end{enumerate}
+\end{frame}
+
 \begin{frame}{Finite Horizon}
-how to choose $N$?
-\begin{itemize}
-\item $N=t_{end}$ problem gets smaller every time 
-\item $N=t+n$ problem size is constant
-\item .
-\item .
-\item .
-\end{itemize}
+
+%\begin{itemize}
+%\item $N=t_{end} \rightarrow $ problem gets smaller every time 
+%\item $N=t+n \rightarrow $ problem size is constant
+%\item .
+%\item .
+%\item .
+%\end{itemize}
+\begin{block}{}
+\small{
+\begin{align*}
+  \min_{\begin{array}{c} s_{t},...,s_{N}\\ q_{t},...,q_{N-1} \end{array}} \sum_{i=t}^{N-1} J_{i}(s_{i},q_{i}) \ \  
+  s.t. \ \left\lbrace \begin{array}{c}
+  x_{t} - s_{t} = 0 \\
+  h_i (s_i ,q_i ) - s_{i+1} = 0 \ \ \forall i = t, ... , N-1 \end{array} \right. 
+\end{align*}}
+\end{block}
+\vspace{1ex}
+How to choose $N$? \\
+\vspace{1ex}
+\begin{tabular}{l l}
+$N=t_{end} $ &$ \rightarrow $ problem size decreasing \\ \vspace{1ex}
+\onslide<2->
+$N=t+n $ & $\rightarrow $ problem size constant \\
+\end{tabular}
 
 \end{frame}
-% \end{document}
+%\end{document}
