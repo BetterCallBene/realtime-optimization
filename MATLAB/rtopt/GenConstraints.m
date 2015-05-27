@@ -62,7 +62,7 @@ classdef(Abstract) GenConstraints < handle
                 
             for timestep = 1:n_int+1
                 t9 = (-r(1, timestep) .^ 2 - r(2, timestep) .^ 2);
-t1 = [0.89401e1 + t9; -0.90601e1 - t9;];
+t1 = [0.841e1 + t9; -0.961e1 - t9;];
  %inEqCountConstraintsFunction
                 res(inEqCountConstraints * (timestep-1)+1:inEqCountConstraints * timestep) = t1;
             end

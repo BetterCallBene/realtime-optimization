@@ -5,7 +5,7 @@ with(CodeGeneration);
 with(FileTools);
 TEST := false;
 R := 3;
-eps := 0.1e-1;
+eps := .1;
 # State und Control Vektor
 x := [r[1], r[2], r[3], q[1], q[2], q[3], q[4], v[1], v[2], v[3], omega[1], omega[2], omega[3], u[1], u[2], u[3], u[4]];
 

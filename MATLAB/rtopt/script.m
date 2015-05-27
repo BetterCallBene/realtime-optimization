@@ -17,7 +17,7 @@ options.Hessian         = 'user-supplied';
 options.HessFcn         = @hessianAdapter;
 
 %TODO: n_int auf einen sinnvollen Wert festlegen
-n_int = 100;
+n_int = 50;
 % Quadrocopter soll 5 Meter hoch fliegen
 xbc = [         ... Variablenname L�nge   Name
                 ... Anfangsbedingung
@@ -61,10 +61,28 @@ global objectCost objectConstr;
 objectCost = cCost;
 objectConstr = cC;
 
+%Test LinearProb
+
+speed = 800*2*pi/60;
+Au = eye(4).*(-1);
+A = sparse([],[],[],2*cQ.n_var*(n_int+1),cQ.n_var*(n_int+1),0);
+for timestep = 1:(n_int+1)
+    A(14+(cQ.n_var *(timestep-1)):17+(cQ.n_var *(timestep-1)), 14+(cQ.n_var *(timestep-1)):17+(cQ.n_var *(timestep-1))) = Au;
+end
+
+for timestep = 1:(n_int+1)
+    A(cQ.n_var*(n_int+1) + 14+(cQ.n_var *(timestep-1)):cQ.n_var*(n_int+1) +17+(cQ.n_var *(timestep-1)), 14+(cQ.n_var *(timestep-1)):17+(cQ.n_var *(timestep-1))) = eye(4);
+end
+b = zeros(2*cQ.n_var*(n_int+1), 1);
+for timestep = 1:(n_int +1)
+    b(cQ.n_var*(n_int+1)+ 14 +(cQ.n_var *(timestep-1)):cQ.n_var*(n_int+1) +17+(cQ.n_var *(timestep-1))) = speed.* ones(4, 1); 
+end
+
+
 %% L�sung des Problems
 tic;
 %TODO: Realtime Ansatz einbauen, bzw. fmincon ersetzen/erweitern
-v = fmincon(@costAdapter,v0,[],[],[],[],[],[],@constrAdapter, options);
+v = fmincon(@costAdapter,v0,A,b,[],[],[],[],@constrAdapter, options);
 t = linspace(0, 1, n_int + 1);
 save('../visualization/Circle.mat', 't', 'v')
 toc;
