@@ -10,7 +10,7 @@ eps := .1;
 x := [r[1], r[2], r[3], q[1], q[2], q[3], q[4], v[1], v[2], v[3], omega[1], omega[2], omega[3], u[1], u[2], u[3], u[4]];
 
 eqConstraints := Vector([VectorCalculus:-`+`(VectorCalculus:-`+`(VectorCalculus:-`+`(VectorCalculus:-`+`(q[1]^2, q[2]^2), q[3]^2), q[4]^2), -1)]);
-inEqConstraints := Vector(`<,>`(VectorCalculus:-`+`(VectorCalculus:-`+`(R, VectorCalculus:-`-`(eps))^2, VectorCalculus:-`-`(VectorCalculus:-`+`(r[1]^2, r[2]^2))), VectorCalculus:-`+`(VectorCalculus:-`+`(r[1]^2, r[2]^2), VectorCalculus:-`-`(VectorCalculus:-`+`(R, eps)^2))));
+inEqConstraints := Vector([VectorCalculus:-`+`(VectorCalculus:-`+`(r[1]^2, r[2]^2), VectorCalculus:-`-`(R^2))]);
 eqMatrix := convert(eqConstraints, Matrix);
 
 inEqMatrix := convert(inEqConstraints, Matrix);

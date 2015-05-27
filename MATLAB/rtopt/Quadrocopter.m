@@ -33,7 +33,7 @@ classdef Quadrocopter < Model
     end
     
     methods
-        function res = Quadrocopter(varign)
+        function res = Quadrocopter(varargin)
             
         end
         % Jm (Motor Rotation Inertia for Rotating Component only)
