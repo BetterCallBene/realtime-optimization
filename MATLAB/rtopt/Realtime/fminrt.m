@@ -28,9 +28,9 @@ for i = 1:n_timepoints
    LDD = calcLDD(i);
    
    %Solve LD + LDD*deltay = 0 with Riccati
-   deltay = riccati2(LD, LDD, cDyn.environment.measurement(i));
+   deltay = riccati2(LD, LDD);
    
-   %Perform the Newtopn step
+   %Perform the Newton step
    y = y + deltay;
    
    %Save result
@@ -39,6 +39,5 @@ for i = 1:n_timepoints
    %Setup next iteration (for the estimation of the new horizon point we
    %duplicate the old horizon point)
    y = [y(cDyn.robot.n_var+n_lambda + 1 :end), y(end - (cDyn.robot.n_var + n_lambda)+1 , end)];
-    
 end
 toc;
