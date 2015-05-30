@@ -1,15 +1,3 @@
-%% Aufstellen des Problems
-
-options                 = optimoptions('fmincon');
-options.Algorithm       = 'interior-point';
-%options.Algorithm       = 'sqp';
-options.Display         = 'iter';
-options.GradObj         = 'on';
-options.GradConstr      = 'on';
-options.Hessian         = 'user-supplied';
-options.HessFcn         = @hessianAdapter;
-
-%TODO: n_int auf einen sinnvollen Wert festlegen
 n_int = 50;
 % Quadrocopter soll 5 Meter hoch fliegen
 xbc = [         ... Variablenname L�nge   Name
@@ -49,13 +37,15 @@ cC = Constraints(cFE);
 % Initialisierung Kostenfunktion
 cCost = Costs(cBQD);
 
-%Variablen f�r fmincon verf�gbar machen
-global objectCost objectConstr;
-objectCost = cCost;
-objectConstr = cC;
+%Choose horizon
+horizon = 15;
 
-%% L�sung des Problems
+%Choose starting value 
+y_var = cQ.n_var + size(cC.get_eq_con(),1);
+y = zeros( y_var * horizon, 1);
+y(7:y_var: horizon*y_var) = 1; % Normalize Quaternions
+%%
 tic;
-%TODO: Realtime Ansatz einbauen, bzw. fmincon ersetzen/erweitern
-v = fmincon(@costAdapter,v0,[],[],[],[],[],[],@constrAdapter, options);
+%Use realtime solver
+v = fminrt(cCost, cC, horizon, y);
 toc;
