@@ -1,26 +1,35 @@
-classdef RiccatiManager < handle
-    % RICCATISTEP Summary of this function goes here
-    %   Detailed explanation goes here
+classdef RiccatiManager <  TestEnv
+    % RICCATIMANAGER Central class to perform a riccati solution
     
     properties(Access=private)
         m ; %number of unknowns
         A ; %matrix storing parameters corresponding to smaller indices
         b ; %vector storing summands]
-        
+        solved;
+        sol;
     end
     
     properties(Dependent)
-        sol;
-        solved;
+        
+        
     end
     
     methods
-        function ricStep = RiccatiManager(m)
-            obj.m = m;
-            obj.A = zeros(m);
-            obj.b = zeros(m,1);
-            obj.sol = zeros(m,1);
-            obj.solved = false;
+        function ricStep = RiccatiManager(varargin)
+            if(nargin == 0)
+                global TEST;
+                if ~(~isempty(TEST) && TEST == true)
+                    error('wrong number of inputs');
+                end
+            elseif(nargin == 1)
+                obj.m = varargin{1};
+                obj.A = zeros(varargin{1});
+                obj.b = zeros(varargin{1},1);
+                obj.sol = zeros(varargin{1},1);
+                obj.solved = false;
+            else
+                error('wrong number of inputs');
+            end
         end
         
         function doStep(obj,i, LDD_i, LD_i, lim_right)
@@ -46,11 +55,14 @@ classdef RiccatiManager < handle
         end
         
         function res = resolveRecursion(obj)
+            obj.A = obj.A + eye(obj.m);
             if(~obj.solved)
                 obj.sol = obj.b;
                 
                 for i = 1:obj.m
+                    obj.sol(i)
                     obj.sol(i) = obj.A(i,:) * obj.sol;
+                    obj.sol(i)
                 end
             end
             res = obj.sol;
@@ -73,12 +85,48 @@ classdef RiccatiManager < handle
             obj.solved = true;
         end
         
-        function sol = get.sol(obj)
-            if obj.solved
-                sol = obj.sol;
-            else
-                error('Recursion is not resolved yet');
+        %         function sol = get.sol(obj)
+        %             if obj.solved
+        %                 sol = obj.sol;
+        %             else
+        %                 sol = obj.sol;
+        %                 disp('Recursion is not resolved yet');
+        %             end
+        %         end
+    end
+    
+    methods(Test)
+        
+        function testRiccati(obj)
+            
+            %Test algorithm with some random matrix A and vector b
+            
+            testm = 5;
+            while(true)
+                testA = rand(testm)*100+ ones(testm);
+                if(det(testA) > 0.1)
+                    break;
+                end
             end
+            obj.m = testm;
+            obj.A = testA;
+            testb = rand(testm,1)*100+ones(testm,1);
+            obj.b = testb;
+            obj.solved = false;
+            
+            
+            %Calculate numerical solution
+            numX = testA\testb;
+            
+            %Calculate riccati solution
+            for i = testm:-1:1
+                obj.doStep(i, testA(i,:), testb(i), obj.m);
+            end
+            
+            ricX = obj.resolveRecursion();
+            
+            obj.assertLessThan(norm(ricX - numX), obj.tol);
         end
+        
     end
 end
