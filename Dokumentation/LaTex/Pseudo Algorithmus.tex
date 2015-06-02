@@ -163,7 +163,7 @@
   \end{align*}
   In diesem Beispiel hängt $ l_i $ nicht von $s_i$ ab, daher ist $M_i$ gleich Null. \\
   \\
-  2. Löse $ (J^{k}(y^{k})) \Delta y^{k} = \nabla_{\lambda_k} L^{k}(y^{k}) $ mit Riccati Recursion.\\
+  2. Löse $ (J^{k}(y^{k})) \Delta y^{k} =- \nabla_{\lambda_k} L^{k}(y^{k}) $ mit Riccati Recursion.\\
   Betrachte
   \begin{align*}
   \begin{pmatrix}
@@ -178,7 +178,7 @@
   \Delta q_{N-1} \\
   \Delta \lambda_{N} \\
   \Delta s_N
-  \end{pmatrix} =
+  \end{pmatrix} =-
   \begin{pmatrix}
   \nabla_{s_{N-1}} L^{k}(y^{k}) \\
   \nabla_{q_{N-1}} L^{k}(y^{k}) \\
@@ -186,7 +186,7 @@
   \nabla_{s_{N}} L^{k}(y^{k})
   \end{pmatrix}
   \end{align*}
-  Zur einfacheren Schreibweise ist ab jetzt $ \nabla_{s_{N}} := \nabla_{s_{N}} L^{k}(y^{k}) $
+  Zur einfacheren Schreibweise ist ab jetzt $ \nabla_{s_{N}} := -\nabla_{s_{N}} L^{k}(y^{k}) $
   \begin{align*}
   \begin{pmatrix}
    0  & A_{N-1} & B_{N-1} \\
@@ -275,7 +275,7 @@
   \nabla_{s_{N-1}} \\ 
   \nabla_{q_{N-1}} 
   \end{pmatrix}
-  -
+  +
   \begin{pmatrix}
   A_{N-1}^{T}P_N & A_{N-1}^{T} \\
   B_{N-1}^{T}P_N & B_{N-1}^{T}
@@ -305,7 +305,7 @@
    & - (R_{N-1}+B_{N-1}^{T}P_N B_{N-1})^{-1}(\nabla_{q_{N-1}} +B_{N-1}^{T}P_N \nabla_{\lambda_{N}} +B_{N-1}^{T}\nabla_{s_{N}})
   \end{array}
   \end{align*}
-  Damit ergibt sich für das anfängliche System $ J^{k}(y^{k})\Delta y^{k} = \nabla_{y^{k}} L^{k}(y^{k})$
+  Damit ergibt sich für das anfängliche System $ J^{k}(y^{k})\Delta y^{k} = -\nabla_{y^{k}} L^{k}(y^{k})$
   \begin{align*}
   \begin{pmatrix}
     & -E &   &   &   &   &   &      \\
@@ -363,7 +363,7 @@
   \Delta q_{k} =
   (R_{k}+B_{k}^{T}P_{k+1} B_{k})^{-1}
   (\nabla_{q_{k}}+ B_{k}^{T}P_{k+1} \nabla_{\lambda_{k+1}} +
-  B_{k}^{T}\nabla_{s_{k+1}} -B_{k}^{T}P_{k+1} A_{k} \Delta s_{k})  
+  B_{k}^{T}\nabla_{s_{k+1}}^{*} -B_{k}^{T}P_{k+1} A_{k} \Delta s_{k})  
   \end{align*}
   Gib dem System den Wert $u_k = q_k + \Delta q_k $.\\
   Berechne mit Forward Recursion die restlichen Werte von $\Delta y^{k}$
