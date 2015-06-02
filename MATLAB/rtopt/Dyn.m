@@ -1,8 +1,6 @@
 classdef(Abstract) Dyn < handle  & TestEnv
     % Dyn Diese Klasse repräsentiert die Dynamik
     
-    
-    
     properties(SetAccess = public, GetAccess= public)
         environment; % in this object all outside parameters are stored, like gravity, wind, time mesh,...
         robot; % handle for a classRobot element providing the mass matrix and the coriolis terms
