@@ -47,13 +47,15 @@ classdef RiccatiManager_woConstr < TestEnv
             LD_i = -LD_i;
             obj.Q{i} = LDD_i(1:13,1:13);
             obj.nabla_lambda{i} = LD_i(1:13);
-            obj.nabla_q{i} = LD_i(2*13+1:2*13+4);
+            
+            
             if(i == obj.horizon+1)
                 obj.P{i} = obj.Q{i};
                 obj.nabla_s_star{i} = LD_i(13+1:2*13);
                 
-                
             else
+                obj.nabla_q{i} = LD_i(2*13+1:end);
+%             obj.nabla_q{i} = LD_i(2*13+1:2*13+4);
                 obj.M{i} = LDD_i(1:13,14:17);
                 obj.R{i} = LDD_i(14:17, 14:17);
                 
@@ -62,13 +64,13 @@ classdef RiccatiManager_woConstr < TestEnv
                 
                 obj.P{i} = obj.Q{i} + (obj.A{i}' * obj.P{i+1} * obj.A{i}) - ...
                     (obj.M{i} + obj.A{i}' * obj.P{i+1} * obj.B{i}) * ...
-                    (obj.R{i} + obj.B{i}' * obj.P{i+1}  * obj.B{i}) \ ...
-                    (obj.M{i}'  + obj.B{i}' * obj.P{i+1} * obj.A{i});
+                    ((obj.R{i} + obj.B{i}' * obj.P{i+1}  * obj.B{i}) \ ...
+                    (obj.M{i}'  + obj.B{i}' * obj.P{i+1} * obj.A{i}));
                 
-                obj.nabla_s_star{i} = LD_i(13+1:2*13) + obj.A{i}' * ...
-                    obj.P{i+1} * obj.nabla_lambda{i+1} + obj.A{i}' *  ...
-                    obj.nabla_s_star{i+1} -  ( obj.R{i} +  obj.B{i}' * ...
-                    obj.P{i+1} *   obj.B{i}) ...
+                obj.nabla_s_star{i} = LD_i(13+1:2*13) + ...
+                    obj.A{i}' * obj.P{i+1} * obj.nabla_lambda{i+1} + ...
+                    obj.A{i}' * obj.nabla_s_star{i+1} - ...
+                    ( obj.R{i} +  obj.B{i}' * obj.P{i+1} *   obj.B{i}) ...
                     \ ( obj.nabla_q{i} +  obj.B{i}' *   obj.P{i+1} *  obj.nabla_lambda{i+1} +  obj.B{i}' *  obj.nabla_s_star{i+1});
                 
             end
@@ -126,20 +128,26 @@ classdef RiccatiManager_woConstr < TestEnv
             hesse_L( (i-1) * 30 +1:(i-1) * 30 +13  , (i-1) * 30 + 13+1: (i-1) * 30 + 26 ) = -eye(13);
             hesse_L( (i-1) * 30 + 13+1: (i-1) * 30 + 26 , (i-1) * 30 +1:(i-1) * 30 +13) = -eye(13);
             hesse_L( (i-1) * 30 +13+1 : end, (i-1)*30 +13 +1 : end) = LDDi(1:13,1:13);
-           
+            
             
             deltay = 10 * rand(626,1);
             grad_L = - hesse_L * deltay;
             
             
             %Perform reccati recursion
-            for i = 1:obj.horizon+1
-               obj.doStep(i,LDDi, grad_L( %TODO: fill that );
+            for i = obj.horizon+1:-1:1
+                if i == obj.horizon +1
+                    obj.doStep(i,LDDi, grad_L( (i-1) * 30 +1 : end ,1  ) );
+                else
+                    obj.doStep(i,LDDi, grad_L( (i-1) * 30 +1 : i * 30,1  ));
+                end
             end
             
-            for i = 1:obj.horiyon +1 
-            obj.solveStep(i);
+            for i = 1:obj.horizon +1
+                obj.solveStep(i);
             end
+            
+            obj.assertLessThan(norm(obj.delta - deltay), obj.tol);
             
         end
         
