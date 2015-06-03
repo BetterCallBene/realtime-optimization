@@ -23,7 +23,7 @@ TEST = true;
 % suiteCosts = TestSuite.fromClass(?Costs);
 % resultCosts = run(suiteCosts);
 
-suiteRiccati = TestSuite.fromClass(?RiccatiManager);
+suiteRiccati = TestSuite.fromClass(?RiccatiManager_woConstr);
 resultRiccati = run(suiteRiccati);
 
 %Create Suite from SolverTest Class Definition File

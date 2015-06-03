@@ -14,8 +14,6 @@ classdef RiccatiManager_woConstr < TestEnv
         nabla_q;
         horizon ;
         delta;
-        
-        
     end
     
     methods
@@ -24,24 +22,25 @@ classdef RiccatiManager_woConstr < TestEnv
                 global TEST;
                 if ~(~isempty(TEST) && TEST == true)
                     error('wrong number of inputs');
+                else
+                    obj.horizon = 20;
                 end
             elseif(nargin == 1)
-                obj.horizon = vargin{1};
-                
-                %Initialize storage
-                obj.A = cell(horizon,1);
-                obj.B = cell(horizon,1);
-                obj.M = cell(horizon,1);
-                obj.P = cell(horizon+1,1);
-                obj.Q = cell(horizon+1,1);
-                obj.R = cell(horizon,1);
-                obj.nabla_s_star = cell(horizon+1, 1);
-                obj.nabla_lambda = cell(horizon+1,1);
-                obj.nabla_q = cell(horizon ,1);
-                obj.delta = zeros((2*13+4)*horizon + 2*13, 1);
+                obj.horizon = varargin{1};
             else
                 error('wrong number of inputs');
             end
+            %Initialize storage
+            obj.A = cell(obj.horizon,1);
+            obj.B = cell(obj.horizon,1);
+            obj.M = cell(obj.horizon,1);
+            obj.P = cell(obj.horizon+1,1);
+            obj.Q = cell(obj.horizon+1,1);
+            obj.R = cell(obj.horizon,1);
+            obj.nabla_s_star = cell(obj.horizon+1, 1);
+            obj.nabla_lambda = cell(obj.horizon+1,1);
+            obj.nabla_q = cell(obj.horizon ,1);
+            obj.delta = zeros( (2*13+4)*obj.horizon + 2*13, 1);
         end
         
         function doStep(obj,i,LDD_i, LD_i)
@@ -49,8 +48,8 @@ classdef RiccatiManager_woConstr < TestEnv
             obj.Q{i} = LDD_i(1:13,1:13);
             obj.nabla_lambda{i} = LD_i(1:13);
             obj.nabla_q{i} = LD_i(2*13+1:2*13+4);
-            if(i == obj.horizon)
-                obj.P{ i} = obj.Q{i};
+            if(i == obj.horizon+1)
+                obj.P{i} = obj.Q{i};
                 obj.nabla_s_star{i} = LD_i(13+1:2*13);
                 
                 
@@ -81,14 +80,68 @@ classdef RiccatiManager_woConstr < TestEnv
             if ( i ==1 )
                 obj.delta(1:2*13) = [-obj.P{i} , -spones(13) ; -spones(13) , spzeros(13)] * [ obj.nabla_lambda{i} ; obj.nabla_s_star{i} ];
             else
-               obj.delta((i-1) * 30 + 1 : (i-1) * 30 + 2*13) = [-obj.P{i} , -spones(13) ; -spones(13) , spzeros(13)] * [obj.nabla_lambda{i} - obj.A{i-1} * obj.delta( (i-2) * 30 + 13 +1 : (i-2) * 30 +2*13) + obj.B{i-1} * obj.delta( (i-2) *30 + 2*13 +1: (i-1)*30) ; obj.nabla_s_star{i} ];
+                obj.delta((i-1) * 30 + 1 : (i-1) * 30 + 2*13) = [-obj.P{i} , -spones(13) ; -spones(13) , spzeros(13)] * [obj.nabla_lambda{i} - obj.A{i-1} * obj.delta( (i-2) * 30 + 13 +1 : (i-2) * 30 +2*13) + obj.B{i-1} * obj.delta( (i-2) *30 + 2*13 +1: (i-1)*30) ; obj.nabla_s_star{i} ];
             end
-                obj.delta( (i-1) * 30 + 2*13 + 1 : i * 30 ) = (obj.R{i} + obj.B{i}' * obj.P{i+1} * obj.B{i}) \ ( obj.nabla_q{i} + obj.B{i}' * obj.P{i+1} * obj.nabla_lambda{i+1} + obj.B{i}' * obj.nabla_s_star{i+1} - ( obj.M{i}' + obj.B{i}' * obj.P{i+1} * obj.A{i}) * obj.delta( (i-1) * 30 + 13 + 1: (i-1)*30 + 2*13));
-                
+            obj.delta( (i-1) * 30 + 2*13 + 1 : i * 30 ) = (obj.R{i} + obj.B{i}' * obj.P{i+1} * obj.B{i}) \ ( obj.nabla_q{i} + obj.B{i}' * obj.P{i+1} * obj.nabla_lambda{i+1} + obj.B{i}' * obj.nabla_s_star{i+1} - ( obj.M{i}' + obj.B{i}' * obj.P{i+1} * obj.A{i}) * obj.delta( (i-1) * 30 + 13 + 1: (i-1)*30 + 2*13));
+            
             % nach dem ersten Schritt kann dann u = q_t + deltaq_t
-            % übergeben werden um zu steuern
+            % ï¿½bergeben werden um zu steuern
             
         end
         
     end
     
+    methods(Test)
+        
+        function testRiccati_ow(obj)
+            obj.horizon = 20;
+            %Initialize storage
+            obj.A = cell(obj.horizon,1);
+            obj.B = cell(obj.horizon,1);
+            obj.M = cell(obj.horizon,1);
+            obj.P = cell(obj.horizon+1,1);
+            obj.Q = cell(obj.horizon+1,1);
+            obj.R = cell(obj.horizon,1);
+            obj.nabla_s_star = cell(obj.horizon+1, 1);
+            obj.nabla_lambda = cell(obj.horizon+1,1);
+            obj.nabla_q = cell(obj.horizon ,1);
+            obj.delta = zeros( (2*13+4)*obj.horizon + 2*13, 1);
+            
+            
+            LDDi = zeros(30);
+            %Find a invertible matrix
+            while (det(LDDi) == 0  || abs(det(LDDi)) > 1e2)
+                LDDi = 10 * eye(30) +  rand(30);
+                LDDi(18:end, 18:end) = zeros(13);
+            end
+            
+            hesse_L = zeros(30 * obj.horizon +26);
+            for i = 1: obj.horizon
+                hesse_L( (i-1) * 30 +1:(i-1) * 30 +13  , (i-1) * 30 + 13+1: (i-1) * 30 + 26 ) = -eye(13);
+                hesse_L( (i-1) * 30 + 13+1: (i-1) * 30 + 26 , (i-1) * 30 +1:(i-1) * 30 +13) = -eye(13);
+                hesse_L( (i-1) * 30 +13+1 : (i-1)*30 +13 + 30, (i-1)*30 +13 +1 : (i-1)*30 +13 + 30) = LDDi;
+            end
+            
+            i = obj.horizon +1 ;
+            hesse_L( (i-1) * 30 +1:(i-1) * 30 +13  , (i-1) * 30 + 13+1: (i-1) * 30 + 26 ) = -eye(13);
+            hesse_L( (i-1) * 30 + 13+1: (i-1) * 30 + 26 , (i-1) * 30 +1:(i-1) * 30 +13) = -eye(13);
+            hesse_L( (i-1) * 30 +13+1 : end, (i-1)*30 +13 +1 : end) = LDDi(1:13,1:13);
+           
+            
+            deltay = 10 * rand(626,1);
+            grad_L = - hesse_L * deltay;
+            
+            
+            %Perform reccati recursion
+            for i = 1:obj.horizon+1
+               obj.doStep(i,LDDi, grad_L( %TODO: fill that );
+            end
+            
+            for i = 1:obj.horiyon +1 
+            obj.solveStep(i);
+            end
+            
+        end
+        
+    end
+end
