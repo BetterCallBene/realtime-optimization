@@ -71,25 +71,37 @@ classdef RiccatiManager_woConstr < TestEnv
                     obj.A{i}' * obj.P{i+1} * obj.nabla_lambda{i+1} + ...
                     obj.A{i}' * obj.nabla_s_star{i+1} - ...
                     (obj.M{i} + obj.A{i}' * obj.P{i+1} * obj.B{i}) * ...  %dieser Multiplikator hat gefehlt, damit die Dimension stimmt
-                    ( obj.R{i} +  obj.B{i}' * obj.P{i+1} *   obj.B{i}) ...
-                    \ ( obj.nabla_q{i} +  obj.B{i}' *   obj.P{i+1} *  obj.nabla_lambda{i+1} +  obj.B{i}' *  obj.nabla_s_star{i+1});
+                    (( obj.R{i} +  obj.B{i}' * obj.P{i+1} *   obj.B{i}) ...
+                    \ ( obj.nabla_q{i} +  obj.B{i}' *   obj.P{i+1} *  obj.nabla_lambda{i+1} +  obj.B{i}' *  obj.nabla_s_star{i+1}));
                 
             end
         end
         
         function solveStep(obj, i)
             
-            %solve delta lambda
+            %solve [delta lambda ; delta s]
             if ( i ==1 )
-                obj.delta(1:2*13) = [-obj.P{i} , -spones(13) ; -spones(13) , spzeros(13)] * [ obj.nabla_lambda{i} ; obj.nabla_s_star{i} ];
+                obj.delta(1:2*13) = ...
+                    [-obj.P{i} , -eye(13) ; -eye(13) , zeros(13)] * ...
+                    [ obj.nabla_lambda{i} ; obj.nabla_s_star{i} ];
             else
-                obj.delta((i-1) * 30 + 1 : (i-1) * 30 + 2*13) = [-obj.P{i} , -spones(13) ; -spones(13) , spzeros(13)] * [obj.nabla_lambda{i} - obj.A{i-1} * obj.delta( (i-2) * 30 + 13 +1 : (i-2) * 30 +2*13) + obj.B{i-1} * obj.delta( (i-2) *30 + 2*13 +1: (i-1)*30) ; obj.nabla_s_star{i} ];
+                obj.delta((i-1) * 30 + 1 : (i-1) * 30 + 2*13) = [-obj.P{i} , -eye(13) ; -eye(13) , zeros(13)] * [obj.nabla_lambda{i} - obj.A{i-1} * obj.delta( (i-2) * 30 + 13 +1 : (i-2) * 30 +2*13) + obj.B{i-1} * obj.delta( (i-2) *30 + 2*13 +1: (i-1)*30) ; obj.nabla_s_star{i} ];
             end
-            obj.delta( (i-1) * 30 + 2*13 + 1 : i * 30 ) = (obj.R{i} + obj.B{i}' * obj.P{i+1} * obj.B{i}) \ ( obj.nabla_q{i} + obj.B{i}' * obj.P{i+1} * obj.nabla_lambda{i+1} + obj.B{i}' * obj.nabla_s_star{i+1} - ( obj.M{i}' + obj.B{i}' * obj.P{i+1} * obj.A{i}) * obj.delta( (i-1) * 30 + 13 + 1: (i-1)*30 + 2*13));
+          
+            %solve for delta q
+            if( i ~= obj.horizon +1 )
+            obj.delta( (i-1) * 30 + 2*13 + 1 : i * 30 ) = ...
+                (obj.R{i} + obj.B{i}' * obj.P{i+1} * obj.B{i}) \ ...
+                ( ...
+                    obj.nabla_q{i} + ...
+                    obj.B{i}' * obj.P{i+1} * obj.nabla_lambda{i+1} + ...
+                    obj.B{i}' * obj.nabla_s_star{i+1} - ...
+                    ( obj.M{i}' + obj.B{i}' * obj.P{i+1} * obj.A{i} ) * obj.delta( (i-1) * 30 + 13 + 1: (i-1)*30 + 2*13) ...
+                );
             
             % nach dem ersten Schritt kann dann u = q_t + deltaq_t
             % �bergeben werden um zu steuern
-            
+            end
         end
         
     end
@@ -144,7 +156,7 @@ classdef RiccatiManager_woConstr < TestEnv
                 end
             end
             
-            for i = 1:obj.horizon +1
+            for i = 1:obj.horizon +1 
                 obj.solveStep(i);
             end
             
