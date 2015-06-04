@@ -302,7 +302,7 @@
   P_{N-1} = & Q_{N-1}+A_{N-1}^{T}P_N A_{N-1} -A_{N-1}^{T}P_N B_{N-1}
   (R_{N-1}+B_{N-1}^{T}P_N B_{N-1})^{-1} B_{N-1}^{T}P_N A_{N-1} \\
   \nabla_{s_{N-1}}^{*} = & \nabla_{s_{N-1}} + A_{N-1}^{T}P_N \nabla_{\lambda_{N}} + A_{N-1}^{T}\nabla_{s_{N}} \\
-   & - (R_{N-1}+B_{N-1}^{T}P_N B_{N-1})^{-1}(\nabla_{q_{N-1}} +B_{N-1}^{T}P_N \nabla_{\lambda_{N}} +B_{N-1}^{T}\nabla_{s_{N}})
+   & - A_{N-1}^{T}P_N B_{N-1}(R_{N-1}+B_{N-1}^{T}P_N B_{N-1})^{-1}(\nabla_{q_{N-1}} +B_{N-1}^{T}P_N \nabla_{\lambda_{N}} +B_{N-1}^{T}\nabla_{s_{N}})
   \end{array}
   \end{align*}
   Damit ergibt sich für das anfängliche System $ J^{k}(y^{k})\Delta y^{k} = -\nabla_{y^{k}} L^{k}(y^{k})$
@@ -340,7 +340,7 @@
   P_{i-1} = & Q_{i-1}+A_{i-1}^{T}P_i A_{i-1} -A_{i-1}^{T}P_i B_{i-1}
   (R_{i-1}+B_{i-1}^{T}P_i B_{i-1})^{-1} B_{i-1}^{T}P_i A_{i-1} \\
   \nabla_{s_{i-1}}^{*} = & \nabla_{s_{i-1}} + A_{i-1}^{T}P_i \nabla_{\lambda_{i}} + A_{i-1}^{T}\nabla_{s_{i}}^{*} \\
-   & - (R_{i-1}+B_{i-1}^{T}P_i B_{i-1})^{-1}(\nabla_{q_{i-1}} +B_{i-1}^{T}P_i \nabla_{\lambda_{i}} +B_{i-1}^{T}\nabla_{s_{i}}^{*})
+   & - A_{i-1}^{T}P_i B_{i-1}(R_{i-1}+B_{i-1}^{T}P_i B_{i-1})^{-1}(\nabla_{q_{i-1}} +B_{i-1}^{T}P_i \nabla_{\lambda_{i}} +B_{i-1}^{T}\nabla_{s_{i}}^{*})
   \end{array}
   \end{align*}
   Schließlich ergibt sich
