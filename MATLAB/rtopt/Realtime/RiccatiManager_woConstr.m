@@ -2,7 +2,6 @@ classdef RiccatiManager_woConstr < TestEnv
     % RICCATIMANAGER_WOCONSTR Implements the Riccati algorithm without
     % additional constraints.
     
-    
     properties(Access=private)
         robot;
         A;
@@ -17,60 +16,65 @@ classdef RiccatiManager_woConstr < TestEnv
         horizon ;
         delta;
         
+        delta_lambda;
+        delta_s;
+        delta_q;
+        
         n_lambda;
         n_state;
         n_contr;
-        n_var; 
-        
+        n_var;
     end
     
     methods
         function ricM = RiccatiManager_woConstr(varargin)
             % RICCATIMANAGER_WOCONSTR Takes as inpt the horizon length and
             % the used model. If not specified, the defauls are 20 and for
-            % the model a instance of Quadrocopter is used.
+            % the model a instance of Quadrocopter.
             if(nargin == 0)
                 global TEST;
                 if ~(~isempty(TEST) && TEST == true)
                     error('wrong number of inputs');
                 else
-                    obj.horizon = 20;
-                    obj.robot = Quadrocopter();
+                    o.horizon = 20;
+                    o.robot = Quadrocopter();
                 end
             elseif(nargin == 1)
-                obj.horizon = varargin{1};
-                obj.robot = Quadrocopter();
+                o.horizon = varargin{1};
+                o.robot = Quadrocopter();
             elseif(nargin == 2)
-                obj.horizon = varargin{1};
+                o.horizon = varargin{1};
                 if (isa(varargin{2},'Model'))
-                obj.robot = varargin{2};
+                    o.robot = varargin{2};
                 end
             else
                 error('wrong number of inputs');
             end
-           
+            
             %Initialize storage
-            obj.n_lambda = obj.robot.n_state;
-            obj.n_state = obj.robot.n_state;
-            obj.n_contr = obj.robot.n_contr;
-            obj.n_var = obj.n_lambda + obj.n_state + obj.n_contr;
+            o.n_lambda = o.robot.n_state;
+            o.n_state = o.robot.n_state;
+            o.n_contr = o.robot.n_contr;
+            o.n_var = o.n_lambda + o.n_state + o.n_contr;
             
-            obj.A = cell(obj.horizon,1);
-            obj.B = cell(obj.horizon,1);
-            obj.M = cell(obj.horizon,1);
-            obj.P = cell(obj.horizon+1,1);
-            obj.Q = cell(obj.horizon+1,1);
-            obj.R = cell(obj.horizon,1);
-            obj.nabla_s_star = cell(obj.horizon+1, 1);
-            obj.nabla_lambda = cell(obj.horizon+1,1);
-            obj.nabla_q = cell(obj.horizon ,1);
-            obj.delta = zeros( obj.n_var * (obj.horizon +1 ) - obj.n_contr, 1);
+            o.A = cell(o.horizon,1);
+            o.B = cell(o.horizon,1);
+            o.M = cell(o.horizon,1);
+            o.P = cell(o.horizon+1,1);
+            o.Q = cell(o.horizon+1,1);
+            o.R = cell(o.horizon,1);
+            o.nabla_s_star = cell(o.horizon+1, 1);
+            o.nabla_lambda = cell(o.horizon+1,1);
+            o.nabla_q = cell(o.horizon ,1);
+            o.delta = zeros( o.n_var * (o.horizon +1 ) - o.n_contr, 1);
             
-            
-            
+            o.delta_lambda = cell(o.horizon +1, 1);
+            o.delta_s = cell(o.horizon +1, 1);
+            o.delta_q = cell(o.horizon, 1);
         end
         
         function doStep(o,i,LDD_i, LD_i)
+            % DOSTEP Performs one step of Riccati Recursion Part 1 
             o.Q{i} = LDD_i(1:o.n_state,1:o.n_state);
             o.nabla_lambda{i} = LD_i(1:o.n_lambda);
             
@@ -94,7 +98,7 @@ classdef RiccatiManager_woConstr < TestEnv
                 o.nabla_s_star{i} = LD_i(o.n_lambda +1 : o.n_lambda + o.n_state) + ...
                     o.A{i}' * o.P{i+1} * o.nabla_lambda{i+1} + ...
                     o.A{i}' * o.nabla_s_star{i+1} - ...
-                    (o.M{i} + o.A{i}' * o.P{i+1} * o.B{i}) * ... 
+                    (o.M{i} + o.A{i}' * o.P{i+1} * o.B{i}) * ...
                     (( o.R{i} +  o.B{i}' * o.P{i+1} *   o.B{i}) ...
                     \ ( o.nabla_q{i} + o.B{i}' * o.P{i+1} *  o.nabla_lambda{i+1} + o.B{i}' * o.nabla_s_star{i+1}));
                 
@@ -102,75 +106,87 @@ classdef RiccatiManager_woConstr < TestEnv
         end
         
         function solveStep(o, i)
+            % SOLVESTEP Resolves one step of Riccati Recursion Part 2
             
             %solve [delta lambda ; delta s]
             if ( i ==1 )
-                o.delta(1: o.n_lambda + o.n_state) = ...
-                    [-o.P{i} , -eye(o.n_lambda) ; -eye(o.n_state) , zeros(o.n_state)] * ...
-                    [ o.nabla_lambda{i} ; o.nabla_s_star{i} ];
+                
+                o.delta_lambda{i} = -o.P{i}* o.nabla_lambda{i} - o.nabla_s_star{i};
+                o.delta_s{i} = -o.nabla_lambda{i};
+                
+                o.delta(1: o.n_lambda + o.n_state) = [o.delta_lambda{i}; o.delta_s{i}];
+                
             else
-                o.delta((i-1) * 30 + 1 : (i-1) * 30 + 2*13) = [-o.P{i} , -eye(o.n_lambda) ; -eye(o.n_state) , zeros(o.n_state)] * [o.nabla_lambda{i} - o.A{i-1} * o.delta( (i-2) * 30 + 13 +1 : (i-2) * 30 +2*13) + o.B{i-1} * o.delta( (i-2) *30 + 2*13 +1: (i-1)*30) ; o.nabla_s_star{i} ];
+                var = (o.A{i-1} * o.delta_s{i-1} + o.B{i-1}* o.delta_q{i-1});
+                
+                % solve delta lambda
+                o.delta_lambda{i} = -o.P{i}* o.nabla_lambda{i} - o.nabla_s_star{i} + o.P{i} * var ;
+                % solve delta s
+                o.delta_s{i} = - o.nabla_lambda{i}  + var;
+                
+                o.delta((i-1) * 30 + 1 : (i-1) * 30 + 2*13) = [o.delta_lambda{i} ; o.delta_s{i}];
+                
             end
-          
+            
             %solve for delta q
             if( i ~= o.horizon +1 )
-            o.delta( (i-1) * 30 + 2*13 + 1 : i * 30 ) = ...
-                (o.R{i} + o.B{i}' * o.P{i+1} * o.B{i}) \ ...
-                ( ...
+                o.delta_q{i} = (o.R{i} + o.B{i}' * o.P{i+1} * o.B{i}) \ ...
+                    ( ...
                     o.nabla_q{i} + ...
                     o.B{i}' * o.P{i+1} * o.nabla_lambda{i+1} + ...
                     o.B{i}' * o.nabla_s_star{i+1} - ...
-                    ( o.M{i}' + o.B{i}' * o.P{i+1} * o.A{i} ) * o.delta( (i-1) * 30 + 13 + 1: (i-1)*30 + 2*13) ...
-                );
-            
-            % nach dem ersten Schritt kann dann u = q_t + deltaq_t
-            % �bergeben werden um zu steuern
+                    ( o.M{i}' + o.B{i}' * o.P{i+1} * o.A{i} ) * o.delta_s{i} );
+                
+                
+                o.delta( (i-1) * 30 + 2*13 + 1 : i * 30 ) = o.delta_q{i};
             end
         end
     end
     
     methods(Test)
         
-%         function testRiccati_0(obj)
-% %             for i = 1:100
-%             obj.doTestWithHorizon(0);
-% %             end
-%         end
-        
-        function testRiccati_1(obj)
-            obj.doTestWithHorizon(1);
+        function testRiccati_0(o)
+            o.doTestWithHorizon(0);
         end
         
-%         function testRiccati_100(obj)
-%             obj.doTestWithHorizon(100);
-%         end
+        function testRiccati_1(o)
+            o.doTestWithHorizon(1);
+        end
+        
+        function testRiccati_20(o)
+            o.doTestWithHorizon(20);
+        end
+        
+        function testRiccati_100(o)
+            o.doTestWithHorizon(100);
+        end
     end
     
     methods
-        function initialize(obj)
+        function initialize(o)
             %Initialize storage
-            obj.n_lambda = obj.robot.n_state;
-            obj.n_state = obj.robot.n_state;
-            obj.n_contr = obj.robot.n_contr;
-            obj.n_var = obj.n_lambda + obj.n_state + obj.n_contr;
+            o.n_lambda = o.robot.n_state;
+            o.n_state = o.robot.n_state;
+            o.n_contr = o.robot.n_contr;
+            o.n_var = o.n_lambda + o.n_state + o.n_contr;
             
-            obj.A = cell(obj.horizon,1);
-            obj.B = cell(obj.horizon,1);
-            obj.M = cell(obj.horizon,1);
-            obj.P = cell(obj.horizon+1,1);
-            obj.Q = cell(obj.horizon+1,1);
-            obj.R = cell(obj.horizon,1);
-            obj.nabla_s_star = cell(obj.horizon+1, 1);
-            obj.nabla_lambda = cell(obj.horizon+1,1);
-            obj.nabla_q = cell(obj.horizon ,1);
-            obj.delta = zeros( obj.n_var * (obj.horizon +1 ) - obj.n_contr, 1);
-        
+            o.A = cell(o.horizon,1);
+            o.B = cell(o.horizon,1);
+            o.M = cell(o.horizon,1);
+            o.P = cell(o.horizon+1,1);
+            o.Q = cell(o.horizon+1,1);
+            o.R = cell(o.horizon,1);
+            o.nabla_s_star = cell(o.horizon+1, 1);
+            o.nabla_lambda = cell(o.horizon+1,1);
+            o.nabla_q = cell(o.horizon ,1);
+            o.delta = zeros( o.n_var * (o.horizon +1 ) - o.n_contr, 1);
+            
         end
         
-        function doTestWithHorizon(obj, hori)
-            obj.horizon = hori;
-            obj.robot  = Quadrocopter();
-            obj.initialize();
+        function doTestWithHorizon(o, hori)
+            o.horizon = hori;
+            o.robot  = Quadrocopter();
+            o.initialize();
             
             LDDi = zeros(30);
             %Find a invertible matrix
@@ -182,36 +198,52 @@ classdef RiccatiManager_woConstr < TestEnv
             end
             
             getLDD = @(i) LDDi;
-            hesse_L = obj.buildUpHesse(getLDD);
+            hesse_L = o.buildUpHesse(getLDD);
             
-            deltay = 10 * rand((obj.horizon+1) * 30 - 4,1);
+            deltay = 10 * rand((o.horizon+1) * 30 - 4,1);
             grad_L = hesse_L * deltay;
             
+            disp(' ');
+            
+            tic;
             %Perform reccati recursion
-            for i = obj.horizon+1:-1:1
-                if i == obj.horizon +1
-                    obj.doStep(i,LDDi, grad_L( (i-1) * 30 +1 : end ,1  ) );
+            for i = o.horizon+1:-1:1
+                if i == o.horizon +1
+                    o.doStep(i,LDDi, grad_L( (i-1) * 30 +1 : end ,1  ) );
                 else
-                    obj.doStep(i,LDDi, grad_L( (i-1) * 30 +1 : i * 30,1  ));
+                    o.doStep(i,LDDi, grad_L( (i-1) * 30 +1 : i * 30,1  ));
                 end
             end
             
-            for i = 1:obj.horizon +1
-                obj.solveStep(i);
+            for i = 1:o.horizon +1
+                o.solveStep(i);
             end
+            timeRiccati = toc;
+            disp(strcat('Time for Riccati with Horizon',{' '}, int2str(hori), ':'));
+            disp(num2str(timeRiccati));
             
-            obj.assertLessThan(norm(obj.delta - deltay), obj.tol);
+            tic;
+            hesse_L = o.buildUpHesse(getLDD);
+            delta_matlab = hesse_L \ grad_L;
+            timeMatlab = toc;
+            disp(strcat('Time for \ with Horizon',{' '}, int2str(hori), ': '));
+            disp(num2str(timeMatlab));
+            
+            o.assertLessThan(norm(delta_matlab - deltay), o.tol * 10);
+            o.assertLessThan(norm(o.delta - deltay), o.tol * 10);
         end
         
-        function hesse_L = buildUpHesse(obj, getLDD)
-            hesse_L = zeros(30 * obj.horizon +26);
-            for i = 1: obj.horizon
+        function hesse_L = buildUpHesse(o, getLDD)
+            % BUILDUPHESSE Builds up the big hesse matrix, should be used
+            % for testing only, as this is quite inefficient
+            hesse_L = zeros(30 * o.horizon +26);
+            for i = 1: o.horizon
                 hesse_L( (i-1) * 30 +1:(i-1) * 30 +13  , (i-1) * 30 + 13+1: (i-1) * 30 + 26 ) = -eye(13);
                 hesse_L( (i-1) * 30 + 13+1: (i-1) * 30 + 26 , (i-1) * 30 +1:(i-1) * 30 +13) = -eye(13);
                 hesse_L( (i-1) * 30 +13+1 : (i-1)*30 +13 + 30, (i-1)*30 +13 +1 : (i-1)*30 +13 + 30) = getLDD(i);
             end
             
-            i = obj.horizon +1 ;
+            i = o.horizon +1 ;
             LDDi = getLDD(i);
             hesse_L( (i-1) * 30 +1:(i-1) * 30 +13  , (i-1) * 30 + 13+1: (i-1) * 30 + 26 ) = -eye(13);
             hesse_L( (i-1) * 30 + 13+1: (i-1) * 30 + 26 , (i-1) * 30 +1:(i-1) * 30 +13) = -eye(13);

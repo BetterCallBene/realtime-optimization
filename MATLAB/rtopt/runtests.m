@@ -2,26 +2,29 @@
 %   Matlab besitzt sogenanntes unit test framework. Dies ist ein kleines
 %   Beispiel dazu
 %   Mehr Informationen gibt es unter: http://de.mathworks.com/help/matlab/matlab_prog/create-simple-test-suites.html
+
 import matlab.unittest.TestSuite
 
 global TEST;
 TEST = true;
 
+clc;
+
 
 %Create Suite from SolverTest Class
 %The fromClass method creates a suite from all Test methods in the SolverTest class.
 
-% suiteBasisQDyn = TestSuite.fromClass(?BasisQDyn);
-% resultDyn = run(suiteBasisQDyn);
-% 
+suiteBasisQDyn = TestSuite.fromClass(?BasisQDyn);
+resultDyn = run(suiteBasisQDyn);
+
 % suiteConstraints = TestSuite.fromClass(?Constraints);
 % resultConstraints = run(suiteConstraints);
-% 
-% suiteForwEuler = TestSuite.fromClass(?ForwEuler);
-% resultForwEuler = run(suiteForwEuler);
-% 
-% suiteCosts = TestSuite.fromClass(?Costs);
-% resultCosts = run(suiteCosts);
+
+suiteForwEuler = TestSuite.fromClass(?ForwEuler);
+resultForwEuler = run(suiteForwEuler);
+
+suiteCosts = TestSuite.fromClass(?Costs);
+resultCosts = run(suiteCosts);
 
 suiteRiccati = TestSuite.fromClass(?RiccatiManager_woConstr);
 resultRiccati = run(suiteRiccati);
