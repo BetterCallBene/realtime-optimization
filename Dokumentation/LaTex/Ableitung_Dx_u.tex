@@ -17,7 +17,7 @@
 \begin{document}
 
 \section{Motivation}
-Ziel: Berechnung der Matrizen \( Dx_{x_{i-1}} \) und \(  Dx_{u_{i-1}} \) ohne \(x\) zu kennen?
+Ziel: Berechnung der Matrizen \( Dx_{x_{i-1}} \) und \(  Dx_{u_{i-1}} \) ohne \(x\) zu kennen
 
 \section{Vorgehen}
 
@@ -26,7 +26,7 @@ Ziel: Berechnung der Matrizen \( Dx_{x_{i-1}} \) und \(  Dx_{u_{i-1}} \) ohne \(
 Gegeben sei die Differentialgleichung:
 \[ \dot{x}(t)=f(x(t), u(t)) \]
 
-Idee: Anstatt zuerst die Differentialgleichung zu lösen, leite diese nach \(x\) bzw. \(u\) ab und löse erst dann die Differentialgleichung: (Damit das nachfolgende Vorgehen überhaupt erlaubt, bzw. alle Ausdrücke wohldefiniert sind, muss \(x(t)\) in allen Variablen stetig differenzierbar sein, damit man den Satz von Schwarz anwenden kann.) \\
+Idee: Anstatt zuerst die Differentialgleichung zu lösen,  und dann die Lösung nach \(x\) bzw. \(u\) abzuleiten, leite zuerst die ODE nach \(x\) bzw. \(u\) ab und löse erst dann die Differentialgleichung: (Damit das nachfolgende Vorgehen überhaupt erlaubt, bzw. alle Ausdrücke wohldefiniert sind, muss \(x(t)\) in allen Variablen stetig differenzierbar sein, damit man den Satz von Schwarz anwenden kann.) \\
 Am Computer muss dieses Verfahren iterativ für jeden Zeitschritt angewendet werden. D.h. in jedem neuen Zeitschritt berechnet man \(M\) und \(N\) neu (also sozusagen \(M_{i-1}, N_{i-1}\)) \textcolor{red}{Warum \(i-1\)? Ist das jetzt zum Zeitpunkt \(i\) oder zu einem anderen?} \\
 \\
 Man benutzt also:
