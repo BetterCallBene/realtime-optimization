@@ -1,5 +1,5 @@
 classdef RiccatiManager_woConstr < TestEnv
-    % RICCATIMANAGER_WOCONSTR Implements the Riccati algorithm without the constraints
+    % RICCATIMANAGER_WOCONSTR Implements the Riccati algorithm without additional constraints
     
     
     properties(Access=private)
@@ -70,9 +70,9 @@ classdef RiccatiManager_woConstr < TestEnv
                 obj.nabla_s_star{i} = LD_i(13+1:2*13) + ...
                     obj.A{i}' * obj.P{i+1} * obj.nabla_lambda{i+1} + ...
                     obj.A{i}' * obj.nabla_s_star{i+1} - ...
-                    (obj.M{i} + obj.A{i}' * obj.P{i+1} * obj.B{i}) * ...  %dieser Multiplikator hat gefehlt, damit die Dimension stimmt
+                    (obj.M{i} + obj.A{i}' * obj.P{i+1} * obj.B{i}) * ... 
                     (( obj.R{i} +  obj.B{i}' * obj.P{i+1} *   obj.B{i}) ...
-                    \ ( obj.nabla_q{i} +  obj.B{i}' *   obj.P{i+1} *  obj.nabla_lambda{i+1} +  obj.B{i}' *  obj.nabla_s_star{i+1}));
+                    \ ( obj.nabla_q{i} + obj.B{i}' * obj.P{i+1} *  obj.nabla_lambda{i+1} + obj.B{i}' * obj.nabla_s_star{i+1}));
                 
             end
         end
@@ -109,7 +109,7 @@ classdef RiccatiManager_woConstr < TestEnv
     methods(Test)
         
         function testRiccati_ow(obj)
-            obj.horizon = 20;
+            obj.horizon = 0;
             %Initialize storage
             obj.A = cell(obj.horizon,1);
             obj.B = cell(obj.horizon,1);
@@ -128,6 +128,8 @@ classdef RiccatiManager_woConstr < TestEnv
             while (det(LDDi) == 0  || abs(det(LDDi)) > 1e2)
                 LDDi = 10 * eye(30) +  rand(30);
                 LDDi(18:end, 18:end) = zeros(13);
+                 %LDDi must be symmetric
+                LDDi = .5* (LDDi + LDDi');
             end
             
             hesse_L = zeros(30 * obj.horizon +26);
@@ -143,7 +145,7 @@ classdef RiccatiManager_woConstr < TestEnv
             hesse_L( (i-1) * 30 +13+1 : end, (i-1)*30 +13 +1 : end) = LDDi(1:13,1:13);
             
             
-            deltay = 10 * rand(626,1);
+            deltay = 10 * rand((obj.horizon+1) * 30 - 4,1);
             grad_L = - hesse_L * deltay;
             
             
