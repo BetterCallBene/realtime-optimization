@@ -5,9 +5,12 @@ function [t, y] = euler_integ(k, s, f, y0, t0)
 % Eingabewerte:
         % k: Anzahl der Schritte
         % s: Schrittgroesse
-        % f: rechte Seite der Differentialgleichung
+        % f: f(t,y), rechte Seite der Differentialgleichung
         % y0: Anfangswert
         % t0: Anfangszeit
+% Ausgabewerte:
+        % t = Vektor aller Zeitschritte
+        % y = Matrix der errechneten Funktionswerte zu jedem Zeitschritt        
 
 
 n = length(y0);
