@@ -15,6 +15,7 @@
 
 
 \begin{document}
+\subsection*{Jacobimatrix}
 Sei $x \in \mathbb{R}^{k \cdot 13}$, $u \in \mathbb{R}^{k \cdot 4}$, $f(x, u) \in \mathbb{R}^{k \cdot 13}$ und sei zu dem $f \in C^{\infty}$ Dann gibt es für die ODE $\dot x = f(x, u)$, weg der Lipschitzstetigkeit, nach Poincare eine eindeutige Lösung $\phi(x, u) \in \mathbb{R}^{k \cdot 13}$ mit 
 \begin{align*}
  	\dot \phi(x, u) = f(\phi(x, u), u)
@@ -49,4 +50,30 @@ mit $N^k = \frac{d}{du^k_i} \phi(x^k, u^k) \in \mathbb{R}^{13 \times 4}, i = 1..
 		   \cdot \underbrace{I^k}_{\in \mathbb{R}^{4 \times 4}}
 \end{align*}
 mit folgender Anfangsbedingung $N_0^k = 0 \in \mathbb{R}^{13 \times 4}$
+\subsection*{Hessematrix}
+
+\begin{align*}
+\frac{d}{dt^k} \frac{d}{dx^k_j} \frac{d}{dx^k_i} \phi(x^k, u^k) &= \frac{d}{dx^k_j} \left\{ \frac{d}{dx^k} \left[f(\phi(x^k, u^k), u^k) \right] \cdot \frac{d}{dx^k_i}\phi(x^k, u^k) \right\}\\
+&=\left\{\frac{d}{dx^k} \frac{d}{dx^k} \left[f(\phi(x^k, u^k), u^k) \right] \cdot \frac{d}{dx^k_i}\phi(x^k, u^k) + \frac{d}{du^k} \frac{d}{dx^k} \left[ f(\phi(x^k, u^k), u^k)  \right] \cdot \underbrace{\frac{du^k}{dx^k_i}}_{=0} \right\} \\
+&+ \frac{d}{dx^k} \left[f(\phi(x^k, u^k), u^k) \right] \cdot \frac{d}{dx^k_i} \frac{d}{dx^k_i}\phi(x^k, u^k)
+\end{align*}
+mit $M^k = \frac{d}{dx^k_i} \phi(x^k, u^k) \in \mathbb{R}^{13 \times 13}, i = 1..13$ und $O^k = \frac{d}{dx^k_i} \frac{d}{dx^k_j} \phi(x^k, u^k) \in \mathbb{R}^{13 \times 13 \times 13}, i = 1..13, j=1..13$  folgt die ODE 
+\begin{align*}
+\frac{d}{dt^k} O_k &=\frac{d}{dx^k} \frac{d}{dx^k} \left[f(\phi(x^k, u^k), u^k) \right] \cdot M_k + \frac{d}{dx^k} \left[f(\phi(x^k, u^k), u^k) \right] \cdot O_k
+\end{align*}
+mit folgender Anfangsbedingung $H_0^k = 0 \in \mathbb{R}^{13 \times 13 \times 13}$
+\begin{align*}
+\frac{d}{dt^k} \frac{d}{du^k_j} \frac{d}{dx^k_i} \phi(x^k, u^k) &= \frac{d}{du^k_j} \left\{ \frac{d}{dx^k} \left[f(\phi(x^k, u^k), u^k) \right] \cdot \frac{d}{dx^k_i}\phi(x^k, u^k) \right\}\\
+&= \left\{ \frac{d}{dx^k} \frac{d}{dx^k} \left[f(\phi(x^k, u^k), u^k) \right] \cdot \frac{d}{du^k_i}\phi(x^k, u^k) \right. \\
+& \left. + \frac{d}{du^k} \frac{d}{dx^k} \left[f(\phi(x^k, u^k), u^k) \right] \cdot \frac{du^k}{du_j^k} \right\} \cdot \frac{d}{dx^k_i}\phi(x^k, u^k) \\
+&+ \frac{d}{dx^k} \left[f(\phi(x^k, u^k), u^k)\right] \cdot \frac{d}{du^k_j} \frac{d}{dx^k_i}\phi(x^k, u^k) 
+\end{align*}
+mit $M^k = \frac{d}{dx^k_i} \phi(x^k, u^k) \in \mathbb{R}^{13 \times 13}, i = 1..13$, $N^k = \frac{d}{du^k_j} \phi(x^k, u^k) \in \mathbb{R}^{13 \times 4}, i = 1..13$ und $P^k = \frac{d}{du^k_j} \frac{d}{dx^k_i} \phi(x^k, u^k) \in \mathbb{R}^{13 \times 13 \times 4}, i = 1..13, j = 1..4$  folgt die ODE in der Matrixschreibweise
+\begin{align*}
+P^k = H_{x, u} \phi(x, u) = J_{u} {(M_k)^T} &= \left\{\nabla_u \left(\nabla_x \phi \cdot \nabla_x f(\phi, u)\right)\right\}^T \\
+&= \left\{ \nabla_x \phi \cdot \nabla_u \nabla_x f(\phi, u) + \nabla_{ux} \phi \cdot  \nabla_x f(\phi, u)  \right\}^T \\
+&= \left\{ J_u \nabla_x f(\phi, u) \cdot J_x \phi + \nabla_{ux} \phi \cdot  \nabla_x f(\phi, u)  \right\} \\
+&= \left\{ \left(J_x \nabla_x f(\phi, u) \cdot J_u \phi + J_u \nabla_x f(\phi, u) \right)   \cdot J_x \phi +   J_x f(\phi, u) \cdot J_u \nabla_x \phi  \right\} \\
+&= \left\{ \underbrace{\left(H_{x, x} f(\phi, u) \cdot N^k \phi + H_{u, x} f(\phi, u) \right)   \cdot M^k }_{\text{Hier ein Dimesionsproblem, Warum?}}+  J_x f(\phi, u) \cdot  P^k  \right\} 
+\end{align*}
 \end{document}
