@@ -1,5 +1,5 @@
-function [ res ] = fminrt( cConst, horizon,y,calcLD, calcLDD )
-% FMINRT Solves the optimization problem in the SQP-Riccati approach
+function [ res ] = fminrt_mock( cConst, horizon,y,calcLD, calcLDD )
+% FMINRT_MOCK Looks like, the fminrt, but is solving the problem with \.
 
 %Check types of arguments
 if ~isa(cConst,'Constraints')
@@ -24,25 +24,30 @@ for i = 1:n_timepoints
     %Initialize RiccatiManager
     ricM = RiccatiManager_woConstr(horizon, cDyn.robot);
     
-    %Perform Riccati Steps
-    for j = horizon+1:-1:1
-        ricM.doStep(j,calcLDD(j), calcLD(j));
-    end
+%     %Perform Riccati Steps
+%     for j = horizon+1:-1:1
+%         ricM.doStep(j,calcLDD(j), calcLD(j));
+%     end
+%     
+%     %Solve first Steps
+%     ricM.solveStep(1);
+%     
+%     %Give new controls to the engines
+%     % doSomething
+%     
+%     %Solve the remaining steps to obtain a new iterate
+%     for j = 2:horizon+1
+%         ricM.solveStep(j);
+%     end
+
+    hesse = ricM.buildUpHesse(calcLDD);
+    grad = ricM.buildUpGradient(calcLD);
     
-    %Solve first Steps
-    ricM.solveStep(1);
-    
-    %Give new controls to the engines
-    % doSomething
-    
-    %Solve the remaining steps to obtain a new iterate
-    for j = 2:horizon+1
-        ricM.solveStep(j);
-    end
+    delta = hesse \ grad ;
     
     %Perform Newton Step
-    y = y + ricM.delta;
-        
+    y = y + delta;
+    
     %Save result
     res(:,i) = y;
     

@@ -13,9 +13,8 @@ classdef RiccatiManager_woConstr < TestEnv
         nabla_s_star;
         nabla_lambda;
         nabla_q;
-        horizon ;
-        delta;
-        
+        horizon;
+                
         delta_lambda;
         delta_s;
         delta_q;
@@ -24,6 +23,10 @@ classdef RiccatiManager_woConstr < TestEnv
         n_state;
         n_contr;
         n_var;
+    end
+    
+    properties
+        delta;
     end
     
     methods
@@ -236,7 +239,7 @@ classdef RiccatiManager_woConstr < TestEnv
         function hesse_L = buildUpHesse(o, getLDD)
             % BUILDUPHESSE Builds up the big hesse matrix, should be used
             % for testing only, as this is quite inefficient
-            hesse_L = zeros(30 * o.horizon +26);
+            hesse_L = zeros(o.n_var * (o.horizon +1) - o.n_contr);
             for i = 1: o.horizon
                 hesse_L( (i-1) * 30 +1:(i-1) * 30 +13  , (i-1) * 30 + 13+1: (i-1) * 30 + 26 ) = -eye(13);
                 hesse_L( (i-1) * 30 + 13+1: (i-1) * 30 + 26 , (i-1) * 30 +1:(i-1) * 30 +13) = -eye(13);
@@ -248,6 +251,18 @@ classdef RiccatiManager_woConstr < TestEnv
             hesse_L( (i-1) * 30 +1:(i-1) * 30 +13  , (i-1) * 30 + 13+1: (i-1) * 30 + 26 ) = -eye(13);
             hesse_L( (i-1) * 30 + 13+1: (i-1) * 30 + 26 , (i-1) * 30 +1:(i-1) * 30 +13) = -eye(13);
             hesse_L( (i-1) * 30 +13+1 : end, (i-1)*30 +13 +1 : end) = LDDi(1:13,1:13);
+        end
+        
+        function grad_L = buildUpGradient(o, getLD)
+            % BUILDUPGRADIENT Builds the huge gradient, should be used for
+            % testing only.
+            grad_L = zeros(o.n_var * (o.horizon +1) - o.n_contr,1);
+            for i = 1:o.horizon
+                grad_L( (i-1) * o.n_var +1 : i * o.n_var) = getLD(i);
+            end
+            i = o.horizon +1;
+            LDi = getLD(i);
+            grad_L( (i-1 ) * o.horizon +1 : end) = LDi(1: o.n_state+o.n_lambda);
         end
     end
 end
