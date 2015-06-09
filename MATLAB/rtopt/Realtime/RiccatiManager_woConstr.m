@@ -30,7 +30,7 @@ classdef RiccatiManager_woConstr < TestEnv
     end
     
     methods
-        function ricM = RiccatiManager_woConstr(varargin)
+        function o = RiccatiManager_woConstr(varargin)
             % RICCATIMANAGER_WOCONSTR Takes as inpt the horizon length and
             % the used model. If not specified, the defauls are 20 and for
             % the model a instance of Quadrocopter.
@@ -55,25 +55,7 @@ classdef RiccatiManager_woConstr < TestEnv
             end
             
             %Initialize storage
-            o.n_lambda = o.robot.n_state;
-            o.n_state = o.robot.n_state;
-            o.n_contr = o.robot.n_contr;
-            o.n_var = o.n_lambda + o.n_state + o.n_contr;
-            
-            o.A = cell(o.horizon,1);
-            o.B = cell(o.horizon,1);
-            o.M = cell(o.horizon,1);
-            o.P = cell(o.horizon+1,1);
-            o.Q = cell(o.horizon+1,1);
-            o.R = cell(o.horizon,1);
-            o.nabla_s_star = cell(o.horizon+1, 1);
-            o.nabla_lambda = cell(o.horizon+1,1);
-            o.nabla_q = cell(o.horizon ,1);
-            o.delta = zeros( o.n_var * (o.horizon +1 ) - o.n_contr, 1);
-            
-            o.delta_lambda = cell(o.horizon +1, 1);
-            o.delta_s = cell(o.horizon +1, 1);
-            o.delta_q = cell(o.horizon, 1);
+            o.initialize();
         end
         
         function doStep(o,i,LDD_i, LD_i)
