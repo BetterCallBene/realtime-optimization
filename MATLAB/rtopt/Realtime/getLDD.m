@@ -1,9 +1,12 @@
-function [ H ] = getLDD( cCost, cConst, i )
-%GETLDD Summary of this function goes here
-%   Detailed explanation goes here
+function [ H ] = getLDD(y, cCost, cConst, i )
+%GETLDD 
+
+
 
 % Find out size of the matrix
 
+fDD = cCost.get_hess();
+conDD = cConst.get_hess();
 
 % Initialize H
 

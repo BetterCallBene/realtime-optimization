@@ -32,7 +32,7 @@ cFE = ForwEuler(cBQD);
 
 % Initialisierung der Nebenbedingungen
 %TODO: Klasse
-cC = Constraints(cFE);
+cConst = Constraints(cFE);
 
 % Initialisierung Kostenfunktion
 cCost = Costs(cBQD);
@@ -41,11 +41,12 @@ cCost = Costs(cBQD);
 horizon = 15;
 
 %Choose starting value 
-y_var = cQ.n_var + size(cC.get_eq_con(),1);
+y_var = cQ.n_var + size(cConst.get_eq_con(),1);
 y = zeros( y_var * horizon, 1);
 y(7:y_var: horizon*y_var) = 1; % Normalize Quaternions
 %%
 tic;
+
 %Use realtime solver
-v = fminrt(cCost, cC, horizon, y);
+v = fminrt(cCost, cConst, horizon, y);
 toc;

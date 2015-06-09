@@ -1,4 +1,4 @@
-function [ res ] = fminrt( cConst, horizon,y,calcLD, calcLDD )
+function [ res ] = fminrt(cCost, cConst, horizon,y)
 % FMINRT Solves the optimization problem in the SQP-Riccati approach
 
 %Check types of arguments
@@ -23,6 +23,8 @@ for i = 1:n_timepoints
     
     %Initialize RiccatiManager
     ricM = RiccatiManager_woConstr(horizon, cDyn.robot);
+    calcLDD = @(t) getLDD(y,cCost, cConst,t);
+    calcLD = @(t) getLD(y,cCost, cConst,t);
     
     %Perform Riccati Steps
     for j = horizon+1:-1:1
