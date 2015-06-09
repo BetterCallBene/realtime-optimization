@@ -95,6 +95,15 @@ classdef Costs < TestEnv
                 n_tp*(n_state+n_contr),n_tp*(n_state+n_contr))};
         end
         
+%         function cDD_val = get_costDD_approx(obj,t)
+%             %compute the approximated Hessian of the cost value
+%             [n_int, n_tp, n_state, n_contr] = getParams(obj);
+%             
+%             mesh        = obj.dyn.environment.mesh;
+%             
+%             
+%         end
+        
         function [n_int, n_tp, n_state, n_contr] = getParams(obj)
             n_int       = obj.dyn.environment.n_intervals;
             n_tp        = obj.dyn.environment.n_timepoints;
