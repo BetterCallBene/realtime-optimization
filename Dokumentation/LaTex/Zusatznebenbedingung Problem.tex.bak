@@ -1,0 +1,70 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[german]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+
+\setcounter{MaxMatrixCols}{20}
+
+
+\begin{document}
+
+
+  
+  \begin{align*}
+  L^{k}(y) = \sum_{i=k}^{N-1} f_{i}(s_{i},q_{i})
+  + \lambda_{k}^{T}(x_{k} - s_{k})
+  + \sum_{i=k}^{N-1} \lambda_{i+1}^{T} (h_i (s_i ,q_i ) - s_{i+1})
+  + \mu_{i+1}(p_i(s_i)-1)
+  \end{align*}
+  Betrachte das $\mu $als letzte Kompnente von $\lambda$. Dadurch verändert sich die Form des gewählten $y$ nicht und die Bedingung bleibt weiterhin.
+  \begin{align*}
+  \nabla_{y} L^{k}(y)  = 0
+  \end{align*}
+  und das exakt Newton-Raphson-Verfahren
+  \begin{align*}
+  y_{i+1} = y_i + \Delta y_i
+  \end{align*}
+  bei dem jedes $ \Delta y_i $ die Lösung des linearen Systems
+  \begin{align*} 
+  \nabla_{y} L^{k}(y_{i}) + \nabla_{y}^{2} L^{k}(y_{i}) \Delta y_{i} = 0
+  \end{align*}
+  ist.
+  
+  $\nabla_{y}^{2} L^{k}(y)$ hat dann folgende Form.\\
+  \begin{align*} 
+  \nabla_{y}^{2} L^{k}(y) =
+  \begin{pmatrix}
+    & -E  &     &     &     &     &     &     &     &     &  & & &  \\
+-E  & Q_k & M_k & A_k^{T} & C_k^T &    &     &     &     &   &  &  & &   \\
+    & M_k^{T} & R_k & B_k^{T} &   &    &    &    &    &   &  & & &  \\
+    & A_k & B_k &   &  & -E  &     &     &     &     &      & & &   \\
+    & C_k &  &     &     &     &   &   &  &  & & & &  \\
+    &  &  & -E  &  & Q_{k+1} & M_{k+1} & A_{k+1}^{T} & C_{k+1}^T &  & & & &  \\
+    &  &  &     &  & M_{k+1}^{T} & R_{k+1} & B_{k+1}^{T} &  &  & & & &  \\
+    &  &  &     &  & A_{k+1} & B_{k+1} &    &    &     &  &   & &    \\
+    &  &  &     &  & C_{k+1} &    & &  & \ddots &     &     &  &   \\
+    &  &  &   &  & & & & \ddots & Q_{N-1} & M_{N-1} & A_{N-1}^{T} & C_{N-1}^{T} &  \\
+    &  &  &   &  & & &    & & M_{N-1}^{T} & R_{N-1} & B_{N-1}^{T} & & \\
+    &  &  &   &  & & &    & & A_{N-1}     & B_{N-1} &  &  & -E \\
+    &  &  &   &  & & &    & & C_{N-1}     &     &    &  &      \\
+    &  &  &   &  & & &    & &             &     & -E & & Q_N
+\end{pmatrix}
+  \end{align*}
+  \\
+  Mit $ A_i := \dfrac{\partial h_i}{\partial s_i} $, 
+  $ B_i := \dfrac{\partial h_i}{\partial q_i} $,
+  $
+  \begin{pmatrix}
+  Q_i & M_i \\
+  M_i^{T} & R_i
+  \end{pmatrix} := \nabla_{s_i,q_i}^{2}L^{k} $ und 
+  $ Q_N := \nabla_{s_N}^{2}L^{k} $ .\\
+  $ C_i := \dfrac{\partial p_i}{\partial s_i} $
+  
+  
+
+\end{document}
