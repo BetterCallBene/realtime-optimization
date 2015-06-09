@@ -4,6 +4,7 @@ classdef Environment < handle
         mesh;            % time mesh (1xn) vector
         xbc;             % (mx2) matrix with boundary values for states
         g = 9.81;		% Gravitation
+        horizon;         % Horizon of the realtime approach
     end
     
     properties(Dependent)
@@ -77,6 +78,10 @@ classdef Environment < handle
             else
                 error('Input is no integer greater 1.');
             end
+        end
+        
+        function x_t = wind(obj,s_t, t)
+           x_t = s_t + rand(length(s_t), 1);
         end
         
     end

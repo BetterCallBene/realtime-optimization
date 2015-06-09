@@ -11,6 +11,7 @@ classdef(Abstract) GenConstraints < handle
         EqCon;
         EqConD; 
         EqConDD;
+        CountConstraints;
     end
     
     properties(Dependent)
@@ -42,21 +43,21 @@ classdef(Abstract) GenConstraints < handle
             %if obj.isEmptyF
                 [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int] = getParams(obj);
                 
-                CountConstraints = 1;
+                obj.CountConstraints = 1;
  %CountConstraints
-                res = zeros((n_int+ 1) * CountConstraints, 1);
+                res = zeros((n_int+ 1) * obj.CountConstraints, 1);
                 
                 for timestep = 1:n_int+1
                     t1 = [q(1, timestep) .^ 2 + q(2, timestep) .^ 2 + q(3, timestep) .^ 2 + q(4, timestep) .^ 2 - 1;];
 
-                    res(CountConstraints * (timestep-1)+1:CountConstraints * timestep) = t1;
+                    res(obj.CountConstraints * (timestep-1)+1:obj.CountConstraints * timestep) = t1;
                 end
         end
         
         function res = get.EqConD(obj)
             [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
             
-            CountConstraints = 1;
+            obj.CountConstraints = 1;
  %CountConstraints
             CountJacobi = 4;
  %CountJacobi
@@ -68,28 +69,28 @@ classdef(Abstract) GenConstraints < handle
             for timestep=1:(n_int+1)
                 t1 = [1 4 2 .* q(1, timestep); 1 5 2 .* q(2, timestep); 1 6 2 .* q(3, timestep); 1 7 2 .* q(4, timestep);];
 
-                srow(CountJacobi* (timestep-1)+1:CountJacobi * timestep)= uint16(t1(:, 1) + (timestep-1)*CountConstraints);
+                srow(CountJacobi* (timestep-1)+1:CountJacobi * timestep)= uint16(t1(:, 1) + (timestep-1)*obj.CountConstraints);
                 scol(CountJacobi* (timestep-1)+1:CountJacobi * timestep) = uint16(t1(:, 2) + (timestep-1)*(n_state+n_contr));
                 sval(CountJacobi* (timestep-1)+1:CountJacobi * timestep) = t1(:, 3);
             end
             
-            res = sparse(srow, scol, sval, CountConstraints * (n_int + 1), (n_int+1)*(n_state+n_contr));
+            res = sparse(srow, scol, sval, obj.CountConstraints * (n_int + 1), (n_int+1)*(n_state+n_contr));
         end
         
         function res = get.EqConDD(obj)
             [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
             
-            CountConstraints = 1;
- %CountConstraints
+            obj.CountConstraints = 1;
+ %obj.CountConstraints
             t1 = [1 4 4 2; 1 5 5 2; 1 6 6 2; 1 7 7 2;];
  %HesseMatrix
             
-            res = cell(uint16((n_int+1)*CountConstraints), 1);
+            res = cell(uint16((n_int+1)*obj.CountConstraints), 1);
             
             n_var = n_state+n_contr;
             ind = 1;
             for timestep=1:(n_int +1)
-                for ConstraintStep = 1:CountConstraints
+                for ConstraintStep = 1:obj.CountConstraints
                     
                     tmp = t1(uint16(t1(:, 1)) == ConstraintStep, :);
                     

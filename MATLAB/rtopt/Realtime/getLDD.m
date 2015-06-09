@@ -1,17 +1,19 @@
-function [ H ] = getLDD(y, cCost, cConst, i )
-%GETLDD 
-
+function [ H ] = getLDD(s_q,lambda,mu, cCost, cConst, t )
+% GETLDD 
 
 
 % Find out size of the matrix
 
-fDD = cCost.get_hess();
-conDD = cConst.get_hess();
-
 % Initialize H
 
 
-% Fill it up
+
+constrD = cConst.get_eq_conD_block_t(t);
+
+costD = cCost.get_eq.... ;
+    
+
+H = [costD , constrD' ; constrD , spzeros(cConstr.CountConstraints + cConstr.dyn.robot.n_state)];
 
 
 

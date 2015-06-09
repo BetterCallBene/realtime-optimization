@@ -35,6 +35,11 @@ classdef RiccatiManager <  TestEnv
     
     properties
         delta;
+        delta_lambda;
+        delta_s;
+        delta_q;
+        
+        delta_mu;
     end
     
        

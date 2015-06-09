@@ -18,12 +18,17 @@ if (length(y) / (cDyn.robot.n_var + n_lambda)) ~= horizon
     error('the starting point y has wrong length');
 end
 
+%TODO: aus dem y extrahieren
+s;q;lambda; mu;
 tic;
 for i = 1:n_timepoints
+    %TODO: Datentyp anpassen y ->  s_q, lambda_mu
+    cCost.vec = y;
+    cConst.vec = y;   
     
     %Initialize RiccatiManager
     ricM = RiccatiManager_woConstr(horizon, cDyn.robot);
-    calcLDD = @(t) getLDD(y,cCost, cConst,t);
+    calcLDD = @(t) getLDD(s,q,lambda,mu,cCost, cConst,t);
     calcLD = @(t) getLD(y,cCost, cConst,t);
     
     %Perform Riccati Steps
@@ -51,5 +56,6 @@ for i = 1:n_timepoints
     %Setup next iteration (for the estimation of the new horizon point we
     %duplicate the old horizon point)
     y = [y(cDyn.robot.n_var+n_lambda + 1 :end), y(end - (cDyn.robot.n_var + n_lambda)+1 , end)];
+    
 end
 toc;

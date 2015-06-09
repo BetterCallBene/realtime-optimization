@@ -47,6 +47,21 @@ classdef Constraints < GenConstraints & TestEnv
                           ];
         end
         
+        function eq_con = get_eq_con_at_t(obj,t)
+            % the equality constraint of the ocp
+            % combine the discretized ode with the boundary conditions
+            
+           
+            state_mat   = obj.dyn.state;
+            s_t = state_mat(:,t);
+            multShoot = obj.dode.h();            
+            
+            eq_con      = [obj.dyn.environment.wind(s_t, t) - state_mat(:,t);
+                           multShoot(t:t+obj.dyn.environment.horizon); 
+                           obj.EqCon(t:t+obj.dyn.environment.horizon) ...
+                          ];
+        end
+        
         function eq_conD = get_eq_conD(obj)
             % the Jacobian of the equality contraints of the ocp
             [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
@@ -63,6 +78,22 @@ classdef Constraints < GenConstraints & TestEnv
                                 obj.EqConD ...
                           ]';
 
+        end
+        
+        function eq_conD = get_eq_conD_block_t(obj,t)
+            % the Jacobian of the equality contraints of the ocp
+            [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
+
+            multShootD = obj.dode.hD();
+            addConstrD = obj.EqConD;
+            
+            eq_conD     = [
+                           multShootD( (t-1) * n_state +1  : t*n_state, (t-1)* (n_contr+ n_state) +1 : t  * (n_contr+ n_state));...
+                          addConstrD((t -1) * obj.CountConstraints +1 : t * obj.CountConstraints, (t-1)* (n_contr+ n_state) +1 : t  * (n_contr+ n_state))... 
+                          ];
+            %eq_conD = [ A,B ; C,D];
+                      
+                      
         end
         
         function eq_conDD = get_eq_conDD(varargin)

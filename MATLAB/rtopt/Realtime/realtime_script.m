@@ -13,7 +13,11 @@ xbc = [         ... Variablenname L�nge   Name
     0, 0, 0     ...
 ];    
 
+%Choose horizon
+horizon = 15;
+
 env = Environment();
+env.horizon = horizon;
 env.xbc = xbc;
 env.setUniformMesh(uint16(n_int));
 
@@ -37,8 +41,7 @@ cConst = Constraints(cFE);
 % Initialisierung Kostenfunktion
 cCost = Costs(cBQD);
 
-%Choose horizon
-horizon = 15;
+
 
 %Choose starting value 
 y_var = cQ.n_var + size(cConst.get_eq_con(),1);

@@ -15,10 +15,7 @@ classdef RiccatiManager_woConstr < TestEnv
         nabla_q;
         horizon;
                 
-        delta_lambda;
-        delta_s;
-        delta_q;
-        
+               
         n_lambda;
         n_state;
         n_contr;
@@ -27,6 +24,10 @@ classdef RiccatiManager_woConstr < TestEnv
     
     properties
         delta;
+        
+        delta_lambda;
+        delta_s;
+        delta_q;
     end
     
     methods
