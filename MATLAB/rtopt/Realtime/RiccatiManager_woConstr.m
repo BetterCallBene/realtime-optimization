@@ -103,7 +103,7 @@ classdef RiccatiManager_woConstr < TestEnv
                 o.delta(1: o.n_lambda + o.n_state) = [o.delta_lambda{i}; o.delta_s{i}];
                 
             else
-                var = (o.A{i-1} * o.delta_s{i-1} + o.B{i-1}* o.delta_q{i-1});
+                var = (o.A{i-1} * o.delta_s{i-1} + o.B{i-1} * o.delta_q{i-1});
                 
                 % solve delta lambda
                 o.delta_lambda{i} = -o.P{i}* o.nabla_lambda{i} - o.nabla_s_star{i} + o.P{i} * var ;
