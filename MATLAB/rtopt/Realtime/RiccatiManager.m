@@ -18,6 +18,11 @@ classdef RiccatiManager <  TestEnv
         
         nabla_mu;
         
+        z3;
+        z4;
+        z5;
+        
+        
         delta_lambda;
         delta_s;
         delta_q;
@@ -29,11 +34,10 @@ classdef RiccatiManager <  TestEnv
         n_state;
         n_contr;
         n_mu; % Das ist eine Cell, da n_mu die aktiven Constraints in jedem Zeitschritt unterschiedlich sind.
-        n_var;
+        n_var; % Das ist eine Cell, da n_mu die aktiven Constraints in jedem Zeitschritt unterschiedlich sind.
     end
     
     properties
-        delta;
         delta_lambda;
         delta_s;
         delta_q;
@@ -107,32 +111,59 @@ classdef RiccatiManager <  TestEnv
                     o.D{i} = LDD_i(o.n_state + o.n_contr + 1 : o.n_state + o.n_contr + n_mu_i ,  o.n_state +1 : o.n_state + o.n_contr);
                     o.nabla_mu{i} = LD_i( o.n_lambda + o.n_state + o.n_contr +1 : o.n_lambda + o.n_state + o.n_contr + n_mu_i);
                     
-                    z4 = [o.M{i}'  + o.B{i}' * o.P{i+1} * o.A{i}; zeros(n_mu_i, o.n_state)];
-                    z3 = [ o.R{i} +  o.B{i}' * o.P{i+1} *   o.B{i}, o.D{i}' ;...
+                    o.z4{i} = [o.M{i}'  + o.B{i}' * o.P{i+1} * o.A{i}; zeros(n_mu_i, o.n_state)];
+                    o.z3{i} = [ o.R{i} +  o.B{i}' * o.P{i+1} *   o.B{i}, o.D{i}' ;...
                         o.D{i} , zeros(n_mu_i)];
                     z2 = [o.M{i} + o.A{i}' * o.P{i+1} * o.B{i}, zeros(o.n_state, n_mu_i)];
                     z1 =  o.Q{i} + (o.A{i}' * o.P{i+1} * o.A{i});
                     
-                    o.P{i} = z1 - z2 * (z3 \ z4);
+                    o.P{i} = z1 - z2 * (o.z3{i} \ o.z4{i});
                     
-                    z5 = [ o.nabla_q{i} + o.B{i}' * ( o.P{i+1} * o.nabla_lambda{i+1} + o.nabla_s_star{i+1}) ; ...
+                    o.z5{i} = [ o.nabla_q{i} + o.B{i}' * ( o.P{i+1} * o.nabla_lambda{i+1} + o.nabla_s_star{i+1}) ; ...
                         o.nabla_mu{i}];
                     
                     z6 = LD_i(o.n_lambda +1 : o.n_lambda + o.n_state) + ...
                         o.A{i}' * (o.P{i+1} * o.nabla_lambda{i+1} + o.nabla_s_star{i+1});
                     
-                    o.nabla_s_star{i} = z6 - z2 * (z3 \ z5);
+                    o.nabla_s_star{i} = z6 - z2 * (o.z3{i} \ o.z5{i});
                     
                 end
             end
         end
         
         function solveStep(o,i)
-            %TODO: implement
+            %TODO: debug
+            if ( i ==1 )
+                o.delta_lambda{i} = -o.P{i}* o.nabla_lambda{i} - o.nabla_s_star{i};
+                o.delta_s{i} = -o.nabla_lambda{i};
+            else
+                z1 = (o.A{i-1} * o.delta_s{i-1} + o.B{i-1} * o.delta_q{i-1});
+                
+                % solve delta lambda
+                o.delta_lambda{i} = -o.P{i}* o.nabla_lambda{i} - o.nabla_s_star{i} + o.P{i} * z1 ;
+                % solve delta s
+                o.delta_s{i} = - o.nabla_lambda{i}  + z1;
+            end
+            
+            %solve for delta_q and delta_mu
+            if( i ~= horizon +1)
+                if ( o.n_mu{i} == 0)
+                    o.delta_q{i} = (o.R{i} + o.B{i}' * o.P{i+1} * o.B{i}) \ ...
+                        ( ...
+                        o.nabla_q{i} + ...
+                        o.B{i}' * o.P{i+1} * o.nabla_lambda{i+1} + ...
+                        o.B{i}' * o.nabla_s_star{i+1} - ...
+                        ( o.M{i}' + o.B{i}' * o.P{i+1} * o.A{i} ) * o.delta_s{i} );
+                    
+                else
+                    z6 = o.z3{i} \ (o.z5{i} - (o.z4{i} * o.delta_s{i}));
+                    
+                    o.delta_q{i} = z6(1:o.n_contr);
+                    o.delta_mu{i} = z6(o.n_contr +1 : o.n_contr + o.n_mu{i});
+                    
+                end
+            end
         end
-        
-        
-        
     end
     
     methods(Test)
@@ -148,7 +179,8 @@ classdef RiccatiManager <  TestEnv
             o.n_lambda = o.robot.n_state;
             o.n_state = o.robot.n_state;
             o.n_contr = o.robot.n_contr;
-            
+            o.n_mu = cell(o.horizon+1,1);
+            o.n_var = cell(o.horizon+1,1);
             
             o.A = cell(o.horizon,1);
             o.B = cell(o.horizon,1);
@@ -158,6 +190,10 @@ classdef RiccatiManager <  TestEnv
             o.R = cell(o.horizon,1);
             o.C = cell(o.horizon,1);
             o.D = cell(o.horizon,1);
+            
+            o.z3 = cell(o.horizon,1);
+            o.z4 = cell(o.horizon,1);
+            o.z5 = cell(o.horizon,1);
             
             o.nabla_s_star = cell(o.horizon+1, 1);
             o.nabla_lambda = cell(o.horizon+1,1);
