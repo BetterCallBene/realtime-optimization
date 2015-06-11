@@ -1,0 +1,133 @@
+\documentclass[12pt, a4paper]{scrartcl}
+\usepackage{fullpage}
+\usepackage[latin1]{inputenc} %Zeichensatzkodierung (auch Sonderzeichen -> ä,ö,ü)
+\usepackage[english, ngerman]{babel} %Sprache -> Silbentrennung, automatisch generierte Texte auf deutsch; ngerman -> NEUE deutsche Rechtschreibung
+\usepackage[T1]{fontenc} %Sonderzeichen allg
+\usepackage{lmodern} %PDF-optimierte Schrift
+
+\usepackage{amsmath, amssymb, amsbsy, amsthm} %Mathepakete ; amsthm: Theorem-Umgebung; muss nach amsmath eingebunden werden
+
+\usepackage{xcolor} %bunte Schrift 
+
+\setlength{\parindent}{0pt}
+
+\newcommand{\R}{\mathbb{R}}
+
+
+\begin{document}
+
+\section{Motivation}
+Ziel: Ableitung der Nebenbedingung \( x_i-s_i = 0 \) welche aus dem multiple shooting Verfahren kommt. \\
+Das Problem lässt sich reformulieren zu:  Berechnung der Matrizen \( Dx_{x_{i-1}} \) und \(  Dx_{u_{i-1}} \) ohne \(x\) zu kennen.
+
+\section{Gegebenheiten}
+
+Gegeben ist die Differentialgleichung \textcolor{red}{Randwertproblem?}
+\[ \dot x = f(x,u) \qquad \textcolor{red}{x(0) = x_0,\quad x(t_N) = x_N}\]
+welche die Dynamik des Quadkopters beschreibt. Sie wird numerisch mit dem multiple shooting Verfahren gelöst. \\
+Das multiple shooting Verfahren löst \(N\) Anfangswertprobleme auf den \(N\) Intervallen \( [t_{i-1},t_{i}], \quad i \in {1,...,N} \).
+Dabei wird der Anfangswert eines jeden Intervalls jedoch nicht fest vorgegeben, sondern als eine Variable behandelt. Der (unbekannte) Anfangswert für die Differentialgleichung des Intervalls \([t_{i-1},t_i]\) ist \(x(t_{i-1}) = x_{i-1}\). Da die Lösung \(x\) der Differentialgleichung auch von der Steuerung \(u\) in dem jeweiligen Intervall abhängig ist, kann man die Lösung jedes Anfangswertproblems als eine Funktion \(x=x(t,x_{i-1},u_{i-1})\) angeben. Hierbei ist also \( x_{i-1}\) der Anfangswert als Parameter, außerdem gehen wir davon aus, dass die Steuerung im Intervall \([t_{i-1},t_i]\) konstant gleich \(u(t_{i-1})=u_{i-1}\) ist.\\
+Damit \(x\) eine stetige Funktion ist, soll der Anfangswert eines jeden Intervalls mit dem dem Endwert des vorigen Intervalls übereinstimmen. Dies wird als Nebenbedingung folgendermaßen in das bereits bestehenden Optimierungsproblem eingefügt:
+\begin{align}
+	x(t_{x_i},x_{i-1},u_{i-1}) - x_{i} = 0
+	\label{equ_multiple_shooting_Nebenbedingung}
+\end{align}
+Man kann dabei die senkrechte "`Bewegung"' des aus dem multiple shooting stammenden Endpunktes als Funktion in Abhängigkeit von \(x_{i-1}\) und \(u_{i-1}\) ansehen. \\
+\\
+Da wir mit dem SQP-Verfahren arbeiten, brauchen wir als Nebenbedingung nicht nur die oben angegebene Nebenbedingung (\ref{equ_multiple_shooting_Nebenbedingung}), sondern auch deren Ableitung (Jakobimatrix). (Für die Zielfunktion des SQP-Verfahrens ist dann auch noch die Hessematrix von (\ref{equ_multiple_shooting_Nebenbedingung}).)
+
+\section{Jakobimatrix der Nebenbedingung}
+
+\textcolor{red}{Formeln siehe unten und in Datei "`Sensitivitätsgleichungen"'}
+
+\section{Hessematrix der Nebenbedingung}
+
+
+\section{Vorgehen}
+
+\textcolor{red}{Bedingungen prüfen, erfüllen unsere Gleichungen das? Erfüllen sie es auch mit numerischen Lösungen?} \\
+
+Gegeben sei die Differentialgleichung:
+\[ \dot{x}(t)=f(x(t), u(t)) \]
+
+Idee: Anstatt zuerst die Differentialgleichung zu lösen,  und dann die Lösung nach \(x\) bzw. \(u\) abzuleiten, leite zuerst die ODE nach \(x\) bzw. \(u\) ab und löse erst dann die Differentialgleichung: (Damit das nachfolgende Vorgehen überhaupt erlaubt, bzw. alle Ausdrücke wohldefiniert sind, muss \(x(t)\) in allen Variablen stetig differenzierbar sein, damit man den Satz von Schwarz anwenden kann.) \\
+Am Computer muss dieses Verfahren iterativ für jeden Zeitschritt angewendet werden. D.h. in jedem neuen Zeitschritt berechnet man \(M\) und \(N\) neu (also sozusagen \(M_{i-1}, N_{i-1}\)) \textcolor{red}{Warum \(i-1\)? Ist das jetzt zum Zeitpunkt \(i\) oder zu einem anderen?} \\
+\\
+Man benutzt also:
+
+\begin{align*}
+	\frac{\partial }{\partial x_{i-1}} \left( \frac{\textup{d} }{\textup{d} t} x \right) & = \frac{\partial }{\partial x_{i-1}} \left( f(x, u) \right)  \\
+	\vspace{1em} \\
+	\Leftrightarrow \qquad \frac{\textup{d} }{\textup{d} t} \underbrace{\left( \frac{\partial x}{\partial x_{i-1}} \right)}_{=:M_{i-1}} & = \frac{\partial }{\partial x} f(x, u) \cdot \underbrace{\frac{\partial x}{\partial x_{i-1}}}_{=:M_{i-1}} \\	
+\end{align*}
+
+Und:
+
+\begin{align*}
+	\frac{\partial }{\partial u_{i-1}} \left( \frac{\textup{d} }{\textup{d} t} x \right) & = \frac{\partial }{\partial u_{i-1}} \left( f(x, u) \right)  \\
+	\vspace{1em} \\
+	\frac{\textup{d} }{\textup{d} t} \underbrace{\left( \frac{\partial x}{\partial u_{i-1}} \right)}_{=:N_{i-1}} & = \frac{\partial }{\partial u} f(x, u) \cdot \underbrace{\frac{\partial x}{\partial u_{i-1}}}_{=:N_{i-1}} \\	
+\end{align*}
+
+\textcolor{red}{Welche Dimension haben M und N??? Wo sind die anderen Partiellen Ableitungen (\(\frac{\partial u}{\partial x/u_{i-1}}\))?} \\
+
+Es kann nun also folgendes System gelöst werden, um die Ableitung nach \(x_{i-1}\) bzw. \(u_{i-1}\) zu berechnen:
+
+\[ \frac{\textup{d}}{\textup{d} t} \begin{bmatrix} x \\ M_{i-1} \\ N_{i-1} \end{bmatrix}  = \begin{bmatrix} f(x,u) & f_{x}(x,u) & f_{u}(x,u) \end{bmatrix} \cdot \begin{bmatrix} 1 \\M_{i-1} \\ N_{i-1} \end{bmatrix}\]
+
+\textcolor{red}{Achtung auf Multiplikation!!! Dimensionen passen? Matrizen? Vektoren?} \\
+Diese Differentialgleichung kann nun numerisch gelöst werden.
+%\textcolor{red}{Ist das ein Randwertproblem? nur mit zb. Euler oder braucht man multiple shooting? Anfangsbedingungen unten?}
+
+Setzt man den Zeitpunkt \(t_{i-1}\) ein, so erhält man für \(M_{i-1}\) und \(N_{i-1}\) die Anfangsbedingungen der ODE:
+\[ M(t_{i-1})= \frac{\partial x(t_{i-1})}{\partial x_{i-1}} = \mathbb{I}\]
+\[ N(t_{i-1})= \frac{\partial x(t_{i-1})}{\partial u_{i-1}} = 0 \]
+
+%\textcolor{red}{Zusammenhang mit multiple shooting Constraint \(x(t_{i})-s_{i}=0\) mit \(s_{i}\) geschätzter Anfangswert im neuen Intervall? }
+
+\section{Voraussetzungen...}
+
+\subsection{...für das SQP-Verfahren}
+
+\begin{itemize}
+	\item am besten Hauptsächlich Gleichungsnebenbedingungen
+	\item Zielfunktion und Nebenbedingungen zweimal stetig differenzierbar
+\end{itemize}
+
+\section{Einzelne Lösungsschritte}
+
+\begin{enumerate}
+	\item SQP-Verfahren
+	\begin{enumerate}
+		\item normales Optimierungsverfahren \(\rightarrow\) Dynamik muss schon aufgelöst sein
+		\item innerhalb noch mal explizites Lösungsverfahren (zB Newton, Newton-Rhapson?)
+		\item Approximation der Hessematrix \(\nabla^2_{xx}L(x^k,\mu^k)\) möglich \textcolor{red}{(Machen wir nicht?)}
+		\item hauptsächlich für Gleichungsnebenbedingungen, aber auch für Ungleichungsnebenbedingungen möglich
+		\item Globalisierung mit Penalty-Funktion möglich
+		\item Schwierigkeiten: mögliche Unzulässigkeit der Teilprobleme (nur bein Ungleichungsnebenbedingungen?)
+	\end{enumerate}
+	\item Lösung der Dynamik
+	\begin{enumerate}
+		\item 
+	\end{enumerate}
+\end{enumerate}
+
+\subsection{Genauere Berachtung der Hessematrix der Lagrangefunktion}
+
+\textbf{Lagrangefunktion}
+
+\[ L: \R^n \times (\R^m) \times \R^p, \quad L(x,\lambda,\mu)= f(x)+(\lambda^{T}g(x))+\mu^{T}h(x)\]
+\(f(x)\): Zielfunktion \\
+\(h(x)\): Gleichungsnebenbedingungen
+
+\textcolor{red}{Achtung: Optimierung bei uns nach zwei Variablen \(x\) und \(u\), diese stecken hier beide in \(x\)!} \\
+
+\textbf{Hessematrix für SQP-Verfahren}
+
+\[ H_{k}=\nabla^2_{xx}L(x^k,\mu^k)=\nabla^2_{xx}f(x^k)+(\mu^k)^T\nabla^2_{xx}h(x^k) \]
+
+Hier wird die Hessematrix der Nebenbedingungen gebraucht \(\rightarrow\) auch die Nebenbedingungen aus Multiple shooting
+
+ 
+
+\end{document}
