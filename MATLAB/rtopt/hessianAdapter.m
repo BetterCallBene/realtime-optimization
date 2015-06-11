@@ -10,12 +10,19 @@ objectConstr.vec = v;
 
 % get Hessian for subfunctions
 fDD     = objectCost.get_hess();
-conDD   = objectConstr.get_hess();
+eqConDD   = objectConstr.get_eqhess();
+inEqConDD = objectConstr.get_ineqhess();
 
 % initialization and computation with langrage multipliers lambda
-n = size(conDD,1);
+n = size(eqConDD,1);
+m = size(inEqConDD, 1);
+
 h = fDD{1};
 
 for i=1:n
-    h = h + lambda.eqnonlin(i)*conDD{i} ;
+    h = h + lambda.eqnonlin(i)*eqConDD{i} ;
+end
+
+for i=1:m
+    h = h + lambda.ineqnonlin(i)*inEqConDD{i};
 end

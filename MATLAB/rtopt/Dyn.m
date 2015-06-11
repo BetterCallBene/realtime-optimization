@@ -1,11 +1,14 @@
 classdef(Abstract) Dyn < handle  & TestEnv
     % Dyn Diese Klasse repräsentiert die Dynamik
     
-    
-    
     properties(SetAccess = public, GetAccess= public)
         environment; % in this object all outside parameters are stored, like gravity, wind, time mesh,...
         robot; % handle for a classRobot element providing the mass matrix and the coriolis terms
+        solver; % handle of a Solver
+    end
+    
+    properties
+        resetSolverFlag;
     end
     
     properties(Abstract)
@@ -66,27 +69,11 @@ classdef(Abstract) Dyn < handle  & TestEnv
     end
     
     methods
-        
-        %Overwrite function in TestEnv, because we don't want normed
-        %quaternios here.
-        function func_p = plusEpsShift(obj,i,t,vec_old,func)
-            vec_p = vec_old;
-            vec_p((t-1)* obj.robot.n_var + i) = vec_p((t-1)* obj.robot.n_var + i) + obj.eps;
-            obj.backdoor_vec = vec_p;
-            func_p = func();
-            obj.vec = vec_old;
+        function DY = Dyn()
         end
-        
-        %Overwrite function in TestEnv, because we don't want normed
-        %quaternios here.
-        function func_n = minusEpsShift(obj,i,t,vec_old,func)
-            vec_n = vec_old;
-            vec_n((t-1)* obj.robot.n_var + i) = vec_n((t-1)* obj.robot.n_var + i) - obj.eps;
-            obj.backdoor_vec = vec_n;
-            func_n = func();
-            obj.vec = vec_old;
-        end
-        
+    end
+    
+    methods
         function setupTest(obj,n_intervals)
             % Quadrocopter soll 5 Meter hoch fliegen
             xbc = [         ... Variablenname L�nge   Name
