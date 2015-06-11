@@ -11,7 +11,7 @@ classdef Constraints < GenConstraints & TestEnv
                     error('wrong number of inputs');
                 end
             elseif (nargin == 1)
-                if (isa(varargin{1},'ForwEuler'))
+                if (isa(varargin{1},'MultiShooting'))
                     dode = varargin{1};
                 else
                     error('wrong class type for discretized ode');
@@ -20,64 +20,59 @@ classdef Constraints < GenConstraints & TestEnv
                 error('wrong number of inputs');     
             end
             cC@GenConstraints(dode);
-        end
+        end %Check
         
         % other functions
         function [ineq_con,eq_con,ineq_conD,eq_conD] = constr(obj)
             % provide the equality and inequality constraints (along
             % with their jacobians by calling get_eq_con and 
             % get_eq_conD
-            ineq_con    = obj.get_ineq_con();
-            eq_con      = obj.get_eq_con();
-            ineq_conD   = obj.get_ineq_conD();
-            eq_conD     = obj.get_eq_conD();
-        end
+            ineq_con                = obj.get_ineq_con();
+            [eq_con, eq_conD]       = obj.get_eq_con();
+            ineq_conD               = obj.get_ineq_conD();
+        end %Check
         
         
         function ineq_con = get_ineq_con(obj)
             ineq_con = obj.InEqCon;
-        end
+        end %Check
         
         function ineq_conD = get_ineq_conD(obj)
             ineq_conD = obj.InEqConD';
-        end
+        end %Check
         
         function ineq_conDD = get_ineq_conDD(obj)
             ineq_conDD = obj.InEqConDD;
         end
         
         %BB: Nebenbedingung: (Norm(q))^2 = 1 hinzugef�gt
-        function eq_con = get_eq_con(obj)
+        function [eq_con, eq_conD] = get_eq_con(obj) 
             % the equality constraint of the ocp
             % combine the discretized ode with the boundary conditions
+            
+            [r, q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr, n_var] = getParams(obj);
             
             xbc         = obj.dyn.environment.xbc;
             state_mat   = obj.dyn.state;
             
-            eq_con      = [obj.dode.h(); 
+            srow        = 1:2*n_state;
+            scol        = [1:n_state,...
+                n_int*(n_var)+1:n_int*(n_var)+n_state];
+            sval        = ones(1,2*n_state);
+            
+            [H, HD] = obj.dode.h();
+            
+            eq_con      = [H; 
                                 state_mat(:,1) - xbc(:,1); ...
                                 state_mat(:,end) - xbc(:,end); ...
                                 obj.EqCon ...
                           ];
-        end
-        
-        function eq_conD = get_eq_conD(obj)
-            % the Jacobian of the equality contraints of the ocp
-            [r, q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
-
-            %q           = state_mat(4:7, :);
-            
-            srow        = 1:2*n_state;
-            scol        = [1:n_state,...
-                n_int*(n_state+n_contr)+1:n_int*(n_state+n_contr)+n_state];
-            sval        = ones(1,2*n_state);
-
-            eq_conD     = [obj.dode.hD(); sparse(srow,scol,sval,...
-                                2*n_state,(n_int+1)*(n_state+n_contr)); ...
+            eq_conD     = [HD; sparse(srow,scol,sval,...
+                                2*n_state,(n_int+1)*(n_var)); ...
                                 obj.EqConD ...
-                          ]';
-
-        end
+                          ]';          
+            
+        end %Check
         
         function eq_conDD = get_eq_conDD(varargin)
             % the Hessian of the equality constraints of the ocp.
@@ -111,28 +106,20 @@ classdef Constraints < GenConstraints & TestEnv
             else 
                 error('Error: Not yet implemented');
             end
-        end        
+        end    %Check    
         
         % general type get functions -> interace for testing
-        function f = get_eqfunc(obj)
+        function [f, J] = get_eq(obj)
             % interfacing get_eq_con
-            f = get_eq_con(obj);
-        end
+            [f, J] = get_eq_con(obj);
+        end %Check
         
         % general type get functions -> interace for testing
-        function f = get_ineqfunc(obj)
+        function [f, J] = get_ineq(obj)
             % interfacing get_eq_con
             f = get_ineq_con(obj);
-        end
-        
-        function g = get_eqjac(obj)
             % interfacing get_eq_conD
-            g = get_eq_conD(obj);
-        end
-        
-        function g = get_ineqjac(obj)
-            % interfacing get_eq_conD
-            g = get_ineq_conD(obj);
+            J = get_ineq_conD(obj);
         end
         
         function H = get_eqhess(varargin)
@@ -156,30 +143,25 @@ classdef Constraints < GenConstraints & TestEnv
         end
     end
     
+    methods
+        function [J] =  helper_get_eqD(obj)
+            [f, J] = get_eq_con(obj);
+        end
+    end
+    
     methods(Test)
-        function test_get_eq_con(obj)
-            n_intervals = uint16(10);
-            obj.setupTest(n_intervals);
-            val0 = obj.get_eqfunc();
-        end
-        
-        function test_get_ineq_con(obj)
-            n_intervals = uint16(10);
-            obj.setupTest(n_intervals);
-            val0 = obj.get_ineqfunc();
-        end
         
         function test_get_eqjac(obj)
             %TEST_GET_EQJAC This method derives numerically get_eqfunc and compares it
             %with get_eqjac
             
-            n_intervals = uint16(10);
+            n_intervals = uint16(2);
             obj.setupTest(n_intervals);
             
-            func = @() obj.get_eqfunc;
+            func = @() obj.get_eq;
             numDiff = obj.numDiff_nD_AllT(func);
-            anaDiff = obj.get_eqjac()';
-            
+            [F, anaDiff] = obj.get_eq();
+            anaDiff = anaDiff';
             obj.assertSize(anaDiff, size(numDiff) );
             %obj.assertSize(anaDiff, [(n_intervals * 13 + 2*13 + n_intervals +1), (n_intervals+1)* 17 ]);
             obj.assertLessThan(max(abs(anaDiff - numDiff)), obj.tol);
@@ -190,12 +172,14 @@ classdef Constraints < GenConstraints & TestEnv
             %TEST_GET_INEQJAC This method derives numerically get_ineqfunc and compares it
             %with get_ineqjac
             
-            n_intervals = uint16(10);
+            n_intervals = uint16(2);
             obj.setupTest(n_intervals);
             
-            func = @() obj.get_ineqfunc;
+            func = @() obj.get_ineq;
             numDiff = obj.numDiff_nD_AllT(func);
-            anaDiff = obj.get_ineqjac()';
+            [f, anaDiff] = obj.get_ineq();
+            
+            anaDiff  = anaDiff';
             
             obj.assertSize(anaDiff, size(numDiff) );
             %obj.assertSize(anaDiff, [(n_intervals * 13 + 2*13 + n_intervals +1), (n_intervals+1)* 17 ]);
@@ -207,10 +191,10 @@ classdef Constraints < GenConstraints & TestEnv
         function test_get_eqhess(obj)
             % TEST_GET_EQHESS This method derives numerically get_eqjac and
             % compares it with get_eqhess
-            n_intervals = uint16(10);
+            n_intervals = uint16(2);
             obj.setupTest(n_intervals);
             
-            func = @() obj.get_eqjac()'; %TODO: passt das?
+            func = @() obj.helper_get_eqD()'; %TODO: passt das?
             anaDiff = obj.get_eqhess();
             numDiff = obj.numDiff_nxnD_AllT(func);
             
@@ -228,7 +212,7 @@ classdef Constraints < GenConstraints & TestEnv
             n_intervals = uint16(10);
             obj.setupTest(n_intervals);
             
-            func = @() obj.get_ineqjac()'; %TODO: passt das?
+            func = @() obj.get_ineq_conD()'; %TODO: passt das?
             anaDiff = obj.get_ineqhess();
             numDiff = obj.numDiff_nxnD_AllT(func);
             
@@ -243,6 +227,7 @@ classdef Constraints < GenConstraints & TestEnv
     
     methods
         function setupTest(obj, n_intervals)
+            
             n_int_ = n_intervals;
             % Quadrocopter soll 5 Meter hoch fliegen
             xbc = [         ... Variablenname L�nge   Name
@@ -263,43 +248,27 @@ classdef Constraints < GenConstraints & TestEnv
             env.setUniformMesh(n_int_);
             
             robot = Quadrocopter();
-            n_state_ = robot.n_state;
-            n_contr_ = robot.n_contr;
             
-            n_var = n_state_ + n_contr_;
+            FE = ForwEuler();
             
-            dyn_ = BasisQDyn(robot, env);
-            dyn_.vec = rand(n_var * (n_int_ + 1), 1);
+            dyn_ = BasisQDyn(robot, env, FE);
+            dyn_.vec = rand(17 * (n_int_ + 1), 1);
             
-            obj.dode = ForwEuler(dyn_);
+            obj.dode = MultiShooting(dyn_);
             obj.dyn = obj.dode.dyn;
             
         end
         
         
-        function [vec_old, n,m,n_timepoints] = setup(obj,func)
+        function [vec_old, n,m, n_timepoints, dyn] = setup(obj,func)
             vec_old = obj.dyn.vec;
             n_timepoints = obj.dyn.environment.n_timepoints;
+            dyn = obj.dyn;
             n = obj.dyn.robot.n_var;
             m = size(func());
             m=m(1);
         end
         
-        function func_p = plusEpsShift(obj, i ,t ,vec_old,func)
-            vec_p = vec_old;
-            vec_p((t-1) * obj.dyn.robot.n_var + i ) = vec_p((t-1) * obj.dyn.robot.n_var + i) + obj.eps;
-            obj.dyn.backdoor_vec = vec_p;
-            func_p = func();
-            obj.dyn.vec = vec_old;
-        end
-        
-        function func_n = minusEpsShift(obj, i ,t ,vec_old,func)
-            vec_n = vec_old;
-            vec_n((t-1) * obj.dyn.robot.n_var + i ) = vec_n((t-1) * obj.dyn.robot.n_var + i) - obj.eps;
-            obj.dyn.backdoor_vec = vec_n;
-            func_n = func();
-            obj.dyn.vec = vec_old;
-        end
     end
     
     

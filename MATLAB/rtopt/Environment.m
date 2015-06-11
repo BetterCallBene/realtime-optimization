@@ -4,10 +4,11 @@ classdef Environment < handle
         mesh;            % time mesh (1xn) vector
         xbc;             % (mx2) matrix with boundary values for states
         g = 9.81;		% Gravitation
+        
+        n_intervals;     % number of intervals in mesh
     end
     
     properties(Dependent)
-        n_intervals;     % number of intervals in mesh
         n_timepoints;    % number of discretization points in mesh
     end
     
@@ -57,11 +58,13 @@ classdef Environment < handle
             
             xbc = obj.xbc;
         end
+        % 
+%         function n_intervals = get.n_intervals(obj)
+%             % get the number of intervals in the time mesh
+%             n_intervals = length(obj.mesh);
+%         end
         
-        function n_intervals = get.n_intervals(obj)
-            % get the number of intervals in the time mesh
-            n_intervals = length(obj.mesh);
-        end
+       
         
         function n_timepoints = get.n_timepoints(obj)
             % get the number of time points in the mesh (n_intervals +1)
@@ -74,6 +77,7 @@ classdef Environment < handle
             % intervals (without providing the actual mesh values)
             if ((isinteger(n_in))&&(n_in>1))
                 obj.mesh = ones(1,n_in)*(1.0/(double(n_in)));
+                obj.n_intervals = length(obj.mesh);
             else
                 error('Input is no integer greater 1.');
             end

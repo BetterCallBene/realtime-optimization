@@ -151,7 +151,7 @@ classdef(Abstract) GenConstraints < handle
             end
         end
         
-        function [r, q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj)
+        function [r, q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr, n_var] = getParams(obj)
             
             r   = obj.dyn.state(1:3    , :);
             q   = obj.dyn.state(4:7    , :);
@@ -161,6 +161,7 @@ classdef(Abstract) GenConstraints < handle
             n_int = obj.dyn.environment.n_intervals; 
             n_state = obj.dyn.robot.n_state;
             n_contr = obj.dyn.robot.n_contr;
+            n_var = obj.dyn.robot.n_var;
             
             Iges = obj.dyn.robot.I;
             IM = obj.dyn.robot.I_M;

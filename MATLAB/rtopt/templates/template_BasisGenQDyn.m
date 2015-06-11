@@ -17,6 +17,7 @@ classdef(Abstract) BasisGenQDyn < Dyn
     
     methods
         function cBGQD = BasisGenQDyn()
+            cBGQD@Dyn();
             cBGQD.emptyResults();
         end
         

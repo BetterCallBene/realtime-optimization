@@ -5,18 +5,20 @@ classdef TestEnv < matlab.unittest.TestCase
     properties(Constant)
         eps = 1e-2;
         tol = 1e-10;
+        
+        tolRK = 1e-5;
     end
     
     methods
         
-        function numDiff = numDiff_nD(obj,timepoint, func)
+        function numDiff = numDiff_nD(obj, timepoint, func)
             % NUMDIFFDND This method calculates numerically the derivative
             % of func at timepoint t, when func only depends on obj.vec and has m dim output
-            [vec_old, n,m] = obj.setup(func);
+            [vec_old, n, m, timepoints, dyn] = obj.setup(func);
             numDiff = zeros(m,n);
             for i=1:n
-                func_p = obj.plusEpsShift(i,timepoint,vec_old,func);
-                func_n = obj.minusEpsShift(i,timepoint,vec_old,func);
+                func_p = obj.plusEpsShift(i,timepoint,vec_old,func, n, dyn);
+                func_n = obj.minusEpsShift(i,timepoint,vec_old,func, n, dyn);
                 
                 %Central difference
                 numDiff(:,i) = (func_p - func_n)/2/obj.eps;
@@ -27,13 +29,13 @@ classdef TestEnv < matlab.unittest.TestCase
             % NUMDIFF_NDALLT This method calculates numericalle the
             % derivative of func, but for all timepoints
             
-            [vec_old, n, m, n_timepoints] = obj.setup(func);
+            [vec_old, n, m, n_timepoints, dyn] = obj.setup(func);
             numDiff = zeros(m , n * n_timepoints);
             
             for timepoint = 1:n_timepoints
                 for i = 1:n
-                    func_p = obj.plusEpsShift(i,timepoint,vec_old, func);
-                    func_n = obj.minusEpsShift(i,timepoint,vec_old, func);
+                    func_p = obj.plusEpsShift(i,timepoint,vec_old, func, n, dyn);
+                    func_n = obj.minusEpsShift(i,timepoint,vec_old, func, n, dyn);
                     
                     %Central difference
                     numDiff( : , ((timepoint-1) * n) + i) ...
@@ -46,11 +48,11 @@ classdef TestEnv < matlab.unittest.TestCase
             % NUMDIFF_DNXND This method calculates numerically the
             % derivative of func, when func only depends on obj.vec and has
             % n times n dimensional output
-            [vec_old, n, m] = obj.setup(func);
+            [vec_old, n, m, n_timepoints, dyn] = obj.setup(func);
             numDiff = zeros(m,n,n);
             for i=1:n
-                func_p = obj.plusEpsShift(i,timepoint, vec_old,func);
-                func_n = obj.minusEpsShift(i,timepoint, vec_old,func);
+                func_p = obj.plusEpsShift(i,timepoint, vec_old,func, n, dyn);
+                func_n = obj.minusEpsShift(i,timepoint, vec_old,func, n, dyn);
                 
                 %Central difference
                 numDiff(:,i,:) = (func_p - func_n )/2/obj.eps;
@@ -61,12 +63,13 @@ classdef TestEnv < matlab.unittest.TestCase
             % NUMDIFF_NXND_ALLT This method calculates numerically the
             % derivative of func, when func only depends on obj.vec and has
             % n times n dimensional output
-            [vec_old, n , m, n_timepoints ] = obj.setup(func);
+            [vec_old, n, m, n_timepoints, dyn] = obj.setup(func);
+            
             numDiff  = zeros( m , n*n_timepoints,n*n_timepoints);
             for timepoint = 1:n_timepoints
                 for i = 1:n
-                    func_p = obj.plusEpsShift(i, timepoint, vec_old, func);
-                    func_n = obj.minusEpsShift(i, timepoint, vec_old, func);
+                    func_p = obj.plusEpsShift(i, timepoint, vec_old, func, n, dyn);
+                    func_n = obj.minusEpsShift(i, timepoint, vec_old, func, n, dyn);
                     
                     %Central difference
                     numDiff(:,(timepoint -1 ) * n + i, : ) = (func_p - func_n)/2/obj.eps;
@@ -74,29 +77,37 @@ classdef TestEnv < matlab.unittest.TestCase
             end
         end
         
+        
         %Some help functions (typically overwritten in subclasses)
-        function [vec_old, n, m, n_timepoints] = setup(obj, func)
+        function [vec_old, n, m, n_timepoints, dyn] = setup(obj, func)
             vec_old = obj.vec;
             n_timepoints = obj.environment.n_timepoints;
+            dyn = obj;
             n = obj.robot.n_var;
             m = size(func());
             m = m(1);
         end
         
-        function func_p = plusEpsShift(obj,i,t,vec_old,func)
+        %Overwrite function in TestEnv, because we don't want normed
+        %quaternios here.
+        function func_p = plusEpsShift(obj,i,t,vec_old,func, n_var, dyn)
+            %vec_old = dyn.vec;
             vec_p = vec_old;
-            vec_p((t-1)* obj.robot.n_var + i) = vec_p((t-1)* obj.robot.n_var + i) + obj.eps;
-            obj.vec = vec_p;
+            vec_p((t-1)* n_var + i) = vec_p((t-1)* n_var + i) + obj.eps;
+            dyn.backdoor_vec = vec_p;
             func_p = func();
-            obj.vec = vec_old;
+            dyn.backdoor_vec = vec_old;
         end
         
-        function func_n = minusEpsShift(obj,i,t,vec_old,func)
+        %Overwrite function in TestEnv, because we don't want normed
+        %quaternios here.
+        function func_n = minusEpsShift(obj,i,t,vec_old,func, n_var, dyn)
+            %vec_old = dyn.vec;
             vec_n = vec_old;
-            vec_n((t-1)* obj.robot.n_var + i) = vec_n((t-1)* obj.robot.n_var + i) - obj.eps;
-            obj.vec = vec_n;
+            vec_n((t-1)* n_var + i) = vec_n((t-1)* n_var + i) - obj.eps;
+            dyn.backdoor_vec = vec_n;
             func_n = func();
-            obj.vec = vec_old;
+            dyn.backdoor_vec = vec_old;
         end
     end
 end
