@@ -8,13 +8,16 @@ classdef(Abstract) Solver < handle & TestEnv
         timepoint; % 
         M0;
         N0;
+        u0;
         %M0_vec;
         %N0_vec;
         M0_size;
         N0_size;
+        
        
         h;
         JDot;
+        vec_sav;
     end
     
     properties(Dependent)
@@ -23,6 +26,7 @@ classdef(Abstract) Solver < handle & TestEnv
         
         JDot_u;
         JDot_x;
+        contr;
     end
     
     
@@ -49,7 +53,7 @@ classdef(Abstract) Solver < handle & TestEnv
             obj.dyn.backdoor_vec = vec;
         end
         
-         function res = get.M0(obj)
+        function res = get.M0(obj)
              if isempty(obj.M0)
                  n_state = obj.dyn.robot.n_state;
                  obj.M0 = eye(n_state);
@@ -94,6 +98,12 @@ classdef(Abstract) Solver < handle & TestEnv
             res = obj.JDot(:, n_state + 1:end);
         end
         
+        function M = kM(obj, y)
+            n_state  = obj.dyn.robot.n_state;
+            M0_ = reshape(y, [n_state, n_state]);
+            M = obj.JDot_x * M0_;
+        end
+        
     end
     
     methods %Help Functions
@@ -119,7 +129,9 @@ classdef(Abstract) Solver < handle & TestEnv
                 obj.nextStep(varargin{1})
             end
                         
-            y0 = obj.helperCreateVektor(obj.dyn.state(:, obj.timepoint), obj.M0, obj.N0);
+            %y0 = obj.helperCreateVektor(obj.dyn.state(:, obj.timepoint), obj.M0, obj.N0);
+            state = obj.vec_sav((obj.timepoint - 1) * n_var +1:(obj.timepoint - 1) * n_var + n_state);
+            y0 = obj.helperCreateVektor(state, obj.M0, obj.N0);
         end
         function y = helperCreateVektor(obj, F, M, N)
             [n_state, n_contr, n_var] = obj.getParams();
@@ -135,6 +147,29 @@ classdef(Abstract) Solver < handle & TestEnv
         function s = Solver()
         end
         
+        function val = get_contr(obj, timepoint)
+           % (if not yet stored, extract them from vec)            
+           
+            [n_state, n_contr, n_var, n_timepoints] = getParams(obj);
+
+            val = obj.vec_sav((timepoint-1)*(n_var)+n_state + 1:...
+                timepoint*(n_var));
+            
+        end
+        
+        function [old_intervals] = preToDo(obj)
+            [n_state, n_contr, n_var, n_timepoints] = getParams(obj);
+            obj.vec_sav = obj.vec;  % Speichere alten vektor
+            obj.vec = zeros(n_var, 1);
+            old_intervals = obj.dyn.environment.n_intervals;
+            obj.dyn.environment.n_intervals = 0;
+        end
+        
+        function postToDo(obj, old_intervals)
+            obj.vec = obj.vec_sav;
+            obj.dyn.environment.n_intervals = old_intervals;
+        end
+        
         function [F, J, M, N] = ode(obj, timepoint)
             
             obj.nextStep(timepoint);
@@ -145,15 +180,29 @@ classdef(Abstract) Solver < handle & TestEnv
             tspan = [(timepoint -1)*obj.h, timepoint*obj.h];
             meshGrid = [tspan(1), tspan(1) + mesh(1)/2, tspan(2)]; 
             
+            old_timepoint = obj.timepoint;
+            obj.u0 = obj.get_contr(old_timepoint);
+            obj.timepoint = 1;
+            
             y = obj.integrate(@obj.funcToIntegrate, meshGrid, y0);
+            
+            obj.timepoint = old_timepoint;
             
             [F, M, N, J] = obj.helperCreateMatrizen(y);
             
             %J = [M, N];
         end
+        function [F, J, M, N] = odeTest(obj, timepoint)
+            [old_intervals] = obj.preToDo();
+            [F, J, M, N] = obj.ode(timepoint);
+            obj.postToDo(old_intervals);
+        end
         
         function dy = funcToIntegrate(obj, t, y)
+            [n_state] = obj.getParams();
             
+            obj.vec = [y(1:n_state); obj.u0];
+            dy = obj.helperCreateVektor(obj.dyn.dot(obj.timepoint), obj.kM(y(n_state+1:n_state + obj.M0_size)), obj.JDot_u);
         end
         
         function nextStep(obj, timepoint)
@@ -189,6 +238,15 @@ classdef(Abstract) Solver < handle & TestEnv
             obj.dyn = BasisQDyn(model, env, obj);
             obj.dyn.vec = rand(17* (n_intervals+1), 1);
             
+        end
+        
+        function [vec_old, n, m, n_timepoints, dyn] = setup(obj,func)
+            vec_old = obj.dyn.vec;
+            n_timepoints = obj.dyn.environment.n_timepoints;
+            n = obj.dyn.robot.n_var;
+            dyn = obj.dyn;
+            m = size(func());
+            m=m(1);
         end
     end
     

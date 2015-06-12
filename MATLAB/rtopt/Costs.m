@@ -142,28 +142,13 @@ classdef Costs < TestEnv
             
         end
         
-        function [vec_old, n, m, n_timepoints] = setup(obj, func)
+        function [vec_old, n, m, n_timepoints, dyn] = setup(obj, func)
+            dyn = obj.dyn;
             vec_old = obj.vec;
             n_timepoints = obj.dyn.environment.n_timepoints;
             n = obj.dyn.robot.n_var;
             m = size(func());
             m = m(1);
-        end
-        
-         function func_p = plusEpsShift(obj,i,t,vec_old,func)
-            vec_p = vec_old;
-            vec_p((t-1)* obj.dyn.robot.n_var + i) = vec_p((t-1)* obj.dyn.robot.n_var + i) + obj.eps;
-            obj.vec = vec_p;
-            func_p = func();
-            obj.vec = vec_old;
-        end
-        
-        function func_n = minusEpsShift(obj,i,t,vec_old,func)
-            vec_n = vec_old;
-            vec_n((t-1)* obj.dyn.robot.n_var + i) = vec_n((t-1)* obj.dyn.robot.n_var + i) - obj.eps;
-            obj.vec = vec_n;
-            func_n = func();
-            obj.vec = vec_old;
         end
     end
     

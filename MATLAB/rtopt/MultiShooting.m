@@ -61,7 +61,7 @@ classdef MultiShooting < TestEnv
                 vvec = zeros(1,n_int*(2*n_state+n_state*(n_state+n_contr)));
                 
                 ind = 0;
-                
+                [old_intervals] = obj.solver.preToDo();
                 for timepoint=1:n_int
                     [F, J] = obj.solver.ode(timepoint);
                     % Bestimme h
@@ -91,7 +91,8 @@ classdef MultiShooting < TestEnv
                     ind                     = ind + n_state;
                 end
                 HD = sparse(rvec(1:ind),cvec(1:ind),vvec(1:ind),...
-                      n_int*n_state,(n_int+1)*(n_state+n_contr));
+                      n_int*n_state,(n_int+1)*(n_var));
+                obj.solver.postToDo(old_intervals);
             else
                 error('wrong state and control lengths wrt index.');
             end
