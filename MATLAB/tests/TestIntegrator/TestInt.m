@@ -5,11 +5,13 @@ classdef TestInt < handle & TestEnv
     properties
         dynForwEuler;
         dynRungeKutta;
+        dynOde45;
     end
     
     properties(Dependent)
         solver1;
         solver2;
+        solver3;
     end
     
     methods
@@ -20,29 +22,33 @@ classdef TestInt < handle & TestEnv
         function res = get.solver2(obj)
             res = obj.dynRungeKutta.solver;
         end
+        
+        function res = get.solver3(obj)
+            res = obj.dynOde45.solver;
+        end
     end
     
     
     methods(Test)
         function testIntegratoren(testCase)
-            n_intervals = 4;
+            n_intervals = 50;
             timepoint = 5;
             testCase.setupTest(n_intervals);
-            [F1, J1] = testCase.solver1.ode(timepoint);
-            [F2, J2] = testCase.solver1.ode(timepoint);
+            [F1, J1] = testCase.solver1.odeTest(timepoint);
+            [F2, J2] = testCase.solver2.odeTest(timepoint);
+            [F3, J3] = testCase.solver2.odeTest(timepoint);
             
 
             anaDiff1 = J1;
             anaDiff2 = J2;
             
-            func1 = @() testCase.solver1.ode(timepoint);
+            func1 = @() testCase.solver1.odeTest(timepoint);
             numDiff1 = testCase.solver1.numDiff_nD(timepoint, func1);
             
-            func2 = @() testCase.solver2.ode(timepoint);
+            func2 = @() testCase.solver2.odeTest(timepoint);
             numDiff2 = testCase.solver2.numDiff_nD(timepoint, func2);
                 
-            %testCase.assertLessThan(max(abs(anaDiff1 - numDiff1)), testCase.tol);
-            %testCase.assertLessThan(max(abs(anaDiff2(:, 1:13) - numDiff2(:, 1:13))), testCase.tol);
+            testCase.assertLessThan(max(abs(anaDiff1 - anaDiff2)), 9e-2);
             
             %max(abs(anaDiff2 - numDiff2))
             %norm(anaDiff2 - numDiff2, 1)
@@ -81,16 +87,20 @@ classdef TestInt < handle & TestEnv
             
             %vec =  rand(17* (n_intervals+1), 1);
             %save('Data.mat', 'vec');
-            load('Data.mat', 'vec');
+            vec = rand(17* (n_intervals+1), 1);
             
             solver1 = ForwEuler();
             solver2 = RungeKutta();
+            solver3 = ode45M();
             
             obj.dynForwEuler = BasisQDyn(model, env, solver1);
             obj.dynForwEuler.vec = vec;
             
             obj.dynRungeKutta = BasisQDyn(model, env, solver2);
             obj.dynRungeKutta.vec = vec;
+            
+            obj.dynOde45 = BasisQDyn(model, env, solver3);
+            obj.dynOde45.vec = vec;
         end
     end
     
