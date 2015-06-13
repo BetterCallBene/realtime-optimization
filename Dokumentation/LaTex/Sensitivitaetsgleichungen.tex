@@ -10,6 +10,7 @@
 \usepackage{xcolor} %bunte Schrift 
 
 \setlength{\parindent}{0pt}
+%\allowdisplaybreaks[1] % erlaubt Zeilenumbrüche in zB. align-Umgebung 
 
 \newcommand{\R}{\mathbb{R}}
 
@@ -50,6 +51,89 @@ mit $N^k = \frac{d}{du^k_i} \phi(x^k, u^k) \in \mathbb{R}^{13 \times 4}, i = 1..
 		   \cdot \underbrace{I^k}_{\in \mathbb{R}^{4 \times 4}}
 \end{align*}
 mit folgender Anfangsbedingung $N_0^k = 0 \in \mathbb{R}^{13 \times 4}$
+
+\subsection*{Jakobimatrix der DAE}
+
+Betrachtet wird nun die DAE 
+
+\[ B (\phi) \cdot \dot{\phi} =
+	\begin{pmatrix}
+		f(\phi, u) \\ 0
+	\end{pmatrix} \]
+	
+	mit der Matrix \( B =
+		\begin{pmatrix}
+			1 &   &        &   &      &      &      &      &   &      \\
+			  & 1 &        &   &      &      &      &      &   &      \\
+				&   & \ddots &   &      &      &      &      &   &      \\
+				&   &  &   &      &      &      &      &   &   1   \\
+			0	& 0 & 0      & 2q_1 & 2q_2 & 2q_3 & 2q_4 & 0 & \dots & 0
+		\end{pmatrix}\)
+\\
+
+Dann folgt mit den in Abschnitt "`Jakobimatrix"' genannten Voraussetzungen: \\
+Für \(M\):
+
+\begin{align*}
+	\frac{\textup{d}}{\textup{d}x_{i-1}} \left( B(\phi) \cdot \dot{\phi} \right) = \frac{\textup{d}}{\textup{d}x_{i-1}} \begin{pmatrix} f \\ 0 \end{pmatrix}
+\end{align*}
+
+Auf der rechten Seite ändert sich nichts (die Null in der 14. Zeile ist auch abgeleitet Null), ebenso in den ersten 13 Zeilen auf der linken Seite (weil \(B\) dort eine Einheitsmatrix ist). Neu dazu kommt die Ableitung der letzten Zeile. Diese lautet mit der Kettenregel wie folgt:
+
+\begin{align*}
+	& \frac{\textup{d}}{\textup{d}x_{i-1}} \left( \begin{pmatrix} 0 & 0 & 0 & 2q_1 & \dots & 2q_4 & 0 & \dots & 0 \end{pmatrix} \cdot \dot{\phi}\right)  \\
+	& = \frac{\textup{d}}{\textup{d}x_{i-1}} \left( \sum_{k=1}^4{2q_k \cdot \dot{q}_k}\right) \\
+	& = \frac{\textup{d}}{\textup{d}x} \left( \sum_{k=1}^4{2q_k \cdot \dot{q}_k}\right) \cdot \underbrace{\frac{\textup{d}x}{\textup{d}x_{i-1}}}_{=M} \\
+	& = \begin{pmatrix} 0 & 0 & 0 & 2\dot{q}_1 & \dots & 2\dot{q}_4 & 0 & \dots & 0 \end{pmatrix} \cdot M
+\end{align*}
+
+Analog gilt für \(N\): Die ersten 13 Zeilen der Linken Seite ändern sich nicht. Auch die rechte Zeile bleibt (bis auf die dazukommende Nullzeile) gleich. Für die letzte Zeile der linken Seite gilt wieder:
+
+\begin{align*}
+	& \frac{\textup{d}}{\textup{d}u_{i-1}} \left( \begin{pmatrix} 0 & 0 & 0 & 2q_1 & \dots & 2q_4 & 0 & \dots & 0 \end{pmatrix} \cdot \dot{\phi}\right)  \\
+	& = \frac{\textup{d}}{\textup{d}u_{i-1}} \left( \sum_{k=1}^4{2q_k \cdot \dot{q}_k}\right) \\
+	& = \frac{\textup{d}}{\textup{d}x} \left( \sum_{k=1}^4{2q_k \cdot \dot{q}_k}\right) \cdot \underbrace{\frac{\textup{d}x}{\textup{d}u_{i-1}}}_{=N} \\
+	& = \begin{pmatrix} 0 & 0 & 0 & 2\dot{q}_1 & \dots & 2\dot{q}_4 & 0 & \dots & 0 \end{pmatrix} \cdot N
+\end{align*}
+
+Die Ableitung nach \(u\) kommt sowohl für M als auch für N nicht zum tragen, da \(B\) nicht von \(u\) abhängig ist.
+
+Das zu lösende Differentialgleichungssystem sieht nun (in Matrixschreibweise) also folgendermaßen aus:
+
+\[
+	 \begin{bmatrix} \dot{x} \\
+									 \sum\limits_{k=1}^4{2\cdot q_k \cdot \dot{q_k}} \\
+									 \dot{M} \\
+									 \begin{pmatrix} 0 & 0 & 0 & 2\dot{q}_1 & \dots & 2\dot{q}_4 & 0 & \dots & 0 \end{pmatrix} \cdot M \\
+									 \dot{N} \\
+									 \begin{pmatrix} 0 & 0 & 0 & 2\dot{q}_1 & \dots & 2\dot{q}_4 & 0 & \dots & 0 \end{pmatrix} \cdot N
+		\end{bmatrix}	
+ = \begin{bmatrix} f \vspace{0.6ex} \\
+									 0 \vspace{0.6ex} \\
+									 \frac{\textup{d}}{\textup{d}x} f \cdot M \vspace{0.6ex} \\
+									 0 \vspace{0.6ex} \\
+									 \frac{\textup{d}}{\textup{d}x} f \cdot N + \frac{\textup{d}}{\textup{d}u} f \vspace{0.6ex} \\
+									 0
+	 \end{bmatrix}
+\]
+
+bzw.
+
+\[
+	 \begin{bmatrix} \dot{x} - f \vspace{.2ex} \\
+									 \sum\limits_{k=1}^4{2\cdot q_k \cdot \dot{q_k}} \vspace{.2ex} \\
+									 \dot{M} - \frac{\textup{d}}{\textup{d}x} f \cdot M \vspace{.2ex} \\
+									 \begin{pmatrix} 0 & 0 & 0 & 2\dot{q}_1 & \dots & 2\dot{q}_4 & 0 & \dots & 0 \end{pmatrix} \cdot M \vspace{.2ex} \\
+									 \dot{N} - \frac{\textup{d}}{\textup{d}x} f \cdot N - \frac{\textup{d}}{\textup{d}u} f \vspace{.2ex} \\
+									 \begin{pmatrix} 0 & 0 & 0 & 2\dot{q}_1 & \dots & 2\dot{q}_4 & 0 & \dots & 0 \end{pmatrix} \cdot N
+	 \end{bmatrix}
+		= \textbf{0}
+\]
+
+Die Anfangsbedingungen sind weiterhin \(M_0 = \mathbb{I}^{13\times13}\) und \(N_0 = \textbf{0}\). \\
+Werden (wegen DAE-Löser) nun auch Anfangsbedingungen für \(\dot{M}\) und \(\dot{N}\) gebraucht???
+
+
 \subsection*{Hessematrix}
 
 \begin{align*}
@@ -76,4 +160,5 @@ P^k = H_{x, u} \phi(x, u) = J_{u} {(M_k)^T} &= \left\{\nabla_u \left(\nabla_x \p
 &= \left\{ \left(J_x \nabla_x f(\phi, u) \cdot J_u \phi + J_u \nabla_x f(\phi, u) \right)   \cdot J_x \phi +   J_x f(\phi, u) \cdot J_u \nabla_x \phi  \right\} \\
 &= \left\{ \underbrace{\left(H_{x, x} f(\phi, u) \cdot N^k \phi + H_{u, x} f(\phi, u) \right)   \cdot M^k }_{\text{Hier ein Dimesionsproblem, Warum?}}+  J_x f(\phi, u) \cdot  P^k  \right\} 
 \end{align*}
+
 \end{document}
