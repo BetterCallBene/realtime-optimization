@@ -10,8 +10,8 @@ function [ H ] = getLDD(s_q,lambda,mu, cCost, cConst, t )
 
 constrD = cConst.get_eq_conD_block_t(t);
 
-costD = cCost.get_costDD ; %brauchen nur den Teil an der Stelle t
-costD = costD( (t-1)*(cConstr.dyn.robot.n_state+cConstr.dyn.robot.n_contr) + 1: t*(cConstr.dyn.robot.n_state+cConstr.dyn.robot.n_contr));
+costDall = cCost.get_costDD ; %brauchen nur den Teil an der Stelle t
+costD = costDall( (t-1)*(cConstr.dyn.robot.n_state+cConstr.dyn.robot.n_contr) + 1: t*(cConstr.dyn.robot.n_state+cConstr.dyn.robot.n_contr));
 %wollte nicht zu viel in Cost umschreiben, daher such ich hier den
 %passenden Wert raus
     
