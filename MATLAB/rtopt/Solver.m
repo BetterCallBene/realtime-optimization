@@ -104,6 +104,13 @@ classdef(Abstract) Solver < handle & TestEnv
             M = obj.JDot_x * M0_;
         end
         
+        function N = kN(obj, y)
+            [n_state, n_contr] = getParams(obj);
+            
+            N0_ = reshape(y, [n_state, n_contr]);
+            N = obj.JDot_x * N0_ + obj.JDot_u;
+        end
+        
     end
     
     methods %Help Functions
@@ -198,11 +205,14 @@ classdef(Abstract) Solver < handle & TestEnv
             obj.postToDo(old_intervals);
         end
         
-        function dy = funcToIntegrate(obj, t, y)
+        function dy = funcToIntegrate(obj, t, varargin)
+            
+            y = varargin{1};
+            
             [n_state] = obj.getParams();
             
             obj.vec = [y(1:n_state); obj.u0];
-            dy = obj.helperCreateVektor(obj.dyn.dot(obj.timepoint), obj.kM(y(n_state+1:n_state + obj.M0_size)), obj.JDot_u);
+            dy = obj.helperCreateVektor(obj.dyn.dot(obj.timepoint), obj.kM(y(n_state+1:n_state + obj.M0_size)), obj.kN(y(n_state + obj.M0_size+1:end)));
         end
         
         function nextStep(obj, timepoint)
