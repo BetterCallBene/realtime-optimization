@@ -68,6 +68,7 @@ classdef Constraints < GenConstraints & TestEnv
         
         function ineq_con = get_ineq_con_at_t(obj,t)
             ineq_con =  obj.ineqCon();
+            ineq_con = ineq_con( (t-1) *2*o.dyn.n_contr +1 : t **2*o.dyn.n_contr );
         end
             
         
