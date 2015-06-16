@@ -31,7 +31,7 @@ classdef RiccatiManager < TestEnv
     end
     
     properties
-        delta_lambda;
+        delta_lambda;  
         delta_s;
         delta_q;
         delta_mu;
@@ -154,6 +154,12 @@ classdef RiccatiManager < TestEnv
                 end
             end
         end
+        
+        function delta_mu = assembleMu(o,activeSet_i,i)
+            % ASSEMBLEMU builds a mu, which also considers the inactive constraints
+            delta_mu = zeros(length(activeSet_i),1);
+            delta_mu(activeSet_i) = o.delta_mu{i};
+        end
     end
     
     methods(Test)
@@ -173,7 +179,6 @@ classdef RiccatiManager < TestEnv
         function testRiccati_100(o)
             o.doTestWithHorizon(100,0,1e-8);
         end
-        
         
         function testRiccatiwConstr_0(o)
             o.doTestWithHorizon(0,randi(4,1),1e-10);

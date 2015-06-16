@@ -2,13 +2,13 @@ function [ H ] = getLDD(s_q,lambda,mu, cCost, cConst, t )
 % GETLDD 
 
 
-% Find out size of the matrix
+AB = cConst.get_eq_conD_block_t(t);
+CD = cConst.get_ineq_conD_block_t(t);
 
-% Initialize H
+%Active Set
 
+activeSet_t = cConst.activeSet(
 
-
-constrD = cConst.get_eq_conD_block_t(t);
 
 costDall = cCost.get_costDD ; %brauchen nur den Teil an der Stelle t
 costD = costDall( (t-1)*(cConstr.dyn.robot.n_state+cConstr.dyn.robot.n_contr) + 1: t*(cConstr.dyn.robot.n_state+cConstr.dyn.robot.n_contr));
@@ -16,7 +16,7 @@ costD = costDall( (t-1)*(cConstr.dyn.robot.n_state+cConstr.dyn.robot.n_contr) + 
 %passenden Wert raus
     
 
-H = [costD , constrD' ; constrD , spzeros(cConstr.CountConstraints + cConstr.dyn.robot.n_state)];
+H = [costD , AB' ; AB , spzeros(cConstr.CountConstraints + cConstr.dyn.robot.n_state)];
 
 
 

@@ -1,6 +1,11 @@
 classdef Constraints < GenConstraints & TestEnv
 % classConstraints providing discretized ODE constraint using forward euler
 
+    properties
+       activeSet; 
+       n_addConstr = 8;
+    end
+    
     methods
         %constructor
         function cC = Constraints(varargin)
@@ -57,10 +62,14 @@ classdef Constraints < GenConstraints & TestEnv
             multShoot = obj.dode.h();            
             
             eq_con      = [obj.dyn.environment.wind(s_t, t) - state_mat(:,t);
-                           multShoot(t:t+obj.dyn.environment.horizon); 
-                           obj.EqCon(t:t+obj.dyn.environment.horizon) ...
+                           multShoot(); 
                           ];
         end
+        
+        function ineq_con = get_ineq_con_at_t(obj,t)
+            ineq_con =  obj.ineqCon();
+        end
+            
         
         function eq_conD = get_eq_conD(obj)
             % the Jacobian of the equality contraints of the ocp
@@ -83,17 +92,17 @@ classdef Constraints < GenConstraints & TestEnv
         function eq_conD = get_eq_conD_block_t(obj,t)
             % the Jacobian of the equality contraints of the ocp
             [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
-
             multShootD = obj.dode.hD();
-            addConstrD = obj.EqConD;
             
-            eq_conD     = [
-                           multShootD( (t-1) * n_state +1  : t*n_state, (t-1)* (n_contr+ n_state) +1 : t  * (n_contr+ n_state));...
-                          addConstrD((t -1) * obj.CountConstraints +1 : t * obj.CountConstraints, (t-1)* (n_contr+ n_state) +1 : t  * (n_contr+ n_state))... 
-                          ];
-            %eq_conD = [ A,B ; C,D];
-                      
-                      
+            eq_conD     = multShootD( (t-1) * n_state +1  : t*n_state, (t-1)* (n_contr+ n_state) +1 : t  * (n_contr+ n_state));
+                         
+            %eq_conD = [ A,B];
+        end
+         
+        function ineq_conD = get_ineq_conD_block_t(obj,t)
+            ineq_conD = obj.ineqConD_at_t(t);
+           
+            %ineq_conD = [ 0, D];
         end
         
         function eq_conDD = get_eq_conDD(varargin)
@@ -130,6 +139,38 @@ classdef Constraints < GenConstraints & TestEnv
             end
         end        
         
+        function mu = checkIfActive(o,mu)
+           % CHECKIFACTIVE Checks which constraint is active and which isnt and stores it
+           % in the activeSet property.
+           
+           bIneq = o.ineqCon() >= 0;
+           bMu = mu > 0;
+           %Check mus from previous iteration
+           o.activeSet = bIneq .* bMu;
+           %Set inactive mus to 1
+           mu(~o.activeSet) = 1;
+        end 
+        
+        function ineqCon = ineqCon(o)
+            % INEQCON Calculates the inequality constraints, such that
+            % for every control signal q_i holds: u_min <= q_i <= u_max 
+            ineqCon = zeros(2*o.dyn.n_contr*horizon,1);
+            
+            for i = 1:horizon
+               ineqCon( (i-1) * 2*o.dyn.n_contr +1: i * 2*o.dyn.n_contr) = [ o.vec( (i-1) * o.dyn.n_var + o.dyn.n_state +1 : i * o.dyn.n_var) - o.dyn.robot.u_max; ... 
+               o.dyn.robot.u_min - o.vec( (i-1) * o.dyn.n_var + o.dyn.n_state +1 : i * o.dyn.n_var)];
+            end
+        end
+        
+        function ineqConD = ineqConD_at_t(o,t)
+            % INEQCOND_AT_T Calculats the derivative of ineqCon for
+            % timestep t. Which ensures, that every control q_i is in a
+            % given interval. As the result is not timedependent, t is not
+            % used.
+            ineqConD = [sparse(o.dyn.n_contr, o.dyn.n_state) , speye(o.dyn.n_contr)];
+            ineqConD = [ineqConD; -ineqConD];
+        end
+        
         % general type get functions -> interace for testing
         function f = get_func(obj)
             % interfacing get_eq_con
@@ -150,6 +191,10 @@ classdef Constraints < GenConstraints & TestEnv
             else
                 H = [];
             end
+        end
+        
+        function activeSet_k = getActiveSet(o,k)
+            activeSet_k = o.activeSet( (k-1) *2*o.dyn.n_contr +1 : k *2*o.dyn.n_contr);
         end
     end
     
