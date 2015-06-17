@@ -236,6 +236,34 @@ classdef RiccatiManager_woConstr < TestEnv
             hesse_L( (i-1) * 30 +13+1 : end, (i-1)*30 +13 +1 : end) = LDDi(1:13,1:13);
         end
         
+        function hesse_L = buildUpHesse_activ(o, getLDD)
+            % BUILDUPHESSE Builds up the big hesse matrix with activ constraints, should be used
+            % for testing only, as this is quite inefficient
+            
+            LDD1 = getLDD(1);
+            [m , n] = size(LDD1);
+            hesse_L = [sparse(13,13), -speye(13), sparse(13,n-13);...
+                       [ -speye(13); sparse(m-13,13)], LDD1];
+            
+            for i = 2: o.horizon
+                LDDi = getLDD(i);
+                [m , n] = size(hesse_L);
+                [k , l] = size(LDDi);
+                
+                SPE = [ sparse(13,n-13),-speye(13);...
+                        sparse(k-13,n)];
+                hesse_L = [hesse_L, SPE';
+                           SPE, LDDi];
+            end
+            
+            i = o.horizon +1 ;
+            LDDi = getLDD(i);
+            [m, n] = size(hesse_L);
+            SPE = [ sparse(13,n-13),-speye(13)];
+            hesse_L = [hesse_L, SPE';
+                       SPE, LDDi(1:13,1:13)];
+        end
+        
         function grad_L = buildUpGradient(o, getLD)
             % BUILDUPGRADIENT Builds the huge gradient, should be used for
             % testing only.
@@ -246,6 +274,18 @@ classdef RiccatiManager_woConstr < TestEnv
             i = o.horizon +1;
             LDi = getLD(i);
             grad_L( (i-1 ) * o.horizon +1 : end) = LDi(1: o.n_state+o.n_lambda);
+        end
+        
+        function grad_L = buildUpGradient_activ(o, getLD)
+            % BUILDUPGRADIENT Builds the huge gradient with activ constraints, should be used for
+            % testing only.
+            grad_L = getLD(1);
+            for i = 2:o.horizon
+                grad_L = [grad_L , getLD(i)];
+            end
+            i = o.horizon +1;
+            LDi = getLD(i);
+            grad_L = [grad_L ,LDi(1: o.n_state+o.n_lambda)];
         end
     end
 end
