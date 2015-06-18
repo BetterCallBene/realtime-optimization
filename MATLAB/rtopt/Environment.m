@@ -81,6 +81,7 @@ classdef Environment < handle
         end
         
         function x_t = wind(obj,s_t, t)
+            %WIND This function is a simple 
            x_t = s_t + rand(length(s_t), 1);
         end
         

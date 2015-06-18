@@ -1,9 +1,9 @@
 classdef Constraints < GenConstraints & TestEnv
-% classConstraints providing discretized ODE constraint using forward euler
-
+    % classConstraints providing discretized ODE constraint using forward euler
+    
     properties
-       activeSet; 
-       n_addConstr = 8;
+        activeSet;
+        n_addConstr = 8;
     end
     
     methods
@@ -22,7 +22,7 @@ classdef Constraints < GenConstraints & TestEnv
                     error('wrong class type for discretized ode');
                 end
             else
-                error('wrong number of inputs');     
+                error('wrong number of inputs');
             end
             cC@GenConstraints(dode);
         end
@@ -30,7 +30,7 @@ classdef Constraints < GenConstraints & TestEnv
         % other functions
         function [ineq_con,eq_con,ineq_conD,eq_conD] = constr(obj)
             % provide the equality and inequality constraints (along
-            % with their jacobians by calling get_eq_con and 
+            % with their jacobians by calling get_eq_con and
             % get_eq_conD
             ineq_con    = [];
             eq_con      = obj.get_eq_con();
@@ -45,49 +45,50 @@ classdef Constraints < GenConstraints & TestEnv
             xbc         = obj.dyn.environment.xbc;
             state_mat   = obj.dyn.state;
             
-            eq_con      = [obj.dode.h(); 
-                                state_mat(:,1) - xbc(:,1); ...
-                                state_mat(:,end) - xbc(:,end); ...
-                                obj.EqCon ...
-                          ];
+            eq_con      = [obj.dode.h();
+                state_mat(:,1) - xbc(:,1); ...
+                state_mat(:,end) - xbc(:,end); ...
+                obj.EqCon ...
+                ];
         end
         
         function eq_con = get_eq_con_at_t(obj,t)
-            % the equality constraint of the ocp
-            % combine the discretized ode with the boundary conditions
+            %GET_EQ_CON_AT_T Returns all equality constraints for the realtime optimization problem at time t.
             
-           
             state_mat   = obj.dyn.state;
-            s_t = state_mat(:,t);
-            multShoot = obj.dode.h();            
+            s_t = state_mat(:,1);
+            multShoot = obj.dode.h();
             
-            eq_con      = [obj.dyn.environment.wind(s_t, t) - state_mat(:,t);
-                           multShoot(); 
-                          ];
+            eq_con      = [obj.dyn.environment.wind(s_t, t) - state_mat(:,1);
+                multShoot();
+                ];
         end
         
+        %TODO: get_eq_con_at_t und get_ineq_con_at_t ist inkonsistent.
         function ineq_con = get_ineq_con_at_t(obj,t)
+            % GET_INEQ_CON_AT_T Returns all inequality constraints at
+            % timepoint t.
             ineq_con =  obj.ineqCon();
-            ineq_con = ineq_con( (t-1) *2*o.dyn.n_contr +1 : t *2*o.dyn.n_contr );
+            ineq_con = ineq_con( (t-1) * o.n_addConstr +1 : t * o.n_addConstr );
         end
-            
+        
         
         function eq_conD = get_eq_conD(obj)
             % the Jacobian of the equality contraints of the ocp
             [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
-
+            
             %q           = state_mat(4:7, :);
             
             srow        = 1:2*n_state;
             scol        = [1:n_state,...
                 n_int*(n_state+n_contr)+1:n_int*(n_state+n_contr)+n_state];
             sval        = ones(1,2*n_state);
-
+            
             eq_conD     = [obj.dode.hD(); sparse(srow,scol,sval,...
-                                2*n_state,(n_int+1)*(n_state+n_contr)); ...
-                                obj.EqConD ...
-                          ]';
-
+                2*n_state,(n_int+1)*(n_state+n_contr)); ...
+                obj.EqConD ...
+                ]';
+            
         end
         
         function eq_conD = get_eq_conD_block_t(obj,t)
@@ -96,70 +97,72 @@ classdef Constraints < GenConstraints & TestEnv
             multShootD = obj.dode.hD();
             
             eq_conD     = multShootD( (t-1) * n_state +1  : t*n_state, (t-1)* (n_contr+ n_state) +1 : t  * (n_contr+ n_state));
-                         
+            
             %eq_conD = [ A,B];
         end
-         
+        
         function ineq_conD = get_ineq_conD_block_t(obj,t)
             ineq_conD = obj.ineqConD_at_t(t);
-           
+            
             %ineq_conD = [ 0, D];
         end
         
         function eq_conDD = get_eq_conDD(varargin)
             % the Hessian of the equality constraints of the ocp.
-            % Returns a cell array of Hessians if only the object 
+            % Returns a cell array of Hessians if only the object
             % is provided. If the object and the Langrange multipliers are
             % provided, the function returns the Hessian of the Lagrangian
             if (nargin == 1)
                 obj         = varargin{1};
                 [q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
-            
+                
                 eq_conDD = [obj.dode.hDD(); cell(2*n_state,1)];
                 for i=0:2*n_state-1
                     eq_conDD{end-i} = sparse((n_int+1)*(n_state+n_contr),...
                         (n_int+1)*(n_state+n_contr));
                 end
                 eq_conDD = [eq_conDD; obj.EqConDD];
-%             elseif (nargin == 2)
-%                 lambda      = varargin{2}; 
-%                 H           = varargin{1}.dode.hDD();
-%                 
-%                 if (~isempty(lambda))
-%                     eq_conDD    = {lambda(1)*H{1}};
-%                     for i=2:length(lambda)
-%                         eq_conDD{1} = eq_conDD{1} + lambda(i)*H{i}; 
-%                     end
-%                 else
-%                     eq_conDD = cell(1,1);
-%                 end
-%             else 
-%                 eq_conDD = cell(1,1);
-            else 
+                %             elseif (nargin == 2)
+                %                 lambda      = varargin{2};
+                %                 H           = varargin{1}.dode.hDD();
+                %
+                %                 if (~isempty(lambda))
+                %                     eq_conDD    = {lambda(1)*H{1}};
+                %                     for i=2:length(lambda)
+                %                         eq_conDD{1} = eq_conDD{1} + lambda(i)*H{i};
+                %                     end
+                %                 else
+                %                     eq_conDD = cell(1,1);
+                %                 end
+                %             else
+                %                 eq_conDD = cell(1,1);
+            else
                 error('Error: Not yet implemented');
             end
-        end        
+        end
         
         function mu = checkIfActive(o,mu)
-           % CHECKIFACTIVE Checks which constraint is active and which isnt and stores it
-           % in the activeSet property.
-           
-           bIneq = o.ineqCon() >= 0;
-           bMu = mu > 0;
-           %Check mus from previous iteration
-           o.activeSet = bIneq .* bMu;
-           %Set inactive mus to 1
-           mu(~o.activeSet) = 1;
-        end 
+            % CHECKIFACTIVE Checks which constraint is active and which isnt and stores it
+            % in the activeSet property.
+            
+            bIneq = o.ineqCon() >= 0;
+            bMu = mu > 0;
+            %Check mus from previous iteration
+            o.activeSet = bIneq .* bMu;
+            %Set inactive mus to 1
+            mu(~o.activeSet) = 1;
+        end
         
         function ineqCon = ineqCon(o)
             % INEQCON Calculates the inequality constraints, such that
-            % for every control signal q_i holds: u_min <= q_i <= u_max 
-            ineqCon = zeros(2*o.dyn.n_contr*horizon,1);
+            % for every control signal q_i holds: u_min <= q_i <= u_max
+            horizon = o.dyn.environment.horizon;
+            ineqCon = zeros(o.n_addConstr*horizon,1);
             
             for i = 1:horizon
-               ineqCon( (i-1) * 2*o.dyn.n_contr +1: i * 2*o.dyn.n_contr) = [ o.vec( (i-1) * o.dyn.n_var + o.dyn.n_state +1 : i * o.dyn.n_var) - o.dyn.robot.u_max; ... 
-               o.dyn.robot.u_min - o.vec( (i-1) * o.dyn.n_var + o.dyn.n_state +1 : i * o.dyn.n_var)];
+                ineqCon( (i-1) * o.n_addConstr +1: i * o.n_addConstr) = ...
+                    [ o.dyn.vec( (i-1) * o.dyn.robot.n_var + o.dyn.robot.n_state +1 : i * o.dyn.robot.n_var) - o.dyn.robot.u_max; ...
+                    o.dyn.robot.u_min - o.dyn.vec( (i-1) * o.dyn.robot.n_var + o.dyn.robot.n_state +1 : i * o.dyn.robot.n_var)];
             end
         end
         
@@ -195,11 +198,15 @@ classdef Constraints < GenConstraints & TestEnv
         end
         
         function activeSet_k = getActiveSet(o,k)
-            activeSet_k = o.activeSet( (k-1) *2*o.dyn.n_contr +1 : k *2*o.dyn.n_contr);
+            % GETACTIVESET Gives you a boolean vector of size o.n_addConstr
+            % indicating, which additional inequality constraint is active
+            % and which isn't.
+            activeSet_k = o.activeSet( (k-1) * o.n_addConstr +1 : k * o.n_addConstr);
         end
     end
     
     methods(Test)
+        
         function test_get_eq_con(obj)
             n_intervals = uint16(50);
             obj.setupTest(n_intervals);
@@ -221,7 +228,7 @@ classdef Constraints < GenConstraints & TestEnv
             obj.assertSize(anaDiff, [(n_intervals * 13 + 2*13 + n_intervals +1), (n_intervals+1)* 17 ]);
             obj.assertLessThan(max(abs(anaDiff - numDiff)), obj.tol);
             
-        
+            
         end
         
         function test_get_hess(obj)
@@ -258,8 +265,8 @@ classdef Constraints < GenConstraints & TestEnv
                 1, 0, 0, 0, ...
                 0, 0, 0,    ...
                 0, 0, 0     ...
-                ];    
-
+                ];
+            
             env = Environment();
             env.xbc = xbc;
             env.setUniformMesh(n_int_);
@@ -277,7 +284,6 @@ classdef Constraints < GenConstraints & TestEnv
             obj.dyn = obj.dode.dyn;
             
         end
-        
         
         function [vec_old, n,m,n_timepoints] = setup(obj,func)
             vec_old = obj.dyn.vec;
@@ -303,6 +309,4 @@ classdef Constraints < GenConstraints & TestEnv
             obj.dyn.vec = vec_old;
         end
     end
-    
-    
 end
