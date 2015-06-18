@@ -46,7 +46,7 @@ cCost = Costs(cBQD);
 
 %% Choose starting values
 
-n_timepoints = 50 ; %How many timepoints, do we want to calculate.
+n_timepoints = 15 ; %How many timepoints, do we want to calculate.
 
 s = cell(horizon +1,1);
 q = cell(horizon,1);
@@ -66,9 +66,12 @@ lambda{horizon +1} = ones(cQ.n_state,1);
 %Choose how to calculate the LDD (approximation or not)?
 getLDD = @(cost, const, t) getLDD(cost, const, t);
 
+% Initialisierung des Solvers
+cRTSolver = RealtimeSolver(cCost, cConst);
+
 %% Calculate the solution with fminrt
 
 tic;
 %Use realtime solver
-[res, est_y  ] = fminrt(cCost, cConst, getLDD, horizon, n_timepoints, s,q,lambda,mu);
+[res, est_y  ] = cRTSolver.fminrt(getLDD, n_timepoints, s, q, lambda, mu);
 toc;
