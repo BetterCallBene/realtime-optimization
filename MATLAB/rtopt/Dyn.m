@@ -1,7 +1,5 @@
 classdef(Abstract) Dyn < handle  & TestEnv
-    % Dyn Diese Klasse repräsentiert die Dynamik
-    
-    
+    % DYN Diese Klasse repräsentiert die Dynamik
     
     properties(SetAccess = public, GetAccess= public)
         environment; % in this object all outside parameters are stored, like gravity, wind, time mesh,...
@@ -67,9 +65,25 @@ classdef(Abstract) Dyn < handle  & TestEnv
     
     methods
         
-        %Overwrite function in TestEnv, because we don't want normed
-        %quaternios here.
+        function vec = getVecFromCells(o,s,q)
+            % GETVECFROMCELLS Takes as input cells s and q, where s_{i} is
+            % the state at timepoint i and q{i} is the control at timepoint
+            % i. This is rearanged, such that the data fits to the format
+            % used in o.vec = [ s_1; q_1; ... ]. The last control value can
+            % be set to zero, because we stop the calculation at that point.
+            length_s = length(s);
+            vec = zeros(length_s * o.robot.n_var,1);
+            for i = 1: length_s-1
+                vec( (i-1) * o.robot.n_var +1 : i * o.robot.n_var ) = ...
+                    [ s{i} ; q{i}] ;
+            end
+            i = length_s;
+            vec( (i-1) * o.robot.n_var +1 : end - o.robot.n_contr ) = s{i};
+        end
+        
         function func_p = plusEpsShift(obj,i,t,vec_old,func)
+            % PLUSEPSSHIFT This funktion overwrites the one in TestEnv, as
+            % we need unnormed quaternions here.
             vec_p = vec_old;
             vec_p((t-1)* obj.robot.n_var + i) = vec_p((t-1)* obj.robot.n_var + i) + obj.eps;
             obj.backdoor_vec = vec_p;
@@ -77,9 +91,9 @@ classdef(Abstract) Dyn < handle  & TestEnv
             obj.vec = vec_old;
         end
         
-        %Overwrite function in TestEnv, because we don't want normed
-        %quaternios here.
         function func_n = minusEpsShift(obj,i,t,vec_old,func)
+            % MINUSEPSSHIFT Same function as PLUSEPSSHFIT only with a
+            % minus.
             vec_n = vec_old;
             vec_n((t-1)* obj.robot.n_var + i) = vec_n((t-1)* obj.robot.n_var + i) - obj.eps;
             obj.backdoor_vec = vec_n;

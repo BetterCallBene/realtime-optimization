@@ -1,6 +1,7 @@
-n_int = 50;
-% Quadrocopter soll 5 Meter hoch fliegen
-%TODO: Zusatzbedingungen kommen in die Kostenfunktion
+%% Define setting
+
+% Quadrocopter soll einen halben Meter nach unten fliegen
+%TODO: Zusatzbedingungen, wie Anfangs und Endpunkt kommen in die Kostenfunktion
 xbc = [         ... Variablenname L�nge   Name
                 ... Anfangsbedingung
     0, 0, 0.5,  ...     r           3      Ortsvektor
@@ -22,40 +23,50 @@ env.horizon = horizon;
 env.xbc = xbc;
 
 %Die Dynamik wird nur auf dem Horizon betrachtet:
-env.setUniformMesh(horizon);
+env.setUniformMesh(uint16(horizon-1)); %TODO: Überprüfen, dass das nicht von den boundary conditions abhängt.
 
 cQ = Quadrocopter();
 
 % TODO: Irgendwas besser f�r Startl�sung als rand finden
-v0 = rand(cQ.n_var*(n_int+1),1);
-
+%v0 = rand(cQ.n_var*horizon,1);
 
 % Initialisierung der Dynamik
-%TODO: Klasse
 cBQD = BasisQDyn(cQ, env);
-cBQD.vec = rand(cQ.n_var * (n_int+1), 1);
 
 % Wahl des Integrators
 cFE = ForwEuler(cBQD);
 
 % Initialisierung der Nebenbedingungen
-%TODO: Klasse
 cConst = Constraints(cFE);
 
 % Initialisierung Kostenfunktion
 cCost = Costs(cBQD);
 
-%% Choose starting value
-%TODO: Hier muss man sich noch überlegen, wie man die zusätzlichen
-%Constraints initialisiert...
-y_var = 2*cQ.n_state + cQ.n_contr + size(cConst.get_eq_con(),1);
-%TODO: init active set
+%% Choose starting values
 
-y = zeros( y_var * horizon, 1);
-y(7:y_var: horizon*y_var) = 1; % Normalize Quaternions
-%%
+n_timepoints = 100 ; %How many timepoints, do we want to calculate.
+
+s = cell(horizon +1,1);
+q = cell(horizon,1);
+lambda = cell(horizon +1 ,1);
+mu = ones( cConst.n_addConstr * horizon,1);
+
+% Setup a initial estimation
+for i = 1: horizon 
+s{i} = [zeros(6,1); 1; zeros(6,1)];
+q{i} = zeros(4,1);
+lambda{i} = ones(horizon,1);
+end
+
+s{horizon +1} = [zeros(6,1); 1; zeros(6,1)];
+lambda{horizon +1} = ones(horizon,1);
+
+%Choose how to calculate the LDD (approximation or not)?
+getLDD = @(cost, const, t) getLDD(cost, const, t);
+
+%% Calculate the solution with fminrt
+
 tic;
-
 %Use realtime solver
-v = fminrt(cCost, cConst, horizon, y);
+v = fminrt(cCost, cConst, getLDD, horizon, n_timepoints, s,q,lambda,mu);
 toc;

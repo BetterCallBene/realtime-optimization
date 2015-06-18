@@ -1,4 +1,4 @@
-function [ H ] = getLDD(s_q,lambda,mu, cCost, cConst, t )
+function [ H ] = getLDD(cCost, cConst, t )
 % GETLDD 
 
 
