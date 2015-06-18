@@ -37,6 +37,7 @@ classdef Constraints < GenConstraints & TestEnv
             ineq_conD   = [];
             eq_conD     = obj.get_eq_conD();
         end
+        
         %BB: Nebenbedingung: (Norm(q))^2 = 1 hinzugef�gt
         function eq_con = get_eq_con(obj)
             % the equality constraint of the ocp
@@ -53,7 +54,8 @@ classdef Constraints < GenConstraints & TestEnv
         end
         
         function eq_con = get_eq_con_at_t(obj,t)
-            %GET_EQ_CON_AT_T Returns all equality constraints for the realtime optimization problem at time t.
+            % GET_EQ_CON_AT_T Returns all equality constraints for the realtime 
+            % optimization problem at time t.
             
             state_mat   = obj.dyn.state;
             s_t = state_mat(:,1);
@@ -69,7 +71,7 @@ classdef Constraints < GenConstraints & TestEnv
             % GET_INEQ_CON_AT_T Returns all inequality constraints at
             % timepoint t.
             ineq_con =  obj.ineqCon();
-            ineq_con = ineq_con( (t-1) * o.n_addConstr +1 : t * o.n_addConstr );
+            ineq_con = ineq_con( (t-1) * obj.n_addConstr +1 : t * obj.n_addConstr );
         end
         
         
@@ -148,7 +150,7 @@ classdef Constraints < GenConstraints & TestEnv
             bIneq = o.ineqCon() >= 0;
             bMu = mu > 0;
             %Check mus from previous iteration
-            o.activeSet = bIneq .* bMu;
+            o.activeSet = bIneq & bMu;
             %Set inactive mus to 1
             mu(~o.activeSet) = 1;
         end
@@ -157,9 +159,9 @@ classdef Constraints < GenConstraints & TestEnv
             % INEQCON Calculates the inequality constraints, such that
             % for every control signal q_i holds: u_min <= q_i <= u_max
             horizon = o.dyn.environment.horizon;
-            ineqCon = zeros(o.n_addConstr*horizon,1);
+            ineqCon = zeros(o.n_addConstr*(horizon+1),1);
             
-            for i = 1:horizon
+            for i = 1:horizon+1
                 ineqCon( (i-1) * o.n_addConstr +1: i * o.n_addConstr) = ...
                     [ o.dyn.vec( (i-1) * o.dyn.robot.n_var + o.dyn.robot.n_state +1 : i * o.dyn.robot.n_var) - o.dyn.robot.u_max; ...
                     o.dyn.robot.u_min - o.dyn.vec( (i-1) * o.dyn.robot.n_var + o.dyn.robot.n_state +1 : i * o.dyn.robot.n_var)];
@@ -171,7 +173,7 @@ classdef Constraints < GenConstraints & TestEnv
             % timestep t. Which ensures, that every control q_i is in a
             % given interval. As the result is not timedependent, t is not
             % used.
-            ineqConD = [sparse(o.dyn.n_contr, o.dyn.n_state) , speye(o.dyn.n_contr)];
+            ineqConD = [sparse(o.dyn.robot.n_contr, o.dyn.robot.n_state) , speye(o.dyn.robot.n_contr)];
             ineqConD = [ineqConD; -ineqConD];
         end
         
