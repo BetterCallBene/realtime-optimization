@@ -22,6 +22,7 @@ horizon = 15;
 
 env = Environment();
 env.horizon = horizon;
+env.wind = @(s_t ,t ) s_t + [rand(3,1); zeros(10,1)];
 env.xbc = xbc;
 
 %Die Dynamik wird nur auf dem Horizon betrachtet:
