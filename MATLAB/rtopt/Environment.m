@@ -1,10 +1,11 @@
 classdef Environment < handle
     % ENVIRONMENT Diese Klasse speichert alle Parameter, die den Quadrocopter nicht intern beschreiben, also Nebenbedingungen, Mesh, Gravitation, Wind (später)
     properties
-        mesh;            % time mesh (1xn) vector
-        xbc;             % (mx2) matrix with boundary values for states
+        mesh;           % time mesh (1xn) vector
+        xbc;            % (mx2) matrix with boundary values for states
         g = 9.81;		% Gravitation
-        horizon;         % Horizon of the realtime approach
+        horizon;        % Horizon of the realtime approach
+        wind;           % A function handle, which has s_t and t as input and returns the exact measured state
     end
     
     properties(Dependent)
@@ -79,14 +80,6 @@ classdef Environment < handle
                 error('Input is no integer greater 1.');
             end
         end
-        
-        function x_t = wind(obj,s_t, t)
-            %WIND This function is a simple 
-           x_t = s_t + rand(length(s_t), 1);
-        end
-        
     end
-    
-    
 end
 

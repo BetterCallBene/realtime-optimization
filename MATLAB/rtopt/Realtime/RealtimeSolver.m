@@ -1,13 +1,15 @@
 classdef RealtimeSolver < TestEnv
     % REALTIMESOLVER Just a dummy class for the fminrt function, which
-    % enables us to write a proper unittest for fminrt.
+    % enables us to write a proper unittests for fminrt and to refactor the
+    % function fminrt in smaller functions, without creating additional
+    % files.
     
     properties
         cCost;
         cConst;
         
-        est_y;
-        res;
+        est_y;      %A cell to store the estimated values at i at {i,:}
+        res;        %A cekk to store the result at time i at {i,:}
     end
     
     properties
@@ -88,35 +90,19 @@ classdef RealtimeSolver < TestEnv
     
     methods(Test)
         
+        function testActiveSetChecker(o)
+            %TODO: implement
+            hori = 12;
+        end
+        
         function testCalculateSolution(o)
+            % TESTCALCULATESOLUTION Checks if the method calculateSolution
+            % works correctly, using the \ operator and a tolerance of
+            % 1e-15.
+            
             % Initialize classes
-            hori = 15;
-            env = Environment();
-            env.horizon = hori;
-            env.setUniformMesh(uint16(hori));
-            cQ = Quadrocopter();
-            cBQD = BasisQDyn(cQ,env);
-            cFE = ForwEuler(cBQD);
-            o.cCost = Costs(cBQD);
-            o.cConst = Constraints(cFE);
-            o.cDyn = o.cConst.dyn;
-            o.horizon = o.cDyn.environment.horizon;
-            o.ricM = RiccatiManager(o.horizon, o.cDyn.robot);
-            %n_timepoints = 15; %TODO: increase after test is build
-            
-            s = cell(o.horizon +1,1);
-            q = cell(o.horizon,1);
-            lambda = cell(o.horizon +1 ,1);
-            mu = ones( o.cConst.n_addConstr * (o.horizon+1),1);
-            
-            % Setup initial estimations
-            for i = 1: o.horizon
-                s{i} = [zeros(6,1); 1; zeros(6,1)];
-                q{i} = zeros(4,1);
-                lambda{i} = ones(cQ.n_state,1);
-            end
-            s{o.horizon +1} = [zeros(6,1); 1; zeros(6,1)];
-            lambda{o.horizon +1} = ones(cQ.n_state,1);
+            hori = 30;            
+            [s, lambda, q, mu] = o.setupTest(hori);
             
             %Set values
             vec = o.cDyn.getVecFromCells(s,q);
@@ -131,51 +117,15 @@ classdef RealtimeSolver < TestEnv
             i = 1;
             o.calculateSolution(i,get_LDD,s, lambda,q,mu);
             
-            %Build up delta and large HESSE
-            hesse_L = zeros(5);
-            
-            n_var = 30 + sum(  o.cConst.getActiveSet(1));
-            last = 0;
-            hesse_L(last +1 : last + 13 ,last + 13 +1 :last + 26 ) =  -eye(13);
-            hesse_L(last + 13 +1 : last + 26 ,last + 1 :last + 13) =  -eye(13);
-            hesse_L(last +13+1 : last + 13 + n_var, last +13 +1 : last  +13 + n_var) = get_LDD(o.cCost, o.cConst,1);
-            
-            grad_L= zeros(5,1);
-            grad_L(last +1 : last + n_var) = getLD(o.cCost, o.cConst, 1);
-            
-            last = last + n_var;
-            delta_ric = [o.ricM.delta_lambda{1}; o.ricM.delta_s{1}; o.ricM.delta_q{1}; o.ricM.delta_mu{1}];
-            for k = 2 : o.horizon
-                y =  [o.ricM.delta_lambda{k}; o.ricM.delta_s{k}; o.ricM.delta_q{k}; o.ricM.delta_mu{k}];
-                delta_ric = [delta_ric ;y];
-                
-                n_var = 30  + sum(o.cConst.getActiveSet(k));
-                hesse_L(last + 1 : last + 13 ,last  + 13 +1 :last  + 26 ) =  -eye(13);
-                hesse_L(last  + 13 +1 : last  + 26 ,last  +1 :last + 13  ) =  -eye(13);
-                hesse_L(last  +13+1 : last  +13 + n_var, last  +13 +1 : last +13 + n_var) = get_LDD(o.cCost, o.cConst,k);
-                
-                grad_L(last+1 : last + n_var) = getLD(o.cCost, o.cConst, k);
-                last = last + n_var;
-            end
-            k = o.horizon +1 ;
-            y = [o.ricM.delta_lambda{k} ; o.ricM.delta_s{k}];
-            delta_ric = [delta_ric ; y];
-            LDk = getLD(o.cCost, o.cConst, k);
-            LDDk = get_LDD(o.cCost, o.cConst,k);
-            % n_var = 30 + sum(o.cConst.getActiveSet(k));
-            hesse_L( last +1:last +13  , last + 13+1: last + 26 ) = -eye(13);
-            hesse_L( last + 13+1: last + 26 , last +1: last +13) = -eye(13);
-            hesse_L( last +13+1 : last + 13 + 13, last +13 +1 : last + 13 +13) = LDDk(1:13,1:13);
-            
-            grad_L(last +1 : last + 26 ) = LDk(1:26);
-            
-            
-            %Solve with \
-            
+            %Build up delta and large gradient and hesse
+            [grad_L, hesse_L] = o.buildUpGradHesse(get_LDD);
+            delta_ric = o.buildUpDelta_ric();
+
+            %Solve with \            
             delta_matlab = hesse_L \ grad_L;
             
-            o.assertLessThan( norm(delta_matlab - delta_ric) , o.tol );
-            
+            %Assert that both solutions are the same
+            o.assertLessThan( norm(delta_matlab - delta_ric) , 1e-15 );
         end
     end
     
@@ -218,6 +168,9 @@ classdef RealtimeSolver < TestEnv
         end
         
         function [s, lambda, q, mu] = performNewtonAndShift(o, s, lambda, q, mu)
+            % PERFORMNEWTONANDSHIFT Performs y + delta_y and shifts
+            % every point to the left, as the actual timepoint increases by
+            % one.
             for k = 2 : o.horizon
                 s{k-1} = s{k} + o.ricM.delta_s{k};
                 lambda{k-1} = lambda{k} + o.ricM.delta_lambda{k};
@@ -233,11 +186,81 @@ classdef RealtimeSolver < TestEnv
         end
         
         function [s, lambda, q, mu] = estimateNewHorizonPoint(o, s, lambda, q, mu)
+            % ESTIMATENEWHORIZONPOINT This method estimateds the the new
+            % horizon point by duplicating the old horizon point.
             k = o.horizon +1 ;
             s{k} = s{k-1};
             lambda{k} = lambda{k-1};
             q{k-1} = q{k-2};
             mu((k-1) * o.cConst.n_addConstr +1 : end )= mu((k-2) * o.cConst.n_addConstr+1 : (k-1) * o.cConst.n_addConstr);
+        end
+        
+        function [grad_L, hesse_L] = buildUpGradHesse(o,get_LDD)
+            hesse_L = zeros(1);
+            grad_L= zeros(5,1);
+            last = 0;
+            
+            for k = 1 : o.horizon                
+                n_var = 30  + sum(o.cConst.getActiveSet(k));
+                hesse_L(last + 1 : last + 13 ,last  + 13 +1 :last  + 26 ) =  -eye(13);
+                hesse_L(last  + 13 +1 : last  + 26 ,last  +1 :last + 13  ) =  -eye(13);
+                hesse_L(last  +13+1 : last  +13 + n_var, last  +13 +1 : last +13 + n_var) = get_LDD(o.cCost, o.cConst,k);
+                
+                grad_L(last+1 : last + n_var) = getLD(o.cCost, o.cConst, k);
+                last = last + n_var;
+            end
+            k = o.horizon +1 ;
+            
+            LDk = getLD(o.cCost, o.cConst, k);
+            LDDk = get_LDD(o.cCost, o.cConst,k);
+            
+            hesse_L( last +1:last +13  , last + 13+1: last + 26 ) = -eye(13);
+            hesse_L( last + 13+1: last + 26 , last +1: last +13) = -eye(13);
+            hesse_L( last +13+1 : last + 13 + 13, last +13 +1 : last + 13 +13) = LDDk(1:13,1:13);
+            
+            grad_L(last +1 : last + 26 ) = LDk(1:26);
+        end
+        
+        function delta_ric = buildUpDelta_ric(o)
+            delta_ric = [];
+            for k = 1 : o.horizon
+                y =  [o.ricM.delta_lambda{k}; o.ricM.delta_s{k}; o.ricM.delta_q{k}; o.ricM.delta_mu{k}];
+                delta_ric = [delta_ric ;y];
+            end
+            k = o.horizon +1 ;
+            y = [o.ricM.delta_lambda{k} ; o.ricM.delta_s{k}];
+            delta_ric = [delta_ric ; y];
+        end
+        
+        function [s, lambda, q, mu] = setupTest(o,hori)
+            
+            env = Environment();
+            
+            env.wind = @(s_t, t) s_t + 0.5 * [ones(3,1); zeros(10,1)];
+            env.horizon = hori;
+            env.setUniformMesh(uint16(hori));
+            cQ = Quadrocopter();
+            cBQD = BasisQDyn(cQ,env);
+            cFE = ForwEuler(cBQD);
+            o.cCost = Costs(cBQD);
+            o.cConst = Constraints(cFE);
+            o.cDyn = o.cConst.dyn;
+            o.horizon = o.cDyn.environment.horizon;
+            o.ricM = RiccatiManager(o.horizon, o.cDyn.robot);
+            
+            s = cell(o.horizon +1,1);
+            q = cell(o.horizon,1);
+            lambda = cell(o.horizon +1 ,1);
+            mu = ones( o.cConst.n_addConstr * (o.horizon+1),1);
+            
+            % Setup initial estimations
+            for i = 1: o.horizon
+                s{i} = [zeros(6,1); 1; zeros(6,1)];
+                q{i} = zeros(4,1);
+                lambda{i} = ones(cQ.n_state,1);
+            end
+            s{o.horizon +1} = [zeros(6,1); 1; zeros(6,1)];
+            lambda{o.horizon +1} = ones(cQ.n_state,1);
         end
     end
 end
