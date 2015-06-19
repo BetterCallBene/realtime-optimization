@@ -1,7 +1,7 @@
 function odeQuad()
 global u;
 
-tspan = [0 1];
+tspan = [0.025 0.05];
 
 val = rand(13, 1);
 u = rand(4, 1);
@@ -20,6 +20,7 @@ tic
 sol = ode15i(@Fimpl,tspan,y01,yp01,opts);
 toc
 
+yend = sol.y(:, 11);
 end
 
 function res = Fimpl(t,y,yp)
