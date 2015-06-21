@@ -14,6 +14,8 @@ classdef(Abstract) Solver < handle & TestEnv
         M0_size;
         N0_size;
         
+        n_intervalsInt;
+        
        
         h;
         JDot;
@@ -56,7 +58,7 @@ classdef(Abstract) Solver < handle & TestEnv
         function res = get.M0(obj)
              if isempty(obj.M0)
                  n_state = obj.dyn.robot.n_state;
-                 obj.M0 = eye(n_state);
+                 obj.M0 = speye(n_state);
              end
              res = obj.M0;
          end
@@ -64,7 +66,7 @@ classdef(Abstract) Solver < handle & TestEnv
         function res = get.N0(obj)
             if isempty(obj.N0)
                 [n_state, n_contr, n_var] = obj.getParams();
-                obj.N0 = zeros(n_state, n_contr);
+                obj.N0 = sparse(n_state, n_contr);
             end
             res = obj.N0;
         end
@@ -177,32 +179,40 @@ classdef(Abstract) Solver < handle & TestEnv
             obj.dyn.environment.n_intervals = old_intervals;
         end
         
-        function [F, J, M, N] = ode(obj, timepoint)
+        function [F, J, M, N] = ode(obj, timepoint, varargin)
             
             obj.nextStep(timepoint);
             mesh = obj.dyn.environment.mesh;
             
-            y0 = obj.helperCreateInitialConditions();
+            if nargin <= 2
+                y0 = obj.helperCreateInitialConditions();
+                yp0 = [];
+            elseif nargin == 4
+                y0 = varargin{1};
+                yp0 = varargin{2};
+            else
+                error('Wrong parameter count');
+            end
             
             tspan = [(timepoint -1)*obj.h, timepoint*obj.h];
-            meshGrid = [tspan(1), tspan(1) + mesh(1)/2, tspan(2)]; 
+            meshGrid = linspace(tspan(1), tspan(2), obj.n_intervalsInt); 
             
             old_timepoint = obj.timepoint;
             obj.u0 = obj.get_contr(old_timepoint);
             obj.timepoint = 1;
             
-            y = obj.integrate(@obj.funcToIntegrate, meshGrid, y0);
+            y = obj.integrate(@obj.funcToIntegrate, meshGrid, y0, yp0);
             
             obj.timepoint = old_timepoint;
             
+            pause;
+            
             [F, M, N, J] = obj.helperCreateMatrizen(y);
             
-            %J = [M, N];
+            J = [M, N];
         end
-        function [F, J, M, N] = odeTest(obj, timepoint)
-            [old_intervals] = obj.preToDo();
-            [F, J, M, N] = obj.ode(timepoint);
-            obj.postToDo(old_intervals);
+        function [F, J, M, N] = odeTest(obj, timepoint, y0, yp0)
+            [F, J, M, N] = obj.ode(timepoint, y0, yp0);
         end
         
         function dy = funcToIntegrate(obj, t, varargin)

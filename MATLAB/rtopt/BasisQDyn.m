@@ -2,6 +2,12 @@ classdef BasisQDyn < BasisGenQDyn
     
     properties
         backdoor_vec;
+        
+        dotDpatternflag;
+        dotDDpatternflag;
+        
+        dotDCellpattern;
+        dotDDCellpattern;
     end
     
     properties(Dependent)
@@ -13,6 +19,10 @@ classdef BasisQDyn < BasisGenQDyn
     methods
         function bQDyn = BasisQDyn(varargin)
             bQDyn@BasisGenQDyn();
+            
+            bQDyn.dotDpatternflag = true;
+            bQDyn.dotDDpatternflag = true;
+            
             if (nargin >= 1)
                 mc = metaclass(varargin{1});
                 if strcmp(mc.SuperclassList(1).Name, 'Model')
@@ -110,11 +120,6 @@ classdef BasisQDyn < BasisGenQDyn
             end
         end
         
-        %function res = get.state(cq)
-        %    res = cq.backdoor_state;
-        %end
-        
-        
         
         function res = dot(obj,ind) % Rechte Seite der ODE aus (Quadrocoptermodell.pdf: (1.46))
             % compute the right hand side of the ode for a given time
@@ -148,11 +153,40 @@ classdef BasisQDyn < BasisGenQDyn
                 H_ = obj.H;
                 for i = 1:size(H_, 1)
                     if isempty(res{H_(i, 1)})
-                        res{H_(i, 1)} = zeros(17, 17);
+                        res{H_(i, 1)} = sparse(17, 17);
                     end
                     res{H_(i, 1)}(H_(i, 2), H_(i, 3)) = H_(i, ind + 3);
                 end
             end
+        end
+    end
+    methods
+        function pattern =  dotDpattern(obj)
+            if obj.dotDpatternflag
+                J_ = obj.J;
+                
+                obj.dotDCellpattern = sparse(J_(:, 1), J_(:, 2), ones(size(J_(:, 1), 1), size(J_(:, 1), 2)), 13, 17);
+                obj.dotDpatternflag = false;
+            end
+            pattern = obj.dotDCellpattern;
+        end
+        
+        function pattern =  dotDDpattern(obj)
+            if obj.dotDDpatternflag
+                n_state       = obj.robot.n_state;
+                
+                obj.dotDDCellpattern = cell(1, n_state);
+                H_ = obj.H;
+                for i = 1:size(H_, 1)
+                    if isempty(obj.dotDDCellpattern{H_(i, 1)})
+                        obj.dotDDCellpattern{H_(i, 1)} = sparse(17, 17);
+                    end
+                    obj.dotDDCellpattern{H_(i, 1)}(H_(i, 2), H_(i, 3)) = 1;
+                end
+                
+                obj.dotDDpatternflag = false;
+            end
+            pattern = obj.dotDDCellpattern;
         end
         
     end

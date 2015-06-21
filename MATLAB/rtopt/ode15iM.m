@@ -5,6 +5,11 @@ classdef ode15iM < Solver
     properties
         
         opts;
+        dfdyPattern;
+        dfdypPattern;
+        
+        dfdyPatternflag;
+        dfdypPatternflag;
     end
     
     methods
@@ -12,9 +17,51 @@ classdef ode15iM < Solver
         function odMi = ode15iM()
             %JP = JPat(N) | MvPat(N);?
             odMi@Solver();
-            %obj.opts = odeset('RelTol',1e-5,'AbsTol',1e-4,'Jacobian',@odMi.Jac,'Jpattern',{JP,[]});
+            odMi.dfdyPatternflag = true;
+            odMi.dfdypPatternflag = true;
+            
         end
         
+%         function [F, M, N, J] = helperCreateMatrizen(obj, y)
+%             
+%             [n_state, n_contr] = obj.getParams();
+%             
+%             n_constraints = 1;
+%             
+%             F = y(1:n_state, 1);
+%             M_vec = y(n_state + n_constraints +1 : n_state + n_constraints+ obj.M0_size, 1); %y(n_state + n_constraints +1 : n_state + n_constraints+ obj.M0_size, 1)
+%             N_vec = y(n_state + obj.M0_size + n_constraints + n_state + 1: n_state + obj.M0_size + n_constraints + n_state + obj.N0_size, 1);
+%             
+%             M = reshape(M_vec, [n_state, n_state]);
+%             N = reshape(N_vec, [n_state, n_contr]);
+%             
+%             J = [M, N];
+%         end
+        
+%         function y0 = helperCreateInitialConditions(obj, varargin)
+%             [n_state, n_contr, n_var] = obj.getParams();
+%             
+%             if (nargin == 2)
+%                 obj.nextStep(varargin{1})
+%             end
+%                         
+%             %y0 = obj.helperCreateVektor(obj.dyn.state(:, obj.timepoint), obj.M0, obj.N0);
+%             state = obj.vec_sav((obj.timepoint - 1) * n_var +1:(obj.timepoint - 1) * n_var + n_state);
+%             y0 = obj.helperCreateVektor(state, obj.M0, obj.N0);
+%         end
+        
+%         function y = helperCreateVektor(obj, F, M, N)
+%             [n_state, n_contr, n_var] = obj.getParams();
+%             
+%             n_constraints = 1;
+%             y = zeros(n_state + n_constraints + obj.M0_size+ n_state + obj.N0_size + n_contr, 1);
+%             y(1:n_state, 1) = F;
+%             y(n_state+n_constraints:n_state+n_constraints, 1) = 0;
+%             y(n_state + n_constraints +1 : n_state + n_constraints+ obj.M0_size, 1) = reshape(M, [obj.M0_size, 1]);
+%             y(n_state + n_constraints+ obj.M0_size + 1: n_state + n_constraints+ obj.M0_size + n_state, 1) = sparse(n_state, 1);
+%             y(n_state + obj.M0_size + n_constraints + n_state + 1: n_state + obj.M0_size + n_constraints + n_state + obj.N0_size, 1) = reshape(N, [obj.N0_size, 1]);
+%             y(n_state + obj.M0_size + n_constraints + n_state + obj.N0_size + 1:end, 1) = sparse(n_contr, 1);
+%         end
         
         function yp = helperCreateInitialConditionsDot(obj)
             
@@ -36,11 +83,16 @@ classdef ode15iM < Solver
             yp = obj.helperCreateVektor(xp, Mp, Np);
         end
         
-        function y = integrate(obj, func, meshGrid, y0)
-            yp0 = obj.helperCreateInitialConditionsDot();
+        function y = integrate(obj, func, meshGrid, varargin)
+            y0 = varargin{1};
+            if nargin == 4
+                yp0 = obj.helperCreateInitialConditionsDot();
+            else
+                yp0 = varargin{2};
+            end
             %% Sparsity pattern of df/dy
-            
-            y = ode15i(func, meshGrid, y0, yp0);
+            opts_ = obj.opts;
+            sol = ode15i(func, meshGrid, y0, yp0, opts_);
         end
         
         function res = funcToIntegrate(obj, t, varargin)
@@ -52,11 +104,11 @@ classdef ode15iM < Solver
             x = y(1:n_state);
             xp = yp(1:n_state);
             
-            M_vec = y(n_state+1:n_state + obj.M0_size);
-            N_vec = y(n_state + obj.M0_size+1:end);
+            M_vec = y(n_state  +1 : n_state + obj.M0_size, 1);
+            N_vec = y(n_state + obj.M0_size + 1: n_state + obj.M0_size + obj.N0_size, 1);
             
-            Mp_vec = yp(n_state+1:n_state + obj.M0_size);
-            Np_vec = yp(n_state + obj.M0_size+1:end);
+            Mp_vec = yp(n_state  +1 : n_state + obj.M0_size, 1);
+            Np_vec = yp(n_state + obj.M0_size + 1: n_state + obj.M0_size + obj.N0_size, 1);
             
             M_ = reshape(M_vec, [n_state, n_state]);
             N_ = reshape(N_vec, [n_state, n_contr]);
@@ -76,15 +128,16 @@ classdef ode15iM < Solver
             qM = qdot_vec * M_;
             qN = qdot_vec * N_;
             
-            res = [ xp - f;
-                    qConstraint;
-                    Mp_vec - fM;
-                    qM';
-                    Np_vec - fN;
-                    qN';
+            res = [ xp - f; % 13
+                    qConstraint; % 1
+                    Mp_vec - fM; % M0_size
+                    qM'; %13
+                    Np_vec - fN; %N0_size
+                    qN'; %4
                   ];
             
         end
+        
         
         
         function [dfdy, dfdyp] = Jac(obj, t, y, yp)
@@ -99,8 +152,8 @@ classdef ode15iM < Solver
             q_vec(4:7) = 2.*x(4:7);
             qdot_vec(4:7) = 2.*xp(4:7);
             
-            M_vec = y(n_state+1:n_state + obj.M0_size);
-            N_vec = y(n_state + obj.M0_size +1:end);
+            M_vec = y(n_state  +1 : n_state + obj.M0_size, 1);
+            N_vec = y(n_state + obj.M0_size + 1: n_state + obj.M0_size + obj.N0_size, 1);
             M_ = reshape(M_vec, [n_state, n_state]);
             N_ = reshape(N_vec, [n_state, n_contr]);
             
@@ -115,17 +168,16 @@ classdef ode15iM < Solver
             k = 1;
             for i = 1:n_state
                 for h = 1:n_state
-                    hugeM(k, :) = (HF{h}(1:n_state, 1:n_state) * M_(:, i))';   
+                    hugeM(k, :) = (HF{h}(1:n_state, 1:n_state) * M_(:, i))';
+                    if i <= n_contr
+                        hugeN(k, :) = (HF{h}(1:n_state, 1:n_state) * N_(:, i))' +  HF{h}(n_state+i:n_state+i, 1:n_state); 
+                    end
                     k = k + 1;
                 end
             end
-            k = 1;
-            for i = 1:n_contr
-                for h = 1:n_state
-                    hugeN(k, :) = (HF{h}(1:n_state, 1:n_state) * N_(:, i))' +  HF{h}(n_state+i:n_state+i, 1:n_state);   
-                    k = k + 1;
-                end
-            end
+            spHugeM = sparse(hugeM);
+            spHugeN = sparse(hugeN);
+            
             
             JFx = JF(1:n_state, 1:n_state);
             bJFx1 = blkdiag(JFx, JFx, JFx, JFx, ...
@@ -139,42 +191,43 @@ classdef ode15iM < Solver
             spMQ1 = 2.* sparse(s1(:, 1), s1(:, 2), s1(:, 3), n_state, n_state * n_state);
             spMQ2 = 2.* sparse(s2(:, 1), s2(:, 2), s2(:, 3), n_contr, n_state * n_contr);
             
-            qpM = [zeros(13, 3), ones( 13, 4), zeros( 13, 6)].* M_';
-            qpN = [zeros( 4, 3), ones(4, 4), zeros( 4, 6)].* N_';
+            qpM = [sparse(13, 3), ones( 13, 4), sparse( 13, 6)].* M_';
+            qpN = [sparse( 4, 3), ones(4, 4), sparse( 4, 6)].* N_';
             
             dfdyX = [-JFx;
                 qdot_vec;
-                -hugeM;
-                zeros(13, 13);
-                -hugeN;
-                zeros(4, 13);
-                ]; 
-            dfdyM = [zeros(14, 169);
+                -spHugeM;
+                sparse(13, 13);
+                -spHugeN;
+                sparse(4, 13);
+                ];
+            
+            dfdyM = [sparse(14, 169);
                 -bJFx1;
                 spMQ1;
-                zeros(56, 169)
+                sparse(56, 169)
                 ];
-            dfdyN = [zeros(196, 52);
+            dfdyN = [sparse(196, 52);
                 -bJFx2;
                 spMQ2;
                 ];
             dfdy = [dfdyX, dfdyM, dfdyN];
             
-            dfdypX = [eye(13);
+            dfdypX = [speye(13);
                 q_vec;
-                zeros(169, 13);
+                sparse(169, 13);
                 2.*qpM;
-                zeros(52, 13);
+                sparse(52, 13);
                 2.*qpN
                 ]; 
              dfdypM = [
-                   zeros(14, 169);
-                   eye(169);
-                   zeros(69, 169);
+                   sparse(14, 169);
+                   speye(169);
+                   sparse(69, 169);
                  ];
-             dfdypN = [zeros(196, 52);
-                 eye(52);
-                 zeros(4, 52);
+             dfdypN = [sparse(196, 52);
+                 speye(52);
+                 sparse(4, 52);
                  ];
             dfdyp = [dfdypX, dfdypM, dfdypN];
         end
@@ -198,8 +251,115 @@ classdef ode15iM < Solver
             end
             
         end
-        function res = jpatternDy(obj)
+        
+        function s = getSpattern(obj, m)
+            s = zeros(4 * m, 3); %1->Zeile, 2->Spalte, 3->Wert
+            s0 = 4;
+            k = 1;
+            for i = 1:m
+                for j = 1:4
+                    s(k, 1) = i;
+                    s(k, 2) = s0;
+                    s(k, 3) = 1;
+                    s0 = s0 + 1;
+                    k= k+1;
+                end %-> 8 
+                s0 = s0 + 13 -4;
+            end
             
+        end
+        
+        function dfdy = jpatternDy(obj)
+            
+            if obj.dfdyPatternflag
+            
+                [n_state, n_contr, n_var] = getParams(obj);
+                
+                JF = obj.dyn.dotDpattern();
+                HF = obj.dyn.dotDDpattern();
+                JFx = JF(1:n_state, 1:n_state);
+
+                bJFx1 = blkdiag(JFx, JFx, JFx, JFx, ...
+                        JFx, JFx, JFx, JFx, ...
+                        JFx, JFx, JFx, JFx, JFx);
+                bJFx2 = blkdiag(JFx, JFx, JFx, JFx);
+
+                qdot_vec = [sparse(1, 3), ones(1, 4), sparse(1, 6)];
+
+                s1 = obj.getSpattern(n_state); 
+                s2 = obj.getSpattern(n_contr);
+
+                spMQ1 = sparse(s1(:, 1), s1(:, 2), s1(:, 3), n_state, n_state * n_state);
+                spMQ2 = sparse(s2(:, 1), s2(:, 2), s2(:, 3), n_contr, n_state * n_contr);
+
+
+                M_ = ones(n_state, n_state);
+                N_ = ones(n_state, n_contr);
+
+                hugeM =zeros(n_state * n_state, n_state);
+                hugeN =zeros(n_state * n_contr, n_state);
+
+
+                k = 1;
+                for i = 1:n_state
+                    for h = 1:n_state
+                        hugeM(k, :) = (HF{h}(1:n_state, 1:n_state) * M_(:, i))';
+                        if i <= n_contr
+                            hugeN(k, :) = (HF{h}(1:n_state, 1:n_state) * N_(:, i))' +  HF{h}(n_state+i:n_state+i, 1:n_state); 
+                        end
+                        k = k + 1;
+                    end
+                end
+                spHugeM = sparse(hugeM);
+                spHugeN = sparse(hugeN);
+
+
+                dfdyX = [JFx;
+                    qdot_vec;
+                    spHugeM;
+                    sparse(13, 13);
+                    spHugeN;
+                    sparse(4, 13);
+                    ]; 
+                dfdyM = [sparse(14, 169);
+                    bJFx1;
+                    spMQ1;
+                    sparse(56, 169)
+                    ];
+                dfdyN = [sparse(196, 52);
+                    bJFx2;
+                    spMQ2;
+                    ];
+                obj.dfdyPattern = logical([dfdyX, dfdyM, dfdyN]);
+                obj.dfdyPatternflag = false;
+            end
+            dfdy = obj.dfdyPattern;
+        end
+        
+        function dfdyp = jpatternDyp(obj)
+            
+            if obj.dfdypPatternflag  
+                q_vec = [sparse(1, 3), ones(1, 4), sparse(1, 6)];
+                dfdypX = [speye(13);
+                    q_vec;
+                    sparse(169, 13);
+                    [sparse(13, 3), ones( 13, 4), sparse( 13, 6)];
+                    sparse(52, 13);
+                    [sparse( 4, 3), ones(4, 4), sparse( 4, 6)]
+                    ]; 
+                 dfdypM = [
+                       sparse(14, 169);
+                       speye(169);
+                       sparse(69, 169);
+                     ];
+                 dfdypN = [sparse(196, 52);
+                     speye(52);
+                     sparse(4, 52);
+                     ];
+                obj.dfdypPattern = [dfdypX, dfdypM, dfdypN];
+                obj.dfdypPatternflag = false;
+            end
+            dfdyp = obj.dfdypPattern;
         end
     end
     methods  
@@ -316,20 +476,54 @@ classdef ode15iM < Solver
             timepoint = 3;
             
             [y0, yp0, old_interval, old_timepoint] = testCase.setupTest(n_intervals, timepoint);
+            
+            [n_state] = testCase.getParams();
             numDiffJ = testCase.numDiff_nD1(timepoint, @testCase.funcToIntegrate, y0, yp0);
             numDiffJD = testCase.numDiff_nD2(timepoint, @testCase.funcToIntegrate, y0, yp0);
+            
             [anaJ, anaJD] = testCase.Jac([], y0, yp0);
             
-            %spy(numDiffJ(:, 1:13) - anaJ(:, 1:13) > 1e-4)
-%             figure
-            %spy(abs(anaJ - numDiffJ) > 1e-4)
-%             figure
-%             spy(anaJ)
-%             figure
-%             spy(numDiffJ)
-%             testCase.timepoint = old_timepoint;
-%             testCase.postToDo(old_interval)
-           
+            
+            testCase.assertLessThan(max(abs(anaJ - numDiffJ)),testCase.tol);
+            testCase.assertLessThan(max(abs(anaJD - numDiffJD)),testCase.tol);
+            
+            figure 
+            spy(anaJ);
+            figure 
+            spy(numDiffJ)
+ 
+            %testCase.timepoint = old_timepoint;
+            %testCase.postToDo(old_interval);
+            
+            %patternDy = testCase.jpatternDy();
+            %patternDyp = testCase.jpatternDyp();
+            
+            %patternDy - logical(anaJ)
+            
+        end
+        
+        
+        function testOde(testCase)
+            
+            n_intervals = 3;
+            timepoint = 1;
+            
+            
+            [y0, yp0, old_interval, old_timepoint] = testCase.setupTest(n_intervals, timepoint);
+            
+            JP = testCase.jpatternDy();
+            JPP = testCase.jpatternDyp();
+            opts_ = odeset('RelTol',1e-3,'AbsTol',1e-2);%,'Jacobian',@testCase.Jac,'Jpattern',{JP,JPP});
+            testCase.opts = opts_;
+            
+            %tspan = [(timepoint -1)*testCase.h, timepoint*testCase.h];
+            
+            %[y01,yp01] = decic(@testCase.funcToIntegrate,tspan(1),y0,[],yp0,[],opts_);
+            
+            %max(abs(y01 - y0))
+            %testCase.opts = odeset('RelTol',1e-3,'AbsTol',1e-2);
+            testCase.odeTest(timepoint, y0, yp0);
+            
         end
         
         function testFuncToIntegrate(testCase)
