@@ -5,9 +5,12 @@ import GenerateScript as GS
 
 def main(template):
 	files = [
-			'tmpRTOptFunction', #0
-			'tmpRTOptJacobi', #1
-			'tmpRTOptHesse' #2
+			('tmpRTOptFunction', 1), #0
+			('tmpRTOptJacobi', 1),#1
+			('tmpRTOptHesse',  1),#2
+			('tmpRTOptFTilde', 0), #3
+			('tmpRTOptJTilde', 0), #4
+			('tmpRTOptHTilde', 0) #5 
 			] 
 
 

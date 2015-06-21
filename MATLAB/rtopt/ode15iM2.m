@@ -22,47 +22,6 @@ classdef ode15iM2 < Solver
             
         end
         
-        function [F, M, N, J] = helperCreateMatrizen(obj, y)
-            
-            [n_state, n_contr] = obj.getParams();
-            
-            n_constraints = 1;
-            
-            F = y(1:n_state, 1);
-            M_vec = y(n_state + n_constraints +1 : n_state + n_constraints+ obj.M0_size, 1); %y(n_state + n_constraints +1 : n_state + n_constraints+ obj.M0_size, 1)
-            N_vec = y(n_state + obj.M0_size + n_constraints + n_state + 1: n_state + obj.M0_size + n_constraints + n_state + obj.N0_size, 1);
-            
-            M = reshape(M_vec, [n_state, n_state]);
-            N = reshape(N_vec, [n_state, n_contr]);
-            
-            J = [M, N];
-        end
-        
-        function y0 = helperCreateInitialConditions(obj, varargin)
-            [n_state, n_contr, n_var] = obj.getParams();
-            
-            if (nargin == 2)
-                obj.nextStep(varargin{1})
-            end
-                        
-            %y0 = obj.helperCreateVektor(obj.dyn.state(:, obj.timepoint), obj.M0, obj.N0);
-            state = obj.vec_sav((obj.timepoint - 1) * n_var +1:(obj.timepoint - 1) * n_var + n_state);
-            y0 = obj.helperCreateVektor(state, obj.M0, obj.N0);
-        end
-        
-        function y = helperCreateVektor(obj, F, M, N)
-            [n_state, n_contr, n_var] = obj.getParams();
-            
-            %y = zeros(n_state + n_constraints, 1);
-            y = zeros(n_state, 1);
-            y(1:n_state, 1) = F;
-            %y(n_state+n_constraints:n_state+n_constraints, 1) = 0;
-            %y(n_state + n_constraints +1 : n_state + n_constraints+ obj.M0_size, 1) = reshape(M, [obj.M0_size, 1]);
-            %y(n_state + n_constraints+ obj.M0_size + 1: n_state + n_constraints+ obj.M0_size + n_state, 1) = sparse(n_state, 1);
-            %y(n_state + obj.M0_size + n_constraints + n_state + 1: n_state + obj.M0_size + n_constraints + n_state + obj.N0_size, 1) = reshape(N, [obj.N0_size, 1]);
-            %y(n_state + obj.M0_size + n_constraints + n_state + obj.N0_size + 1:end, 1) = sparse(n_contr, 1);
-        end
-        
         function yp = helperCreateInitialConditionsDot(obj)
             
             [n_state, n_contr, n_var] = getParams(obj);
@@ -100,28 +59,71 @@ classdef ode15iM2 < Solver
             y = varargin{1};
             yp = varargin{2};
             
-            [n_state] = obj.getParams();
+            u0 = obj.u0;
+            [x0, M0, N0] = obj.helperCreateMatrizen(y);
+            [xp0, M0Dot, N0Dot] = obj.helperCreateMatrizen( yp);
             
-            x = y(1:n_state);
-            xp = yp(1:n_state);
+            [F, f, B] = obj.odeF(t, x0, xp0, u0);
+            [M, N] = obj.odeMN(t, x0, u0, M0, M0Dot, N0, N0Dot, B, f);
             
-            %qConstraint = 2* x(4:7)' * xp(4:7);
-            %qConstraint = x(4)^2 + x(5)^2+x(6)^2 +x(7)^2 -1;
-            obj.vec = [x; obj.u0];
-                                                    %F,                     Jx * M
+            res = obj.helperCreateVektor(F, M, N);
+        end
+        
+        
+        
+        function [res, f, B] = odeF(obj, t, x, xp, u0)
+            
+            obj.vec = [x; u0];
+            
+            B = obj.mass(t, x);
             f = obj.dyn.dot(obj.timepoint);
             
-%             res = [ x(1:3) - f(1:3);
-%                     x(4:7) .*xp(4:7) - f(4:7);
-%                     x(8:end) - f(8:end)
-%                   ];
-
-            res = obj.mass(t, y)*xp - f;
+            res = B*xp - f;
+        end
+        
+        function [M, N] = odeMN(obj, t, x0, u0, M0, M0dot, N0, N0dot, B, f)
+            [n_state] = obj.getParams();
             
+            Bdot = obj.massdot(t, x0);
+            
+            JTilde = obj.dyn.getJTilde(x0, u0);
+            JTildex = JTilde(1:n_state, 1:n_state);
+            JTildeu = JTilde(1:n_state, n_state+1:end);
+            
+            resM = zeros(13, 13);
+            resN = zeros(13, 4);
+            
+            for i= 1:n_state
+                row_iM = 0;
+                row_iN = 0;
+                for j = 1:n_state
+                    row_iM = row_iM +  Bdot{i, j} * M0 * f(j) + B(i, j) * M0dot(j, :);
+                    row_iN = row_iN +  Bdot{i, j} * N0 * f(j) + B(i, j) * N0dot(j, :);
+                end
+                resM(i, :) = row_iM  - JTildex(i, :) * M0;
+                resN(i, :) = row_iN  - JTildex(i, :) * N0 - JTildeu(i, :);
+            end
+            M = reshape(sparse(resM), [obj.M0_size, 1]);
+            N = reshape(sparse(resN), [obj.N0_size, 1]);
         end
         
         function res = mass(obj, t, y)
             res = diag([ones(3, 1); y(4:7); ones(6, 1)]);
+        end
+        
+        function res = massdot(obj, t, y)
+            res = cell(13, 13);
+            for i = 1:13
+                for j = 1:13
+                    res{i, j} = sparse(1, 13);
+                end
+            end
+
+            res{4, 4} = sparse(1, 4, 1, 1, 13);
+            res{5, 5} = sparse(1, 5, 1, 1, 13);
+            res{6, 6} = sparse(1, 6, 1, 1, 13);
+            res{7, 7} = sparse(1, 7, 1, 1, 13);
+
         end
         
         function [dfdy, dfdyp] = JacF(obj, t, y, yp)
@@ -284,6 +286,14 @@ classdef ode15iM2 < Solver
             
         end
         
+        function res = FTildeTest(obj, t, y0, u0)
+            res = obj.dyn.FTilde(y0, u0);
+        end
+        
+        function res = JTildeTest(obj, t, y0, u0)
+            res = obj.dyn.getJTilde(y0, u0);
+        end
+        
         
         function func_p = plusEpsShift1(obj,i, y0, yp0, func)
             %vec_old = dyn.vec;
@@ -413,28 +423,48 @@ classdef ode15iM2 < Solver
             
         end
         
+        function testJTilde(testCase)
+            n_intervals = 4;
+            timepoint = 3;
+            [y0, yp0, old_interval, old_timepoint] = testCase.setupTest(n_intervals, timepoint);
+            [n_state] = testCase.getParams();
+            
+            y01 = y0(1:13);
+            u0 = testCase.get_contr(timepoint);
+            numDiffJ = testCase.numDiff_nD1(timepoint, @testCase.FTildeTest, y01, u0);
+            anaJ = testCase.JTildeTest([], y0, u0);
+            
+            testCase.assertLessThan(max(abs(anaJ(1:n_state, 1:n_state) - numDiffJ)),testCase.tol);
+            
+        end
+        
         
         function testOde(testCase)
             
-            n_intervals = 2;
-            timepoint = 1;
+            n_intervals = 4;
+            timepoint = 2;
             
             testCase.n_intervalsInt = 50;
             
             [y0, yp0, old_interval, old_timepoint] = testCase.setupTest(n_intervals, timepoint);
+            [n_state] = testCase.getParams();
             
-            %JP = testCase.jpatternDy();
-            %JPP = testCase.jpatternDyp();
-            
-            %testCase.opts = odeset('RelTol',1e-3,'AbsTol',1e-2,'Jacobian',@testCase.Jac,'Jpattern',{JP,JPP});
-            %opts_ = odeset('RelTol',1e-4,'AbsTol',1e-3, 'Jacobian',@testCase.JacF);
-            opts_ = odeset('RelTol',1e-4,'AbsTol',1e-5, 'Jacobian',@testCase.JacF);
+            opts_ = odeset('RelTol',1e-3,'AbsTol',1e-4);
             testCase.opts = opts_;
             
             tspan = [(timepoint -1)*testCase.h, timepoint*testCase.h];
-            
+            tic;
             [y01,yp01] = decic(@testCase.funcToIntegrate,tspan(1),y0,[],yp0,[],opts_);
-            testCase.odeTest(timepoint, y01, yp01);
+            
+            absSchaetzCalc= norm(y01 - y0, 1);
+            disp('Abstand des geschaetzen zudem berechneten Wert');
+            disp(absSchaetzCalc);
+            
+            [F, J] = testCase.odeTest(timepoint, y01, yp01);
+            toc
+            Q = norm(F(4:7));
+            % Differenz zur 1
+            testCase.assertLessThan(Q - 1,testCase.tolRK);
             
         end
         

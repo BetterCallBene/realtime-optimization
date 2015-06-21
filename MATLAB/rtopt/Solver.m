@@ -204,12 +204,7 @@ classdef(Abstract) Solver < handle & TestEnv
             y = obj.integrate(@obj.funcToIntegrate, meshGrid, y0, yp0);
             
             obj.timepoint = old_timepoint;
-            
-            pause;
-            
             [F, M, N, J] = obj.helperCreateMatrizen(y);
-            
-            J = [M, N];
         end
         function [F, J, M, N] = odeTest(obj, timepoint, y0, yp0)
             [F, J, M, N] = obj.ode(timepoint, y0, yp0);

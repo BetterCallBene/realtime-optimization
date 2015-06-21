@@ -8,18 +8,18 @@ MAPLE_PATH = '/Library/Frameworks/Maple.framework/Versions/Current/bin/maple'
 def main(template):
 	
 	files = [
-			'tmpRTEqConstraintsFunction',   # 0
-			'tmpRTEqConstraintsJacobi',     # 1
-			'tmpRTEqConstraintsHesse',      # 2
-			'tmpRTEqCountConstraintsJacobi',# 3
-			'tmpRTEqCountConstraints',      # 4
-			'tmpRTEqCountConstraintsHesse', # 5
-			'tmpRTInEqConstraintsFunction', # 6
-			'tmpRTInEqConstraintsJacobi',   # 7
-			'tmpRTInEqConstraintsHesse',    # 8
-			'tmpRTInEqCountConstraintsJacobi', # 9
-			'tmpRTInEqCountConstraints',    # 10
-			'tmpRTInEqCountConstraintsHesse', # 11
+			('tmpRTEqConstraintsFunction', 1),  # 0
+			('tmpRTEqConstraintsJacobi',   1),  # 1
+			('tmpRTEqConstraintsHesse',    1),  # 2
+			('tmpRTEqCountConstraintsJacobi', 1),# 3
+			('tmpRTEqCountConstraints', 1),     # 4
+			('tmpRTEqCountConstraintsHesse', 1), # 5
+			('tmpRTInEqConstraintsFunction', 1), # 6
+			('tmpRTInEqConstraintsJacobi', 1),  # 7
+			('tmpRTInEqConstraintsHesse', 1),   # 8
+			('tmpRTInEqCountConstraintsJacobi', 1), # 9
+			('tmpRTInEqCountConstraints', 1),    # 10
+			('tmpRTInEqCountConstraintsHesse', 1) # 11
 			]
 	if template is None:
 		template = 'template_GenConstraints.m'
