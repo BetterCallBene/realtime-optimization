@@ -403,24 +403,7 @@ classdef ode15iM2 < Solver
             
             [y0, yp0, old_interval, old_timepoint] = testCase.setupTest(n_intervals, timepoint);
             
-            [n_state] = testCase.getParams();
             numDiffJ = testCase.numDiff_nD1(timepoint, @testCase.funcToIntegrate, y0, yp0);
-            %numDiffJD = testCase.numDiff_nD2(timepoint, @testCase.funcToIntegrate, y0, yp0);
-            
-            %[anaJ, anaJD] = testCase.JacF([], y0, yp0);
-            
-            
-            %testCase.assertLessThan(max(abs(anaJ - numDiffJ)),testCase.tol);
-            %testCase.assertLessThan(max(abs(anaJD - numDiffJD)),testCase.tol);
- 
-            %testCase.timepoint = old_timepoint;
-            %testCase.postToDo(old_interval);
-            
-            %patternDy = testCase.jpatternDy();
-            %patternDyp = testCase.jpatternDyp();
-            
-            %patternDy - logical(anaJ)
-            
         end
         
         function testJTilde(testCase)
@@ -467,30 +450,6 @@ classdef ode15iM2 < Solver
             testCase.assertLessThan(Q - 1,testCase.tolRK);
             
         end
-        
-        function testFuncToIntegrate(testCase)
-            n_intervals = 3;
-            timepoint = 2;
-            
-            testCase.setupTest(n_intervals);
-            testCase.nextStep(timepoint);
-            
-            [old_interval] = testCase.preToDo();
-            
-            y0 = testCase.helperCreateInitialConditions();
-            yp0 = testCase.helperCreateInitialConditionsDot();
-            old_timepoint = testCase.timepoint;
-            testCase.timepoint = 1;
-            testCase.u0 = testCase.get_contr(old_timepoint);
-            testCase.funcToIntegrate([], y0, yp0);
-            
-            testCase.timepoint = old_timepoint;
-            
-            testCase.postToDo(old_interval);
-            
-        end
-        
-        
         
     end
     
