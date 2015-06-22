@@ -10,6 +10,9 @@ classdef ode15iM2 < Solver
         
         dfdyPatternflag;
         dfdypPatternflag;
+        
+        flagBDot;
+        BDot;
     end
     
     methods
@@ -19,7 +22,7 @@ classdef ode15iM2 < Solver
             odMi@Solver();
             odMi.dfdyPatternflag = true;
             odMi.dfdypPatternflag = true;
-            
+            odMi.flagBDot = true;
         end
         
         function yp = helperCreateInitialConditionsDot(obj)
@@ -63,48 +66,46 @@ classdef ode15iM2 < Solver
             [x0, M0, N0] = obj.helperCreateMatrizen(y);
             [xp0, M0Dot, N0Dot] = obj.helperCreateMatrizen( yp);
             
-            [F, f, B] = obj.odeF(t, x0, xp0, u0);
-            [M, N] = obj.odeMN(t, x0, u0, M0, M0Dot, N0, N0Dot, B, f);
+            [F, B] = obj.odeF(t, x0, xp0, u0);
+            [M, N] = obj.odeMN(t, x0, xp0, u0, M0, M0Dot, N0, N0Dot, B);
             
             res = obj.helperCreateVektor(F, M, N);
         end
         
         
-        
-        function [res, f, B] = odeF(obj, t, x, xp, u0)
-            
-            obj.vec = [x; u0];
-            
+        function [res, B] = odeF(obj, t, x, xp, u0)
             B = obj.mass(t, x);
-            f = obj.dyn.dot(obj.timepoint);
             
-            res = B*xp - f;
+            ftilde  = obj.dyn.FTilde(x, u0);
+            res = B*xp - ftilde;
         end
         
-        function [M, N] = odeMN(obj, t, x0, u0, M0, M0dot, N0, N0dot, B, f)
-            [n_state] = obj.getParams();
+        function [M, N] = odeMN(obj, t, x0, xp0, u0, M0, M0dot, N0, N0dot, B)
+            %[n_state] = obj.getParams();
+            n_state = 13;
+            M0_size_ = obj.M0_size;
+            N0_size_ = obj.N0_size;
             
-            Bdot = obj.massdot(t, x0);
+            Bdot_ = obj.massdot(t, x0);
+            
+            obj.vec = [x0; u0];
+            
+            f = obj.dyn.dot(obj.timepoint);
+            Bx = tprod(Bdot_,[1 -1 2], f, [-1]);
+            
+            % Test für spaeter
+            % Bx = tprod(Bdot_,[1 -1 2], xp0, [-1]);
             
             JTilde = obj.dyn.getJTilde(x0, u0);
             JTildex = JTilde(1:n_state, 1:n_state);
             JTildeu = JTilde(1:n_state, n_state+1:end);
             
-            resM = zeros(13, 13);
-            resN = zeros(13, 4);
             
-            for i= 1:n_state
-                row_iM = 0;
-                row_iN = 0;
-                for j = 1:n_state
-                    row_iM = row_iM +  Bdot{i, j} * M0 * f(j) + B(i, j) * M0dot(j, :);
-                    row_iN = row_iN +  Bdot{i, j} * N0 * f(j) + B(i, j) * N0dot(j, :);
-                end
-                resM(i, :) = row_iM  - JTildex(i, :) * M0;
-                resN(i, :) = row_iN  - JTildex(i, :) * N0 - JTildeu(i, :);
-            end
-            M = reshape(sparse(resM), [obj.M0_size, 1]);
-            N = reshape(sparse(resN), [obj.N0_size, 1]);
+            resM = Bx * M0 + B *M0dot - JTildex * M0;
+            resN = Bx * N0 + B *N0dot - JTildex * N0 - JTildeu;
+            
+            M = reshape(sparse(resM), [M0_size_, 1]);
+            N = reshape(sparse(resN), [N0_size_, 1]);
         end
         
         function res = mass(obj, t, y)
@@ -112,40 +113,112 @@ classdef ode15iM2 < Solver
         end
         
         function res = massdot(obj, t, y)
-            res = cell(13, 13);
-            for i = 1:13
-                for j = 1:13
-                    res{i, j} = sparse(1, 13);
-                end
+            if obj.flagBDot == true
+                obj.BDot = zeros(13, 13, 13);
+                
+
+                obj.BDot(4, 4, 4) = 1;
+                obj.BDot(5, 5, 5) = 1;
+                obj.BDot(6, 6, 6) = 1;
+                obj.BDot(7, 7, 7) = 1;
+                obj.flagBDot = false;
             end
-
-            res{4, 4} = sparse(1, 4, 1, 1, 13);
-            res{5, 5} = sparse(1, 5, 1, 1, 13);
-            res{6, 6} = sparse(1, 6, 1, 1, 13);
-            res{7, 7} = sparse(1, 7, 1, 1, 13);
-
+            res = obj.BDot;
         end
         
-        function [dfdy, dfdyp] = JacF(obj, t, y, yp)
+        %             bJFx1 = blkdiag(JTildex, JTildex, JTildex, JTildex, ...
+%                     JTildex, JTildex, JTildex, JTildex, ...
+%                     JTildex, JTildex, JTildex, JTildex, JTildex);
+%             bJFx2 = blkdiag(JTildex, JTildex, JTildex, JTildex);s
+        
+        function [dfdy, dfdyp] = Jac(obj, t, y, yp)
             [n_state, n_contr] = obj.getParams();
             
-            x = y(1:n_state);
-            %xp = yp(1:n_state);
+            u0 = obj.u0;
+            [x0, M0, N0] = obj.helperCreateMatrizen(y);
+            [xp0, M0Dot, N0Dot] = obj.helperCreateMatrizen( yp);
             
-            %q_vec = zeros(1, n_state);
-            %qdot_vec = zeros(1, n_state);
+            obj.vec = [x0; obj.u0];
+            f = obj.dyn.dot(obj.timepoint);
+            B_ = obj.mass(t, x0);
+            Bdot_ = obj.massdot(t, x0);
             
-            %q_vec(4:7) = 2.*x(4:7);
-            %qdot_vec(4:7) = 2.*xp(4:7);
-
-            obj.vec = [x; obj.u0];
+            JTilde = obj.dyn.getJTilde(x0, u0);
+            HTilde = obj.dyn.getHTilde(x0, u0);
+            JTildex = JTilde(1:n_state, 1:n_state);
+            %JTildeu = JTilde(1:n_state, n_state+1:end);
             
-            JF = obj.dyn.dotD(obj.timepoint);
-            JFx = JF(1:n_state, 1:n_state);
-
             
-            dfdy = -JFx;
-            dfdyp = obj.mass(t,y);
+            Bx = tprod(Bdot_,[1 -1 2], f, [-1]);
+            
+            dfdy = [obj.JacX(M0, M0Dot, N0, N0Dot, Bdot_, Bx, JTildex, HTilde), ...
+                    obj.JacM(Bx, JTildex), ...
+                    obj.JacN(Bx, JTildex) ...
+                    ];
+            
+        
+            dfdyp = sparse(blkdiag(B_, B_, B_, B_, B_,...
+                B_, B_, B_, B_, B_,...
+                B_, B_, B_, B_, B_,...
+                B_, B_, B_ ...
+            ));
+        end
+        
+        function dfdyX = JacX(obj, M0, M0Dot, N0, N0Dot, Bdot_, Bx, JTildex, HTilde)
+            [n_state, n_contr] = obj.getParams();
+            
+            Mx = zeros(n_state * n_state, n_state);
+            Nx = zeros(n_state * n_contr, n_state);
+            
+            %JTildeu = JTilde(1:n_state, n_state+1:end);
+            
+            
+            for i = 1:n_state
+                M0spalte = full(M0(:, i));
+                M0Dotspalte = full(M0Dot(:, i));
+                HTildexx = HTilde(:, 1:n_state, 1:n_state);
+                Mx((i-1)*n_state+1:i*n_state, :) = tprod(Bdot_, [1 -1 2], M0Dotspalte, [-1]) - tprod(HTildexx, [1 -1 2], M0spalte, [-1]);
+                if i <= n_contr
+                    N0spalte = full(N0(:, i));
+                    N0Dotspalte = full(N0Dot(:, i));
+                    
+                    Nx((i-1)*n_state+1:i*n_state, :) = tprod(Bdot_, [1 -1 2], N0Dotspalte, [-1]) - tprod(HTildexx, [1 -1 2], N0spalte, [-1])  ...
+                        - tprod(1, [-1],  HTilde(:, i + n_state, 1:n_state), [1 -1, 2]);
+                end
+            end
+            
+            tmp = Bx -JTildex;
+            
+            dfdyX = [sparse(tmp);
+                sparse(Mx);
+                sparse(Nx);
+            ];
+            
+        end
+        
+        function dfdyM = JacM(obj, Bx, JTildex)
+            Mdiag = Bx - JTildex;
+            
+            dfdyM = [
+                    sparse(13, 169);
+                    sparse(blkdiag(Mdiag, Mdiag, Mdiag, Mdiag, Mdiag,...
+                Mdiag, Mdiag, Mdiag, Mdiag, Mdiag,....
+                Mdiag, Mdiag, Mdiag ...
+            ));
+                sparse(4*13, 169);
+            ];
+            
+        end
+        
+        function dfdyM = JacN(obj, Bx, JTildex)
+            Ndiag = Bx - JTildex;
+            
+            dfdyM = [
+                    sparse(13, 52);
+                    sparse(169, 52);
+                    sparse(blkdiag(Ndiag, Ndiag, Ndiag, Ndiag));
+            ];
+            
         end
         
     end
@@ -399,11 +472,16 @@ classdef ode15iM2 < Solver
             n_intervals = 4;
             timepoint = 3;
             
-            
-            
             [y0, yp0, old_interval, old_timepoint] = testCase.setupTest(n_intervals, timepoint);
+            tspan = [(timepoint -1)*testCase.h, timepoint*testCase.h];
             
             numDiffJ = testCase.numDiff_nD1(timepoint, @testCase.funcToIntegrate, y0, yp0);
+            numDiffJD = testCase.numDiff_nD2(timepoint, @testCase.funcToIntegrate, y0, yp0);
+            %tic
+            [anaDiffJ, anaDiffJD] =testCase.Jac(tspan(1), y0, yp0);
+            %toc
+            spy((abs(anaDiffJ- numDiffJ) > 1e-4))
+            
         end
         
         function testJTilde(testCase)
@@ -432,18 +510,18 @@ classdef ode15iM2 < Solver
             [y0, yp0, old_interval, old_timepoint] = testCase.setupTest(n_intervals, timepoint);
             [n_state] = testCase.getParams();
             
-            opts_ = odeset('RelTol',1e-3,'AbsTol',1e-4);
+            opts_ = odeset('RelTol',1e-3,'AbsTol',1e-4, 'Jacobian', @testCase.Jac);
             testCase.opts = opts_;
             
             tspan = [(timepoint -1)*testCase.h, timepoint*testCase.h];
             tic;
-            [y01,yp01] = decic(@testCase.funcToIntegrate,tspan(1),y0,[],yp0,[],opts_);
+            %[y01,yp01] = decic(@testCase.funcToIntegrate,tspan(1),y0,[],yp0,[],opts_);
             
-            absSchaetzCalc= norm(y01 - y0, 1);
-            disp('Abstand des geschaetzen zudem berechneten Wert');
-            disp(absSchaetzCalc);
+            %absSchaetzCalc= norm(y01 - y0, 1);
+            %disp('Abstand des geschaetzen zudem berechneten Wert');
+            %disp(absSchaetzCalc);
             
-            [F, J] = testCase.odeTest(timepoint, y01, yp01);
+            [F, J] = testCase.odeTest(timepoint, y0, yp0);
             toc
             Q = norm(F(4:7));
             % Differenz zur 1

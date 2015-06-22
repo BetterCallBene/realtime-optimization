@@ -124,39 +124,27 @@ classdef BasisQDyn < BasisGenQDyn
         function res = dot(obj,ind) % Rechte Seite der ODE aus (Quadrocoptermodell.pdf: (1.46))
             % compute the right hand side of the ode for a given time
             % instance ind
-            if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
-                res = obj.F(:, ind);
-            else
-                error('wrong state and control lengths wrt index.');
-            end
+            res = obj.F(:, ind);
         end
         
         
         function res = dotD(obj,ind )
             % compute the Jacobian of the right hand side of the ode for
             % a given time instance ind
-            if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
-                J_ = obj.J;
-                res = sparse(J_(:, 1), J_(:, 2), J_(:, ind + 2), 13, 17);
-            else
-                error('wrong state and control lengths wrt index.');
-            end
+            J_ = obj.J;
+            res = sparse(J_(:, 1), J_(:, 2), J_(:, ind + 2), 13, 17);
         end
         
         function res = dotDD(obj,ind)
             % compute the Hessian of the right hand side of the ode for
             % a given time instance ind
-            if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
-                n_state       = obj.robot.n_state;
-                
-                res = cell(1, n_state);
-                H_ = obj.H;
-                for i = 1:size(H_, 1)
-                    if isempty(res{H_(i, 1)})
-                        res{H_(i, 1)} = sparse(17, 17);
-                    end
-                    res{H_(i, 1)}(H_(i, 2), H_(i, 3)) = H_(i, ind + 3);
+            res = cell(1, n_state);
+            H_ = obj.H;
+            for i = 1:size(H_, 1)
+                if isempty(res{H_(i, 1)})
+                    res{H_(i, 1)} = sparse(17, 17);
                 end
+                res{H_(i, 1)}(H_(i, 2), H_(i, 3)) = H_(i, ind + 3);
             end
         end
     end

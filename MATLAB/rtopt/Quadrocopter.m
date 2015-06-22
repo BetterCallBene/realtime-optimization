@@ -26,16 +26,19 @@ classdef Quadrocopter < Model
     %
     
     
+    properties
+        I_M;
+        flagI_M;
+    end
 
 	properties(Dependent)
 		n_var;
         I_1;
-        I_M;
     end
     
     methods
-        function res = Quadrocopter(varargin)
-            
+        function QC = Quadrocopter(varargin)
+            QC.flagI_M = true;
         end
         % Jm (Motor Rotation Inertia for Rotating Component only)
         % Mass of rotating component is 52.7% of the total mass of the motor + prop
@@ -43,8 +46,12 @@ classdef Quadrocopter < Model
         %Jm = ((mRC)*(motor_r)^2)/2; % Jm = mr^2/2
         %
         function IM = get.I_M(cq)
-            mRC = (cq.motor_m)*(0.527);
-            IM = ((mRC)*(cq.motor_r)^2)/2;
+            if cq.flagI_M
+                mRC = (cq.motor_m)*(0.527);
+                cq.I_M = ((mRC)*(cq.motor_r)^2)/2;
+                cq.flagI_M = false;
+            end
+            IM = cq.I_M;
         end
         function ret = get.I_1(cq)
             ret = [

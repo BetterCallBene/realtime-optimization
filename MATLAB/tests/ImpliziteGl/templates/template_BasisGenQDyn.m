@@ -73,7 +73,7 @@ classdef(Abstract) BasisGenQDyn < Dyn
         function res = FTilde(obj, y, u)
             [q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = getParams(obj, y, u);
             $3$
-            res = t1';
+            res = t1;
         end
         
         function res = JTilde(obj, y, u)
