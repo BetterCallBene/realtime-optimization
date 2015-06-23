@@ -358,7 +358,7 @@ classdef RealtimeSolver < TestEnv
             env.horizon = hori;
             env.setUniformMesh(uint16(hori));
             cQ = Quadrocopter();
-            cFE = ForwEuler();
+            cFE = ForwEuler(); %TODO: Replace with ode15iM2
             cBQD = BasisQDyn(cQ,env,cFE);
            
             o.cCost = Costs(cBQD);
