@@ -14,10 +14,17 @@ classdef(Abstract) Solver < handle & TestEnv
         M0_size;
         N0_size;
         
-       
+        n_intervalsInt;
+        
         h;
         JDot;
         vec_sav;
+        
+        flagM0;
+        flagN0;
+        
+        flagM0_size;
+        flagN0_size
     end
     
     properties(Dependent)
@@ -54,35 +61,41 @@ classdef(Abstract) Solver < handle & TestEnv
         end
         
         function res = get.M0(obj)
-             if isempty(obj.M0)
+             if obj.flagM0 == true
                  n_state = obj.dyn.robot.n_state;
-                 obj.M0 = eye(n_state);
+                 obj.M0 = speye(n_state);
+                 obj.flagM0 = false;
              end
              res = obj.M0;
          end
         
         function res = get.N0(obj)
-            if isempty(obj.N0)
-                [n_state, n_contr, n_var] = obj.getParams();
-                obj.N0 = zeros(n_state, n_contr);
+            if obj.flagN0 == true
+                [n_state, n_contr] = obj.getParams();
+                obj.N0 = sparse(n_state, n_contr);
+                obj.flagN0 = false;
             end
             res = obj.N0;
         end
         
         function res = get.M0_size(obj)
             
-            if isempty(obj.M0_size)
-                n_state = obj.getParams();
-                obj.M0_size = n_state * n_state;
-            end
-            res = obj.M0_size;
+%             if obj.flagM0_size
+%                 n_state = obj.getParams();
+%                 obj.M0_size = n_state * n_state;
+%                 obj.flagM0_size = false;
+%             end
+%             res = obj.M0_size;
+            res =169; % Performance
         end
         function res = get.N0_size(obj)
-            if isempty(obj.N0_size)
-                [n_state, n_contr] = obj.getParams();
-                obj.N0_size = n_state * n_contr;
-            end
-            res = obj.N0_size;
+%             if obj.flagN0_size
+%                 [n_state, n_contr] = obj.getParams();
+%                 obj.N0_size = n_state * n_contr;
+%                 obj.flagN0_size = false;
+%             end
+%             res = obj.N0_size;
+            res = 52; %Performance
         end
         
         function res = get.JDot(obj)
@@ -104,22 +117,37 @@ classdef(Abstract) Solver < handle & TestEnv
             M = obj.JDot_x * M0_;
         end
         
+        function N = kN(obj, y)
+            [n_state, n_contr] = getParams(obj);
+            
+            N0_ = reshape(y, [n_state, n_contr]);
+            N = obj.JDot_x * N0_ + obj.JDot_u;
+        end
+        
     end
     
     methods %Help Functions
-        function [n_state, n_contr, n_var, n_timepoints] = getParams(obj)
-            n_state = obj.dyn.robot.n_state;
-            n_contr = obj.dyn.robot.n_contr;
-            n_var = obj.dyn.robot.n_var;
-            n_timepoints = obj.dyn.environment.n_timepoints;
+        function [n_state, n_contr, n_var] = getParams(obj)
+            n_state =13; %= obj.dyn.robot.n_state;
+            n_contr = 4;%= obj.dyn.robot.n_contr;
+            n_var = 17;%n_var = obj.dyn.robot.n_var;
+            %n_timepoints = obj.dyn.environment.n_timepoints;
         end
         function [F, M, N, J] = helperCreateMatrizen(obj, Y)
             
-            [n_state, n_contr, n_var] = obj.getParams();
+            %[n_state, n_contr] = obj.getParams();
+            n_state = 13;
+            n_contr = 4;
+            
+            M0_size_ = obj.M0_size;
+            N0_size_ = obj.N0_size;
             
             F = Y(1:n_state, 1);
-            M = sparse(reshape(Y(n_state + 1: n_state + obj.M0_size, 1), [n_state, n_state]));
-            N = sparse(reshape(Y(n_state + obj.M0_size + 1: n_state + obj.M0_size + obj.N0_size, 1), [n_state, n_contr]));
+            
+            M_vec = reshape(Y(n_state + 1: n_state + M0_size_, 1), [n_state, n_state]);
+            M = sparse(M_vec);
+            N_vec = reshape(Y(n_state + M0_size_ + 1: n_state + M0_size_ + N0_size_, 1), [n_state, n_contr]);
+            N = sparse(N_vec);
             J = [M, N];
         end
         function y0 = helperCreateInitialConditions(obj, varargin)
@@ -134,23 +162,30 @@ classdef(Abstract) Solver < handle & TestEnv
             y0 = obj.helperCreateVektor(state, obj.M0, obj.N0);
         end
         function y = helperCreateVektor(obj, F, M, N)
-            [n_state, n_contr, n_var] = obj.getParams();
+            %[n_state] = obj.getParams();
+            n_state = 13;
+            M0_size_ = obj.M0_size;
+            N0_size_ = obj.N0_size;
             
-            y = zeros(n_state + obj.M0_size + obj.N0_size, 1);
+            y = zeros(n_state + M0_size_ + N0_size_, 1);
             y(1:n_state, 1) = F;
-            y(n_state + 1: n_state + obj.M0_size, 1) = reshape(M, [obj.M0_size, 1]);
-            y(n_state + obj.M0_size + 1: n_state + obj.M0_size + obj.N0_size, 1) = reshape(N, [obj.N0_size, 1]);
+            y(n_state + 1: n_state + M0_size_, 1) = reshape(M, [M0_size_, 1]);
+            y(n_state + M0_size_ + 1: n_state + M0_size_ + N0_size_, 1) = reshape(N, [N0_size_, 1]);
         end
     end
     
     methods
         function s = Solver()
+            s.flagM0_size = true;
+            s.flagN0_size = true;
+            s.flagM0 = true;
+            s.flagN0 = true;
         end
         
         function val = get_contr(obj, timepoint)
            % (if not yet stored, extract them from vec)            
            
-            [n_state, n_contr, n_var, n_timepoints] = getParams(obj);
+            [n_state, n_contr, n_var] = getParams(obj);
 
             val = obj.vec_sav((timepoint-1)*(n_var)+n_state + 1:...
                 timepoint*(n_var));
@@ -158,7 +193,7 @@ classdef(Abstract) Solver < handle & TestEnv
         end
         
         function [old_intervals] = preToDo(obj)
-            [n_state, n_contr, n_var, n_timepoints] = getParams(obj);
+            [n_state, n_contr, n_var] = getParams(obj);
             obj.vec_sav = obj.vec;  % Speichere alten vektor
             obj.vec = zeros(n_var, 1);
             old_intervals = obj.dyn.environment.n_intervals;
@@ -170,39 +205,44 @@ classdef(Abstract) Solver < handle & TestEnv
             obj.dyn.environment.n_intervals = old_intervals;
         end
         
-        function [F, J, M, N] = ode(obj, timepoint)
+        function [F, J, M, N] = ode(obj, timepoint, varargin)
             
             obj.nextStep(timepoint);
-            mesh = obj.dyn.environment.mesh;
             
-            y0 = obj.helperCreateInitialConditions();
+            if nargin <= 2
+                y0 = obj.helperCreateInitialConditions();
+                yp0 = [];
+            elseif nargin == 4
+                y0 = varargin{1};
+                yp0 = varargin{2};
+            else
+                error('Wrong parameter count');
+            end
             
             tspan = [(timepoint -1)*obj.h, timepoint*obj.h];
-            meshGrid = [tspan(1), tspan(1) + mesh(1)/2, tspan(2)]; 
+            meshGrid = linspace(tspan(1), tspan(2), obj.n_intervalsInt); 
             
             old_timepoint = obj.timepoint;
             obj.u0 = obj.get_contr(old_timepoint);
             obj.timepoint = 1;
             
-            y = obj.integrate(@obj.funcToIntegrate, meshGrid, y0);
+            y = obj.integrate(@obj.funcToIntegrate, meshGrid, y0, yp0);
             
             obj.timepoint = old_timepoint;
-            
             [F, M, N, J] = obj.helperCreateMatrizen(y);
-            
-            %J = [M, N];
         end
-        function [F, J, M, N] = odeTest(obj, timepoint)
-            [old_intervals] = obj.preToDo();
-            [F, J, M, N] = obj.ode(timepoint);
-            obj.postToDo(old_intervals);
+        function [F, J, M, N] = odeTest(obj, timepoint, y0, yp0)
+            [F, J, M, N] = obj.ode(timepoint, y0, yp0);
         end
         
-        function dy = funcToIntegrate(obj, t, y)
+        function dy = funcToIntegrate(obj, t, varargin)
+            
+            y = varargin{1};
+            
             [n_state] = obj.getParams();
             
             obj.vec = [y(1:n_state); obj.u0];
-            dy = obj.helperCreateVektor(obj.dyn.dot(obj.timepoint), obj.kM(y(n_state+1:n_state + obj.M0_size)), obj.JDot_u);
+            dy = obj.helperCreateVektor(obj.dyn.dot(obj.timepoint), obj.kM(y(n_state+1:n_state + obj.M0_size)), obj.kN(y(n_state + obj.M0_size+1:end)));
         end
         
         function nextStep(obj, timepoint)

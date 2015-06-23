@@ -13,7 +13,8 @@ classdef ode45M < Solver
         
         
         function y = integrate(obj, func, meshGrid, y0)
-            y = ode45(func, meshGrid, y0);
+            [t, y] = ode45(func, meshGrid, y0);
+            y = y(end, :)';
         end
         
         

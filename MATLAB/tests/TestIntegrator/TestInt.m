@@ -36,7 +36,7 @@ classdef TestInt < handle & TestEnv
             testCase.setupTest(n_intervals);
             [F1, J1] = testCase.solver1.odeTest(timepoint);
             [F2, J2] = testCase.solver2.odeTest(timepoint);
-            [F3, J3] = testCase.solver2.odeTest(timepoint);
+            [F3, J3] = testCase.solver3.odeTest(timepoint);
             
 
             anaDiff1 = J1;
