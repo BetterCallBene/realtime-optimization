@@ -96,15 +96,11 @@ classdef(Abstract) BasisGenQDyn < Dyn
         
         function res = getHTilde(obj, y, u)
             
-            res = cell(1, 13);
+            res = zeros(13, 17, 17);
             H_ = obj.HTilde(y, u);
             for i = 1:size(H_, 1)
-                if isempty(res{H_(i, 1)})
-                    res{H_(i, 1)} = sparse(17, 17);
-                end
-                res{H_(i, 1)}(H_(i, 2), H_(i, 3)) = H_(i, 4);
+                res(H_(i, 1), H_(i, 2), H_(i, 3)) = H_(i, 4);
             end
-            
         end
         
         function [q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = getParams(obj, varargin)
