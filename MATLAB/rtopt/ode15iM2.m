@@ -88,10 +88,10 @@ classdef ode15iM2 < Solver
             
             Bdot_ = obj.massdot(t, x0);
             
-            obj.vec = [x0; u0];
+            %obj.vec = [x0; u0];
             
-            f = obj.dyn.dot(obj.timepoint);
-            Bx = tprod(Bdot_,[1 -1 2], f, [-1]);
+            %f = obj.dyn.dot(obj.timepoint);
+            Bx = tprod(Bdot_,[1 -1 2], xp0, [-1]);
             
             % Test für spaeter
             % Bx = tprod(Bdot_,[1 -1 2], xp0, [-1]);
@@ -134,12 +134,14 @@ classdef ode15iM2 < Solver
         function [dfdy, dfdyp] = Jac(obj, t, y, yp)
             [n_state, n_contr] = obj.getParams();
             
+            
+            
             u0 = obj.u0;
             [x0, M0, N0] = obj.helperCreateMatrizen(y);
             [xp0, M0Dot, N0Dot] = obj.helperCreateMatrizen( yp);
             
-            obj.vec = [x0; obj.u0];
-            f = obj.dyn.dot(obj.timepoint);
+            %obj.vec = [x0; obj.u0];
+            %f = obj.dyn.dot(obj.timepoint);
             B_ = obj.mass(t, x0);
             Bdot_ = obj.massdot(t, x0);
             
@@ -148,20 +150,39 @@ classdef ode15iM2 < Solver
             JTildex = JTilde(1:n_state, 1:n_state);
             %JTildeu = JTilde(1:n_state, n_state+1:end);
             
+            flagMxp = zeros(n_state, 1);
+            flagMxp5 = flagMxp4;
+            flagMxp6 = flagMxp5;
+            flagMxp7 = flagMxp6;
             
-            Bx = tprod(Bdot_,[1 -1 2], f, [-1]);
+            flagMxp4(4) = 1;
+            flagMxp5(5) = 1;
+            flagMxp6(6) = 1;
+            flagMxp7(7) = 1;
+            
+            Bx = tprod(Bdot_,[1 -1 2], xp0, [-1]);
+            
+            Bxp = tprod(eins, [-1], Bdot_,[1 -1 2]);
+            %Mxp = Bxp * M0;
+            %Nxp = Bxp * N0;
             
             dfdy = [obj.JacX(M0, M0Dot, N0, N0Dot, Bdot_, Bx, JTildex, HTilde), ...
                     obj.JacM(Bx, JTildex), ...
                     obj.JacN(Bx, JTildex) ...
                     ];
             
-        
-            dfdyp = sparse(blkdiag(B_, B_, B_, B_, B_,...
+            dfdypX = [B_;
+                sparse(3*n_state, n_state);
+                Mxp;
+                Nxp;
+            ];
+                
+            dfdyp = [...
+                sparse(blkdiag(B_, B_, B_, B_, B_,...
                 B_, B_, B_, B_, B_,...
                 B_, B_, B_, B_, B_,...
                 B_, B_, B_ ...
-            ));
+            ))];
         end
         
         function dfdyX = JacX(obj, M0, M0Dot, N0, N0Dot, Bdot_, Bx, JTildex, HTilde)
@@ -475,12 +496,14 @@ classdef ode15iM2 < Solver
             [y0, yp0, old_interval, old_timepoint] = testCase.setupTest(n_intervals, timepoint);
             tspan = [(timepoint -1)*testCase.h, timepoint*testCase.h];
             
+            yp0 = rand(size(y0));
+            
             numDiffJ = testCase.numDiff_nD1(timepoint, @testCase.funcToIntegrate, y0, yp0);
             numDiffJD = testCase.numDiff_nD2(timepoint, @testCase.funcToIntegrate, y0, yp0);
             %tic
             [anaDiffJ, anaDiffJD] =testCase.Jac(tspan(1), y0, yp0);
             %toc
-            spy((abs(anaDiffJ- numDiffJ) > 1e-4))
+            spy((abs(anaDiffJD- numDiffJD) > 1e-4))
             
         end
         
@@ -502,7 +525,7 @@ classdef ode15iM2 < Solver
         
         function testOde(testCase)
             
-            n_intervals = 4;
+            n_intervals = 50;
             timepoint = 2;
             
             testCase.n_intervalsInt = 50;
