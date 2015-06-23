@@ -173,7 +173,7 @@ classdef Costs < TestEnv
                 vindx((i-1)*3+1:i*3) = beta * ones(1,3);
             end
             
-            i = n_tp
+            i = n_tp;
             rindx((i-1)*3+1:i*3) = (i-1)*(n_state+n_contr) + 1:...
                     (i-1)*(n_state+n_contr)+3;
             vindx((i-1)*3+1:i*3) = beta * ones(1,3);
