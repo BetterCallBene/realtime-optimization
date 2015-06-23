@@ -86,7 +86,7 @@ classdef(Abstract) Dyn < handle  & TestEnv
             vec( (i-1) * o.robot.n_var +1 : end - o.robot.n_contr ) = s{i};
         end
         
-        function func_p = plusEpsShift(obj,i,t,vec_old,func)
+        function func_p = plusEpsShift(obj,i,t,vec_old,func,n,dyn)
             % PLUSEPSSHIFT This funktion overwrites the one in TestEnv, as
             % we need unnormed quaternions here.
             vec_p = vec_old;
@@ -96,7 +96,7 @@ classdef(Abstract) Dyn < handle  & TestEnv
             obj.vec = vec_old;
         end
         
-        function func_n = minusEpsShift(obj,i,t,vec_old,func)
+        function func_n = minusEpsShift(obj,i,t,vec_old,func,n,dyn)
             % MINUSEPSSHIFT Same function as PLUSEPSSHFIT only with a
             % minus.
             vec_n = vec_old;

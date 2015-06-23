@@ -23,6 +23,14 @@ resultForwEuler = run(suiteForwEuler);
 suiteCosts = TestSuite.fromClass(?Costs);
 resultCosts = run(suiteCosts);
 
+suiteRiccati = TestSuite.fromClass(?RiccatiManager);
+resultRiccati = run(suiteRiccati);
+
+suiteRTSolver = TestSuite.fromClass(?RealtimeSolver);
+resultRTSolver = run(suiteRTSolver);
+
+
+
 %Create Suite from SolverTest Class Definition File
 %The fromFile method creates a suite using the name of the file to identify the class.
 

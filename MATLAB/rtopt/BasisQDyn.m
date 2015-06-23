@@ -138,6 +138,7 @@ classdef BasisQDyn < BasisGenQDyn
         function res = dotDD(obj,ind)
             % compute the Hessian of the right hand side of the ode for
             % a given time instance ind
+            n_state = obj.robot.n_state;
             res = cell(1, n_state);
             H_ = obj.H;
             for i = 1:size(H_, 1)
