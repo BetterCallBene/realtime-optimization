@@ -33,14 +33,17 @@ cQ = Quadrocopter();
 % TODO: Irgendwas besser f�r Startl�sung als rand finden
 %v0 = rand(cQ.n_var*horizon,1);
 
-% Initialisierung der Dynamik
-cBQD = BasisQDyn(cQ, env);
-
 % Wahl des Integrators
-cFE = ForwEuler(cBQD);
+cFE = ForwEuler();
+
+% Initialisierung der Dynamik
+cBQD = BasisQDyn(cQ, env,cFE);
+
+% Initialisierung des Multiple Shootings
+cMultShoot = MultiShooting(cBQD);
 
 % Initialisierung der Nebenbedingungen
-cConst = Constraints(cFE);
+cConst = Constraints(cMultShoot);
 
 % Initialisierung Kostenfunktion
 cCost = Costs(cBQD);

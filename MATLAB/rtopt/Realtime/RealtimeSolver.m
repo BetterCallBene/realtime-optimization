@@ -89,16 +89,16 @@ classdef RealtimeSolver < TestEnv
         
                 function testActiveSetChecker(o)
         
-                    hori = 12;
+                    hori = 20;
                     n_timepoints = 50;
                     [s, lambda, q, mu] = o.setupTest(hori);
         
                     %Initialize variables
                     o.est_y = cell(n_timepoints,4);
                     o.res = cell(n_timepoints,4);
-        
+                    
                     for i = 1:n_timepoints
-        
+                        
                         %Set values
                         vec = o.cDyn.getVecFromCells(s,q);
                         o.cCost.vec = vec;
@@ -114,6 +114,7 @@ classdef RealtimeSolver < TestEnv
                             is_leq_0 = o.cConst.get_ineq_con_at_t(j) >= 0;
                             %TODO: refine
                             o.assertEqual(sum(aS_j - is_leq_0) , 0);
+                            % TODO: Fehlen hier noch diverse Checks???
         %                     subplot(3,1,1), plot(aS_j,'r+-');
         %                     subplot(3,1,2), plot(is_leq_0,'r+-');
         %                     subplot(3,1,3), plot(o.cConst.get_ineq_con_at_t(j),'r+-');
@@ -134,6 +135,7 @@ classdef RealtimeSolver < TestEnv
         
                         %Display the actual timepoint in the command window
                         disp(int2str(i));
+                        
                     end
         
                 end
@@ -144,7 +146,7 @@ classdef RealtimeSolver < TestEnv
                     % 1e-15.
         
                     % Initialize classes
-                    hori = 30;
+                    hori = 15;
                     [s, lambda, q, mu] = o.setupTest(hori);
         
                     %Set values
@@ -158,11 +160,15 @@ classdef RealtimeSolver < TestEnv
                     %Choose how to calculate the LDD (approximation or not)?
                     get_LDD = @(cost, const, t) getLDD(cost, const, t);
                     i = 1;
+                    tic;
                     o.calculateSolution(i,get_LDD,s, lambda,q,mu);
         
-                    %Build up delta and large gradient and hesse
-                    [grad_L, hesse_L] = o.buildUpGradHesse(get_LDD);
+                    %Build up delta
                     delta_ric = o.buildUpDelta_ric();
+                    toc;
+                    %Build up gradient and hesse
+                    [grad_L, hesse_L] = o.buildUpGradHesse(get_LDD);
+                    
         
                     %Solve with \
                     delta_matlab = hesse_L \ grad_L;
@@ -174,10 +180,7 @@ classdef RealtimeSolver < TestEnv
         function testPerformNewtonAndShift(o)
             
             hori = 15;
-            n_timepoints = 17;
-            
-            
-            i = 1;
+            n_timepoints = 17;            
             
             [s, lambda, q, mu] = o.setupTest(hori);
             
@@ -355,10 +358,12 @@ classdef RealtimeSolver < TestEnv
             env.horizon = hori;
             env.setUniformMesh(uint16(hori));
             cQ = Quadrocopter();
-            cBQD = BasisQDyn(cQ,env);
-            cFE = ForwEuler(cBQD);
+            cFE = ForwEuler();
+            cBQD = BasisQDyn(cQ,env,cFE);
+           
             o.cCost = Costs(cBQD);
-            o.cConst = Constraints(cFE);
+            multShoot = MultiShooting(cBQD);
+            o.cConst = Constraints(multShoot);
             o.cDyn = o.cConst.dyn;
             o.horizon = o.cDyn.environment.horizon;
             o.ricM = RiccatiManager(o.horizon, o.cDyn.robot);

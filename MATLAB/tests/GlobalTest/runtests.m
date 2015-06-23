@@ -12,29 +12,26 @@ TEST = true;
 %The fromClass method creates a suite from all Test methods in the SolverTest class.
 
 % suiteBasisQDyn = TestSuite.fromClass(?BasisQDyn);
-% resultDyn = run(suiteBasisQDyn);                          Check
-% 
+% resultDyn = run(suiteBasisQDyn);                          %Check
 
-suiteConstraints = TestSuite.fromClass(?Constraints);
-resultConstraints = run(suiteConstraints);                %Check
+% suiteConstraints = TestSuite.fromClass(?Constraints);
+% resultConstraints = run(suiteConstraints);                %Check
         
 % suiteForwEuler = TestSuite.fromClass(?ForwEuler);
-% resultForwEuler = run(suiteForwEuler);                    NOT 
-%
-% 
+% resultForwEuler = run(suiteForwEuler);                    %NOT 
+
 % suiteODE15iM2 = TestSuite.fromClass(?ode15iM2);
-% resultODE15iM2 = run(suiteODE15iM2);                        Check
+% resultODE15iM2 = run(suiteODE15iM2);                      %Check
 
 % suiteCosts = TestSuite.fromClass(?Costs);
-% resultCosts = run(suiteCosts);                              Check
-% % 
+% resultCosts = run(suiteCosts);                            %Check
+
+ 
 % suiteRiccati = TestSuite.fromClass(?RiccatiManager);
-% resultRiccati = run(suiteRiccati);                          Check
+% resultRiccati = run(suiteRiccati);                        %Check
 
-
-% 
-% suiteRTSolver = TestSuite.fromClass(?RealtimeSolver);
-% resultRTSolver = run(suiteRTSolver);
+suiteRTSolver = TestSuite.fromClass(?RealtimeSolver);
+resultRTSolver = run(suiteRTSolver);                        %Check
 
 % 
 %Create Suite from SolverTest Class Definition File
