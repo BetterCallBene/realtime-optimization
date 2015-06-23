@@ -25,7 +25,7 @@ TEST = true;
 % resultsuiteode15iM = run(suiteode15iM2, 'testOde');
 
 suiteode15iM2 = ode15iM2();
-resultsuiteode15iM = run(suiteode15iM2, 'testJac');
+resultsuiteode15iM = run(suiteode15iM2);
 
 %suiteRungeKutta = RungeKutta();
 %resultRungeKuttaK1 = run(suiteRungeKutta, 'testOde');

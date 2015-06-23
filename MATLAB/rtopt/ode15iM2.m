@@ -148,9 +148,21 @@ classdef ode15iM2 < Solver
             JTilde = obj.dyn.getJTilde(x0, u0);
             HTilde = obj.dyn.getHTilde(x0, u0);
             JTildex = JTilde(1:n_state, 1:n_state);
-            %JTildeu = JTilde(1:n_state, n_state+1:end);
             
-            flagMxp = zeros(n_state, 1);
+            Bx = tprod(Bdot_,[1 -1 2], xp0, [-1]);
+            
+            dfdy = [obj.JacX(M0, M0Dot, N0, N0Dot, Bdot_, Bx, JTildex, HTilde), ...
+                    obj.JacM(Bx, JTildex), ...
+                    obj.JacN(Bx, JTildex) ...
+                    ];
+            dfdyp = obj.JacP(M0, B_, Bdot_);
+            
+        end
+        
+        function dfdyp = JacP(obj, M0, B_, Bdot_)
+            n_state = 13;
+            n_var = 17;
+            flagMxp4 = zeros(n_state, 1);
             flagMxp5 = flagMxp4;
             flagMxp6 = flagMxp5;
             flagMxp7 = flagMxp6;
@@ -160,29 +172,30 @@ classdef ode15iM2 < Solver
             flagMxp6(6) = 1;
             flagMxp7(7) = 1;
             
-            Bx = tprod(Bdot_,[1 -1 2], xp0, [-1]);
-            
-            Bxp = tprod(eins, [-1], Bdot_,[1 -1 2]);
-            %Mxp = Bxp * M0;
-            %Nxp = Bxp * N0;
-            
-            dfdy = [obj.JacX(M0, M0Dot, N0, N0Dot, Bdot_, Bx, JTildex, HTilde), ...
-                    obj.JacM(Bx, JTildex), ...
-                    obj.JacN(Bx, JTildex) ...
-                    ];
+            Bxp4 = tprod(flagMxp4, [-1], Bdot_,[1 -1 2]);
+            Bxp5 = tprod(flagMxp5, [-1], Bdot_,[1 -1 2]);
+            Bxp6 = tprod(flagMxp6, [-1], Bdot_,[1 -1 2]);
+            Bxp7 = tprod(flagMxp7, [-1], Bdot_,[1 -1 2]);
             
             dfdypX = [B_;
                 sparse(3*n_state, n_state);
-                Mxp;
-                Nxp;
+                Bxp4 * M0;
+                Bxp5 * M0;
+                Bxp6 * M0;
+                Bxp7 * M0;
+                sparse(10*n_state, n_state); 
             ];
-                
-            dfdyp = [...
-                sparse(blkdiag(B_, B_, B_, B_, B_,...
+            dfdypMN = [
+                sparse(n_state, n_var*n_state);
+                sparse(blkdiag(B_, B_, B_, B_,...
                 B_, B_, B_, B_, B_,...
                 B_, B_, B_, B_, B_,...
                 B_, B_, B_ ...
-            ))];
+            ));];
+            dfdyp = [dfdypX, ...
+                dfdypMN
+                ];
+            
         end
         
         function dfdyX = JacX(obj, M0, M0Dot, N0, N0Dot, Bdot_, Bx, JTildex, HTilde)
@@ -501,25 +514,10 @@ classdef ode15iM2 < Solver
             numDiffJ = testCase.numDiff_nD1(timepoint, @testCase.funcToIntegrate, y0, yp0);
             numDiffJD = testCase.numDiff_nD2(timepoint, @testCase.funcToIntegrate, y0, yp0);
             %tic
-            [anaDiffJ, anaDiffJD] =testCase.Jac(tspan(1), y0, yp0);
+            [anaJ, anaJD] =testCase.Jac(tspan(1), y0, yp0);
             %toc
-            spy((abs(anaDiffJD- numDiffJD) > 1e-4))
-            
-        end
-        
-        function testJTilde(testCase)
-            n_intervals = 4;
-            timepoint = 3;
-            [y0, yp0, old_interval, old_timepoint] = testCase.setupTest(n_intervals, timepoint);
-            [n_state] = testCase.getParams();
-            
-            y01 = y0(1:13);
-            u0 = testCase.get_contr(timepoint);
-            numDiffJ = testCase.numDiff_nD1(timepoint, @testCase.FTildeTest, y01, u0);
-            anaJ = testCase.JTildeTest([], y0, u0);
-            
-            testCase.assertLessThan(max(abs(anaJ(1:n_state, 1:n_state) - numDiffJ)),testCase.tol);
-            
+            testCase.assertLessThan(max(abs(anaJ - numDiffJ)),testCase.tol);
+            testCase.assertLessThan(max(abs(anaJD - numDiffJD)),testCase.tol);
         end
         
         
@@ -538,12 +536,6 @@ classdef ode15iM2 < Solver
             
             tspan = [(timepoint -1)*testCase.h, timepoint*testCase.h];
             tic;
-            %[y01,yp01] = decic(@testCase.funcToIntegrate,tspan(1),y0,[],yp0,[],opts_);
-            
-            %absSchaetzCalc= norm(y01 - y0, 1);
-            %disp('Abstand des geschaetzen zudem berechneten Wert');
-            %disp(absSchaetzCalc);
-            
             [F, J] = testCase.odeTest(timepoint, y0, yp0);
             toc
             Q = norm(F(4:7));
