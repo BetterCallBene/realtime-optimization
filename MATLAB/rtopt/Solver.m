@@ -153,7 +153,7 @@ classdef(Abstract) Solver < handle & TestEnv
         function y0 = helperCreateInitialConditions(obj, varargin)
             [n_state, n_contr, n_var] = obj.getParams();
             
-            if (nargin == 2)
+            if (nargin == 2) % Bug in Matlab, es zaehlt obj mit
                 obj.nextStep(varargin{1})
             end
                         
