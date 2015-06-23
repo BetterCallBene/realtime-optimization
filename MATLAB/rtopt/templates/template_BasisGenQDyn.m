@@ -1,5 +1,5 @@
 classdef(Abstract) BasisGenQDyn < Dyn
-    %BASISGENQDYN wird von MAPLE/PYTHON generiert und enthält die
+    %BASISGENQDYN wird von MAPLE/PYTHON generiert und enthaelt die
     %Berechnung der Ableitungen
     
     properties
@@ -17,6 +17,7 @@ classdef(Abstract) BasisGenQDyn < Dyn
     
     methods
         function cBGQD = BasisGenQDyn()
+            cBGQD@Dyn();
             cBGQD.emptyResults();
         end
         
@@ -35,7 +36,7 @@ classdef(Abstract) BasisGenQDyn < Dyn
             if obj.isEmptyF
                 [q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = getParams(obj);
                 
-                {0}
+                $0$
                 
                 obj.F = t1;
                 obj.isEmptyF = false;
@@ -47,7 +48,7 @@ classdef(Abstract) BasisGenQDyn < Dyn
             if obj.isEmptyJ
                 [q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = getParams(obj);
                 
-                {1}
+                $1$
                 
                 obj.J = t1;
                 obj.isEmptyJ = false;
@@ -61,7 +62,7 @@ classdef(Abstract) BasisGenQDyn < Dyn
                 
                 onesV = ones(1, obj.environment.n_timepoints); %Korregiere die Matrix Dimension
                 
-                {2}
+                $2$
                 
                 obj.H = t1;
                 obj.isEmptyH = false;

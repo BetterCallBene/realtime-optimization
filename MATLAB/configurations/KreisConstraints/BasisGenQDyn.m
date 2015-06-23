@@ -1,5 +1,5 @@
 classdef(Abstract) BasisGenQDyn < Dyn
-    %BASISGENQDYN wird von MAPLE/PYTHON generiert und enthält die
+    %BASISGENQDYN wird von MAPLE/PYTHON generiert und enthaelt die
     %Berechnung der Ableitungen
     
     properties
@@ -17,6 +17,7 @@ classdef(Abstract) BasisGenQDyn < Dyn
     
     methods
         function cBGQD = BasisGenQDyn()
+            cBGQD@Dyn();
             cBGQD.emptyResults();
         end
         

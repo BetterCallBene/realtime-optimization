@@ -17,7 +17,31 @@
 \begin{document}
 
 \section{Motivation}
-Ziel: Berechnung der Matrizen \( Dx_{x_{i-1}} \) und \(  Dx_{u_{i-1}} \) ohne \(x\) zu kennen
+Ziel: Ableitung der Nebenbedingung \( x_i-s_i = 0 \) welche aus dem multiple shooting Verfahren kommt. \\
+Das Problem lässt sich reformulieren zu:  Berechnung der Matrizen \( Dx_{x_{i-1}} \) und \(  Dx_{u_{i-1}} \) ohne \(x\) zu kennen.
+
+\section{Gegebenheiten}
+
+Gegeben ist die Differentialgleichung \textcolor{red}{Randwertproblem?}
+\[ \dot x = f(x,u) \qquad \textcolor{red}{x(0) = x_0,\quad x(t_N) = x_N}\]
+welche die Dynamik des Quadkopters beschreibt. Sie wird numerisch mit dem multiple shooting Verfahren gelöst. \\
+Das multiple shooting Verfahren löst \(N\) Anfangswertprobleme auf den \(N\) Intervallen \( [t_{i-1},t_{i}], \quad i \in {1,...,N} \).
+Dabei wird der Anfangswert eines jeden Intervalls jedoch nicht fest vorgegeben, sondern als eine Variable behandelt. Der (unbekannte) Anfangswert für die Differentialgleichung des Intervalls \([t_{i-1},t_i]\) ist \(x(t_{i-1}) = x_{i-1}\). Da die Lösung \(x\) der Differentialgleichung auch von der Steuerung \(u\) in dem jeweiligen Intervall abhängig ist, kann man die Lösung jedes Anfangswertproblems als eine Funktion \(x=x(t,x_{i-1},u_{i-1})\) angeben. Hierbei ist also \( x_{i-1}\) der Anfangswert als Parameter, außerdem gehen wir davon aus, dass die Steuerung im Intervall \([t_{i-1},t_i]\) konstant gleich \(u(t_{i-1})=u_{i-1}\) ist.\\
+Damit \(x\) eine stetige Funktion ist, soll der Anfangswert eines jeden Intervalls mit dem dem Endwert des vorigen Intervalls übereinstimmen. Dies wird als Nebenbedingung folgendermaßen in das bereits bestehenden Optimierungsproblem eingefügt:
+\begin{align}
+	x(t_{x_i},x_{i-1},u_{i-1}) - x_{i} = 0
+	\label{equ_multiple_shooting_Nebenbedingung}
+\end{align}
+Man kann dabei die senkrechte "`Bewegung"' des aus dem multiple shooting stammenden Endpunktes als Funktion in Abhängigkeit von \(x_{i-1}\) und \(u_{i-1}\) ansehen. \\
+\\
+Da wir mit dem SQP-Verfahren arbeiten, brauchen wir als Nebenbedingung nicht nur die oben angegebene Nebenbedingung (\ref{equ_multiple_shooting_Nebenbedingung}), sondern auch deren Ableitung (Jakobimatrix). (Für die Zielfunktion des SQP-Verfahrens ist dann auch noch die Hessematrix von (\ref{equ_multiple_shooting_Nebenbedingung}).)
+
+\section{Jakobimatrix der Nebenbedingung}
+
+\textcolor{red}{Formeln siehe unten und in Datei "`Sensitivitätsgleichungen"'}
+
+\section{Hessematrix der Nebenbedingung}
+
 
 \section{Vorgehen}
 

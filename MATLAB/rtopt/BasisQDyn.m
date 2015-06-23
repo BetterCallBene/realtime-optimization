@@ -28,16 +28,27 @@ classdef BasisQDyn < BasisGenQDyn
                     error('Second argument must be instance of Environment');
                 end
             end
+            
+            if (nargin >= 3)
+                if isa(varargin{3}, 'Solver')
+                    bQDyn.solver = varargin{3};
+                    bQDyn.solver.dyn = bQDyn;
+                else
+                    error('Third argument must be instance of Solver');
+                end
+            end
         end
         
         %set methods
         function set.backdoor_vec(obj,vec)
-            % set new input vector 
-            % and pass information on th dode 
-            if (isempty(obj.backdoor_vec) || (norm(obj.backdoor_vec - vec)>1e-10))
+            if (isempty(obj.backdoor_vec) || size(obj.backdoor_vec, 1) ~= size(vec, 1) || (norm(obj.backdoor_vec - vec)>1e-10))
                 obj.backdoor_vec = vec;
                 obj.emptyResults();
-            end
+            end   
+        end
+        
+        function res = get.backdoor_vec(obj)
+            res = obj.backdoor_vec;
         end
         
         function set.vec(obj, vec)
@@ -116,16 +127,12 @@ classdef BasisQDyn < BasisGenQDyn
         end
         
         
-        function res = dotD(obj,ind)
+        function res = dotD(obj,ind )
             % compute the Jacobian of the right hand side of the ode for
             % a given time instance ind
             if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
-                
                 J_ = obj.J;
-                res = zeros(13, 17);
-                for i = 1:size(J_, 1)
-                    res(J_(i, 1), J_(i, 2)) = J_(i, ind + 2);
-                end
+                res = sparse(J_(:, 1), J_(:, 2), J_(:, ind + 2), 13, 17);
             else
                 error('wrong state and control lengths wrt index.');
             end

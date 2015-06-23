@@ -1,6 +1,7 @@
 classdef Quadrocopter < Model
-    % QUADROCOPTER repräsentiert einen bestimmten Quadrocopter und seine
-    % physikalischen Eigenschaften.
+    %% QUADROCOPTER repraesentiert einen bestimmten Quadrocopter und seine physikalischen Eigenschaften.
+    % * $$I = [0.0093886, 0.0093886, 0.018406]$$
+    % 
     
     properties(Constant, GetAccess=public)
 		n_state = 13;
@@ -35,7 +36,7 @@ classdef Quadrocopter < Model
     end
     
     methods
-        function res = Quadrocopter(varign)
+        function res = Quadrocopter(varargin)
             
         end
         % Jm (Motor Rotation Inertia for Rotating Component only)
