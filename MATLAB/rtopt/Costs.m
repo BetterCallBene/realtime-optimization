@@ -54,6 +54,19 @@ classdef Costs < TestEnv
             c_val   = .5*sum((control(:,1:end-1).^2)*mesh');
         end
         
+        function c_val = get_cost_xu(obj)
+            % compute the cost value with penalty term
+            control = obj.dyn.contr;
+            state   = obj.dyn.state;
+            cam_pos = [ 2; 0; 10];
+            one_vec = ones(1,size(state,2));
+            alpha   = 1;
+            beta    = 1;
+            mesh    = obj.dyn.environment.mesh;
+            c_val   = alpha* 0.5*sum((control(:,1:end-1).^2)*mesh') + ...
+                      beta * 0.5*sum(((state(1:3,1:end) - kron(one_vec,cam_pos)).^2)*one_vec');
+        end
+        
         function cD_val = get_costD(obj)
             % compute the Jacobian of the cost value
             [n_int, n_tp, n_state, n_contr] = getParams(obj);
@@ -75,6 +88,45 @@ classdef Costs < TestEnv
                 n_tp*(n_state+n_contr),1);
         end
         
+        function cD_val = get_costD_xu(obj)
+            % compute the Jacobian of the cost value with penalty term
+            [n_int, n_tp, n_state, n_contr] = getParams(obj);
+            
+            control     = obj.dyn.contr;
+            mesh        = obj.dyn.environment.mesh;
+            state   = obj.dyn.state;
+            cam_pos = [ 2; 0; 10];
+            
+            alpha   = 1;
+            beta    = 1;
+            
+            rind        = zeros(1,(n_tp-1)*n_contr);
+            vind        = zeros(1,(n_tp-1)*n_contr);
+            
+            rindx       = zeros(1,(n_tp)*3);
+            vindx       = zeros(1,(n_tp)*3);
+            for i = 1:n_tp-1
+                rind((i-1)*n_contr+1:i*n_contr) = ...
+                    (i-1)*(n_state+n_contr)+n_state + 1:...
+                    i*(n_state+n_contr);
+                vind((i-1)*n_contr+1:i*n_contr) = ...
+                    alpha * mesh(i)*control(:,i)';
+                
+                rindx((i-1)*3+1:i*3) = (i-1)*(n_state+n_contr) + 1:...
+                    (i-1)*(n_state+n_contr)+3;
+                vindx((i-1)*3+1:i*3) = beta * (state(1:3,i) - cam_pos);
+            end
+            
+            i = n_tp;
+            rindx((i-1)*3+1:i*3) = (i-1)*(n_state+n_contr) + 1:...
+                    (i-1)*(n_state+n_contr)+3;
+            vindx((i-1)*3+1:i*3) = beta * (state(1:3,i) - cam_pos);
+            
+            cD_val        = sparse(rind,ones(1,(n_tp-1)*n_contr),vind,...
+                n_tp*(n_state+n_contr),1) + ...
+                sparse(rindx,ones(1,n_tp*3),vindx,n_tp*(n_state+n_contr),1);
+        end
+        
         function cDD_val = get_costDD(obj)
             %compute the Hessian of the cost value
             [n_int, n_tp, n_state, n_contr] = getParams(obj);
@@ -93,6 +145,42 @@ classdef Costs < TestEnv
             
             cDD_val        = {sparse(rind,rind,vind,...
                 n_tp*(n_state+n_contr),n_tp*(n_state+n_contr))};
+        end
+        
+        function cDD_val = get_costDD_xu(obj)
+            %compute the Hessian of the cost value with penalty term
+            [n_int, n_tp, n_state, n_contr] = getParams(obj);
+            
+            mesh        = obj.dyn.environment.mesh;
+            
+            alpha   = 1;
+            beta    = 1;
+            
+            rind        = zeros(1,(n_tp-1)*n_contr);
+            vind        = zeros(1,(n_tp-1)*n_contr);
+            
+            rindx       = zeros(1,(n_tp)*3);
+            vindx       = zeros(1,(n_tp)*3);
+            for i = 1:n_tp-1
+                rind((i-1)*n_contr+1:i*n_contr) = ...
+                    (i-1)*(n_state+n_contr)+n_state + 1:...
+                    i*(n_state+n_contr);
+                vind((i-1)*n_contr+1:i*n_contr) = ...
+                    alpha * mesh(i)*ones(1,n_contr);
+                
+                rindx((i-1)*3+1:i*3) = (i-1)*(n_state+n_contr) + 1:...
+                    (i-1)*(n_state+n_contr)+3;
+                vindx((i-1)*3+1:i*3) = beta * ones(1,3);
+            end
+            
+            i = n_tp
+            rindx((i-1)*3+1:i*3) = (i-1)*(n_state+n_contr) + 1:...
+                    (i-1)*(n_state+n_contr)+3;
+            vindx((i-1)*3+1:i*3) = beta * ones(1,3);
+            
+            cDD_val        = {sparse(rind,rind,vind,...
+                n_tp*(n_state+n_contr),n_tp*(n_state+n_contr)) + ...
+                sparse(rindx,rindx,vindx,n_tp*(n_state+n_contr),n_tp*(n_state+n_contr))};
         end
         
 %         function cDD_val = get_costDD_approx(obj,t)
