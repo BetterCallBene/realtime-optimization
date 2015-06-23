@@ -73,6 +73,13 @@ classdef ode15iM2 < Solver
             res = obj.helperCreateVektor(F, M, N);
         end
         
+        function [F, J, M, N] = ode(obj, timepoint, varargin)
+            obj.nextStep(timepoint);
+            
+            y0 = obj.helperCreateInitialConditions();
+            yp0 = obj.helperCreateInitialConditionsDot();
+            [F, J, M, N] = ode@Solver(obj, timepoint, y0, yp0);
+        end
         
         function [res, B] = odeF(obj, t, x, xp, u0)
             B = obj.mass(t, x);
