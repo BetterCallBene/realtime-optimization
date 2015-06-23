@@ -1,4 +1,5 @@
 restoredefaultpath
+addpath('helper');
 currentpath= cd('..');
 addpath(pwd);
 addpath(strcat(pwd, '/BasisConfiguration/'));

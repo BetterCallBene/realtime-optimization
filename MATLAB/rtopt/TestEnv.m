@@ -79,7 +79,7 @@ classdef TestEnv < matlab.unittest.TestCase
         
         
         %Some help functions (typically overwritten in subclasses)
-        function [vec_old, n, m, n_timepoints, dyn] = setup(obj, func)
+        function [vec_old, n, m, n_timepoints, dyn] = setup(obj, func, timepoint)
             vec_old = obj.vec;
             n_timepoints = obj.environment.n_timepoints;
             dyn = obj;

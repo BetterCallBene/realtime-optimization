@@ -4,8 +4,7 @@ classdef TestInt < handle & TestEnv
     
     properties
         dynForwEuler;
-        dynRungeKutta;
-        dynOde45;
+        dynOde15iM;
     end
     
     properties(Dependent)
@@ -20,46 +19,101 @@ classdef TestInt < handle & TestEnv
         end
         
         function res = get.solver2(obj)
-            res = obj.dynRungeKutta.solver;
+            res = obj.dynOde15iM.solver;
         end
         
-        function res = get.solver3(obj)
-            res = obj.dynOde45.solver;
+        %Some help functions (typically overwritten in subclasses)
+        function [vec_old, n, m, n_timepoints] = setup(obj, func, solver)
+            vec_old = solver.vec_sav;
+            n_timepoints = solver.dyn.environment.n_timepoints;
+            n = solver.dyn.robot.n_var;
+            m = size(func());
+            m = m(1);
         end
+        
+        %Overwrite function in TestEnv, because we don't want normed
+        %quaternios here.
+        function func_p = plusEpsShift(obj,i,t,vec_old,func, n_var, solver)
+            %vec_old = dyn.vec;
+            vec_p = vec_old;
+            vec_p((t-1)* n_var + i) = vec_p((t-1)* n_var + i) + obj.eps;
+            solver.vec_sav = vec_p;
+            func_p = func();
+            solver.vec_sav = vec_old;
+        end
+        
+        %Overwrite function in TestEnv, because we don't want normed
+        %quaternios here.
+        function func_n = minusEpsShift(obj,i,t,vec_old,func, n_var, solver)
+            %vec_old = dyn.vec;
+            vec_n = vec_old;
+            vec_n((t-1)* n_var + i) = vec_n((t-1)* n_var + i) - obj.eps;
+            solver.vec_sav = vec_n;
+            func_n = func();
+            solver.vec_sav = vec_old;
+        end
+        
+        function numDiff = numDiff_nD(obj, timepoint, func, solver)
+            % NUMDIFFDND This method calculates numerically the derivative
+            % of func at timepoint t, when func only depends on obj.vec and has m dim output
+            [vec_old, n, m, timepoints] = obj.setup(func,solver);
+            numDiff = zeros(m,n);
+            for i=1:n
+                func_p = obj.plusEpsShift(i,timepoint,vec_old,func, n, solver);
+                func_n = obj.minusEpsShift(i,timepoint,vec_old,func, n, solver);
+                
+                %Central difference
+                numDiff(:,i) = (func_p - func_n)/2/obj.eps;
+            end
+        end
+        
     end
     
     
     methods(Test)
         function testIntegratoren(testCase)
-            n_intervals = 50;
-            timepoint = 5;
+            n_intervals = 10;
+            %timepoint = 5;
+            
             testCase.setupTest(n_intervals);
-            [F1, J1] = testCase.solver1.odeTest(timepoint);
-            [F2, J2] = testCase.solver2.odeTest(timepoint);
-            [F3, J3] = testCase.solver3.odeTest(timepoint);
+%             [old_intervals] = testCase.solver1.preToDo();
+%             [F1, J1] = testCase.solver1.ode(timepoint);
+%             testCase.solver1.postToDo(old_intervals);
+%             
+%             
+%             
+%             [old_intervals] = testCase.solver1.preToDo();
+%             func1 = @() testCase.solver1.ode(timepoint);
+%             numDiff1 = testCase.numDiff_nD(timepoint, func1, testCase.solver1);
+%             testCase.solver1.postToDo(old_intervals);
             
-
-            anaDiff1 = J1;
-            anaDiff2 = J2;
+            for timepoint = 1:n_intervals
             
-            func1 = @() testCase.solver1.odeTest(timepoint);
-            numDiff1 = testCase.solver1.numDiff_nD(timepoint, func1);
+                [old_intervals] = testCase.solver2.preToDo();
+                [F2, J2] = testCase.solver2.ode(timepoint);
+                testCase.solver2.postToDo(old_intervals);
             
-            func2 = @() testCase.solver2.odeTest(timepoint);
-            numDiff2 = testCase.solver2.numDiff_nD(timepoint, func2);
+                [old_intervals] = testCase.solver2.preToDo();
+                func2 = @() testCase.solver2.ode(timepoint);
+                numDiff2 = testCase.numDiff_nD(timepoint, func2, testCase.solver2);
+                testCase.solver2.postToDo(old_intervals);
+                %figure
+                max(max(abs(J2 - numDiff2)))
+            end
+            
+            %func2 = @() testCase.solver2.odeTest(timepoint);
+            %numDiff2 = testCase.solver2.numDiff_nD(timepoint, func2);
                 
-            testCase.assertLessThan(max(abs(anaDiff1 - anaDiff2)), 9e-2);
+            %testCase.assertLessThan(max(abs(J1 - numDiff1)), 9e-2);
             
             %max(abs(anaDiff2 - numDiff2))
             %norm(anaDiff2 - numDiff2, 1)
         end
+        
+        %timepoint 5
     end
     
     methods
-        
-        function dy = func(y)
-            
-        end
         
         function setupTest(obj,n_intervals)
             
@@ -85,22 +139,22 @@ classdef TestInt < handle & TestEnv
             model = Quadrocopter();
             
             
-            %vec =  rand(17* (n_intervals+1), 1);
+            vec =  rand(17* (n_intervals+1), 1);
             %save('Data.mat', 'vec');
-            vec = rand(17* (n_intervals+1), 1);
+            
+            %load('Data.mat', 'vec');
+            
             
             solver1 = ForwEuler();
-            solver2 = RungeKutta();
-            solver3 = ode45M();
+            solver2 = ode15iM2();
+            
             
             obj.dynForwEuler = BasisQDyn(model, env, solver1);
             obj.dynForwEuler.vec = vec;
             
-            obj.dynRungeKutta = BasisQDyn(model, env, solver2);
-            obj.dynRungeKutta.vec = vec;
+            obj.dynOde15iM = BasisQDyn(model, env, solver2);
+            obj.dynOde15iM.vec = vec;
             
-            obj.dynOde45 = BasisQDyn(model, env, solver3);
-            obj.dynOde45.vec = vec;
         end
     end
     

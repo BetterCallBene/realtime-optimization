@@ -4,14 +4,14 @@ with(VectorCalculus);
 with(CodeGeneration);
 with(FileTools);
 
-TEST := true;
+TEST := false;
 R := 3;
 eps := .1;
 # State und Control Vektor
 x := [r[1], r[2], r[3], q[1], q[2], q[3], q[4], v[1], v[2], v[3], omega[1], omega[2], omega[3], u[1], u[2], u[3], u[4]];
 
-eqConstraints := Vector();
-inEqConstraints := Vector();
+eqConstraints := Vector([q[1]^2+q[2]^2+q[3]^2+q[4]^2-1]);
+inEqConstraints := Vector([r[1]^2+r[2]^2-R^2]);
 eqMatrix := convert(eqConstraints, Matrix);
 
 inEqMatrix := convert(inEqConstraints, Matrix);
@@ -40,6 +40,6 @@ currentdir();
 # Optimieren in MATLAB und exportieren.
 eqCountConstraints := RowDimension(eqMatrix);
 inEqCountConstraints := RowDimension(inEqMatrix);
-if TEST = false then Matlab(eqCountConstraints, resultname = "eqCountConstraints", defaulttype = integer, output = tmpRTEqCountConstraints); Matlab(eqCountJacobi, resultname = "eqCountJacobi", defaulttype = integer, output = tmpRTEqCountConstraintsJacobi); Matlab(eqCountHesse, resultname = "eqCountHesse", defaulttype = integer, output = tmpRTEqCountConstraintsHesse); Matlab(eval(([codegen:-optimize])(eqMatrix, tryhard)), defaulttype = integer, output = tmpRTEqConstraintsFunction); VectorCalculus:-`*`(VectorCalculus:-`*`(Matlab(eval(([codegen:-optimize])(eqJ, tryhard)), defaulttype = integer, output = tmpRTEqConstraintsJacobi), Matlab(eval(([codegen:-optimize])(eqH, tryhard)), defaulttype = integer, output = tmpRTEqConstraintsHesse)), Matlab(inEqCountConstraints, resultname = "inEqCountConstraints", defaulttype = integer, output = tmpRTInEqCountConstraints)); Matlab(inEqCountJacobi, resultname = "inEqCountJacobi", defaulttype = integer, output = tmpRTInEqCountConstraintsJacobi); Matlab(inEqCountHesse, resultname = "inEqCountHesse", defaulttype = integer, output = tmpRTInEqCountConstraintsHesse); Matlab(eval(([codegen:-optimize])(inEqMatrix, tryhard)), defaulttype = integer, output = tmpRTInEqConstraintsFunction); VectorCalculus:-`*`(VectorCalculus:-`*`(Matlab(eval(([codegen:-optimize])(inEqJ, tryhard)), defaulttype = integer, output = tmpRTInEqConstraintsJacobi), Matlab(eval(([codegen:-optimize])(inEqH, tryhard)), defaulttype = integer, output = tmpRTInEqConstraintsHesse)), currentdir(FileDirHtml)); VectorCalculus:-`*`(VectorCalculus:-`*`(latex(eqMatrix, "eqConstraints.tex"), latex(inEqMatrix, "inEqConstraints.tex")), currentdir(FileDir)) else Matlab(eval(([codegen:-optimize])(eqMatrix, tryhard)), defaulttype = integer) end if;
+if TEST = false then Matlab(eqCountConstraints, resultname = "eqCountConstraints", defaulttype = integer, output = tmpRTEqCountConstraints); Matlab(eqCountJacobi, resultname = "eqCountJacobi", defaulttype = integer, output = tmpRTEqCountConstraintsJacobi); Matlab(eqCountHesse, resultname = "eqCountHesse", defaulttype = integer, output = tmpRTEqCountConstraintsHesse); Matlab(eval(([codegen:-optimize])(eqMatrix, tryhard)), defaulttype = integer, output = tmpRTEqConstraintsFunction); Matlab(eval(([codegen:-optimize])(eqJ, tryhard)), defaulttype = integer, output = tmpRTEqConstraintsJacobi)*Matlab(eval(([codegen:-optimize])(eqH, tryhard)), defaulttype = integer, output = tmpRTEqConstraintsHesse)*Matlab(inEqCountConstraints, resultname = "inEqCountConstraints", defaulttype = integer, output = tmpRTInEqCountConstraints); Matlab(inEqCountJacobi, resultname = "inEqCountJacobi", defaulttype = integer, output = tmpRTInEqCountConstraintsJacobi); Matlab(inEqCountHesse, resultname = "inEqCountHesse", defaulttype = integer, output = tmpRTInEqCountConstraintsHesse); Matlab(eval(([codegen:-optimize])(inEqMatrix, tryhard)), defaulttype = integer, output = tmpRTInEqConstraintsFunction); Matlab(eval(([codegen:-optimize])(inEqJ, tryhard)), defaulttype = integer, output = tmpRTInEqConstraintsJacobi)*Matlab(eval(([codegen:-optimize])(inEqH, tryhard)), defaulttype = integer, output = tmpRTInEqConstraintsHesse)*currentdir(FileDirHtml); latex(eqMatrix, "eqConstraints.tex")*latex(inEqMatrix, "inEqConstraints.tex")*currentdir(FileDir) else Matlab(eval(([codegen:-optimize])(eqMatrix, tryhard)), defaulttype = integer) end if;
 
 # 

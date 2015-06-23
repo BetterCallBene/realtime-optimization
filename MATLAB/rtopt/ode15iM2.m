@@ -23,7 +23,7 @@ classdef ode15iM2 < Solver
             odMi.dfdyPatternflag = true;
             odMi.dfdypPatternflag = true;
             odMi.flagBDot = true;
-            odMi.opts = odeset('RelTol',1e-3,'AbsTol',1e-4, 'Jacobian', @odMi.Jac);
+            odMi.opts = odeset('RelTol',1e-4,'AbsTol',1e-5, 'Jacobian', @odMi.Jac);
         end
         
         function yp = helperCreateInitialConditionsDot(obj)
@@ -539,12 +539,13 @@ classdef ode15iM2 < Solver
             [y0, yp0, old_interval, old_timepoint] = testCase.setupTest(n_intervals, timepoint);
             [n_state] = testCase.getParams();
             
-            opts_ = odeset('RelTol',1e-3,'AbsTol',1e-4, 'Jacobian', @testCase.Jac);
+            opts_ = odeset('RelTol',1e-5,'AbsTol',1e-6, 'Jacobian', @testCase.Jac);
             testCase.opts = opts_;
             
             tspan = [(timepoint -1)*testCase.h, timepoint*testCase.h];
             tic;
             [F, J] = testCase.odeTest(timepoint, y0, yp0);
+            
             toc
             Q = norm(F(4:7));
             % Differenz zur 1
