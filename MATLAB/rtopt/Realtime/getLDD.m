@@ -19,8 +19,10 @@ ZERO = ZERO(activeSet_t,activeSet_t);
 
 costDall = cCost.get_costDD{1} ; %brauchen nur den Teil an der Stelle t
 costD = costDall( (t-1)*(cConst.dyn.robot.n_state+cConst.dyn.robot.n_contr) + 1: t*(cConst.dyn.robot.n_state+cConst.dyn.robot.n_contr), (t-1)*(cConst.dyn.robot.n_state+cConst.dyn.robot.n_contr) + 1: t*(cConst.dyn.robot.n_state+cConst.dyn.robot.n_contr));
-%wollte nicht zu viel in Cost umschreiben, daher such ich hier den
-%passenden Wert raus
+
+% cost_approx_t = cCost.get_costDD_approx(t);
+% costD = cost_approx_t;
+
     
 if (t ~= cCost.dyn.environment.horizon +1 )
 H = [costD , CD' , AB' ;...
