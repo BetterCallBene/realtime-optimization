@@ -10,7 +10,7 @@ classdef ForwEuler < Solver
             FE@Solver(); %Bug von Matlab
         end
         
-        function y = integrate(obj, func, meshGrid, y0)
+        function y = integrate(obj, func, meshGrid, y0,yp0)
             y = y0 + obj.h .* feval(func, meshGrid, y0);
         end
         

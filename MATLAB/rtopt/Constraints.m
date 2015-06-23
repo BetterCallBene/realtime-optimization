@@ -254,19 +254,17 @@ classdef Constraints < GenConstraints & TestEnv
     
         function [J] =  helper_get_eqD(obj)
             [f, J] = get_eq_con(obj);
-%>>>>>>> master
         end
     end
     
     methods(Test)
         
-
         function test_get_eqjac(obj)
             %TEST_GET_EQJAC This method derives numerically get_eqfunc and compares it
             %with get_eqjac
             
             n_intervals = uint16(10);
-            obj.setupTest(n_intervals);
+            obj.setupTest(n_intervals, ForwEuler());
             
             func = @() obj.get_eq;
             numDiff = obj.numDiff_nD_AllT(func);
@@ -283,7 +281,7 @@ classdef Constraints < GenConstraints & TestEnv
             %with get_ineqjac
             
             n_intervals = uint16(2);
-            obj.setupTest(n_intervals);
+            obj.setupTest(n_intervals,ForwEuler());
             
             func = @() obj.get_ineq;
             numDiff = obj.numDiff_nD_AllT(func);
@@ -302,8 +300,8 @@ classdef Constraints < GenConstraints & TestEnv
             % TEST_GET_EQHESS This method derives numerically get_eqjac and
             % compares it with get_eqhess
             n_intervals = uint16(2);
-            obj.setupTest(n_intervals);
-            
+            obj.setupTest(n_intervals,ForwEuler());
+                
             func = @() obj.helper_get_eqD()'; %TODO: passt das?
             anaDiff = obj.get_eqhess();
             numDiff = obj.numDiff_nxnD_AllT(func);
@@ -320,7 +318,7 @@ classdef Constraints < GenConstraints & TestEnv
             % TEST_GET_INEQHESS This method derives numerically get_ineqjac and
             % compares it with get_ineqhess
             n_intervals = uint16(10);
-            obj.setupTest(n_intervals);
+            obj.setupTest(n_intervals,ForwEuler());
             
             func = @() obj.get_ineq_conD()'; %TODO: passt das?
             anaDiff = obj.get_ineqhess();
@@ -333,10 +331,85 @@ classdef Constraints < GenConstraints & TestEnv
                 obj.assertLessThan(max(abs(anaDiff{i} - numDiff_i)), obj.tol);
             end
         end
+        
+        
+        function test_get_eqjac_ode15iM2(obj)
+            %TEST_GET_EQJAC This method derives numerically get_eqfunc and compares it
+            %with get_eqjac
+            
+            n_intervals = uint16(10);
+            obj.setupTest(n_intervals, ode15iM2());
+            
+            func = @() obj.get_eq;
+            numDiff = obj.numDiff_nD_AllT(func);
+            [F, anaDiff] = obj.get_eq();
+            anaDiff = anaDiff';
+            obj.assertSize(anaDiff, size(numDiff) );
+            %obj.assertSize(anaDiff, [(n_intervals * 13 + 2*13 + n_intervals +1), (n_intervals+1)* 17 ]);
+            obj.assertLessThan(max(abs(anaDiff - numDiff)), obj.tol);
+            
+        end
+        
+        function test_get_ineqjac_ode15iM2(obj)
+            %TEST_GET_INEQJAC This method derives numerically get_ineqfunc and compares it
+            %with get_ineqjac
+            
+            n_intervals = uint16(2);
+            obj.setupTest(n_intervals,ode15iM2());
+            
+            func = @() obj.get_ineq;
+            numDiff = obj.numDiff_nD_AllT(func);
+            [f, anaDiff] = obj.get_ineq();
+            
+            anaDiff  = anaDiff';
+            
+            obj.assertSize(anaDiff, size(numDiff) );
+            %obj.assertSize(anaDiff, [(n_intervals * 13 + 2*13 + n_intervals +1), (n_intervals+1)* 17 ]);
+            obj.assertLessThan(max(abs(anaDiff - numDiff)), obj.tol);
+            
+            
+        end
+        
+        function test_get_eqhess_ode15iM2(obj)
+            % TEST_GET_EQHESS This method derives numerically get_eqjac and
+            % compares it with get_eqhess
+            n_intervals = uint16(2);
+            obj.setupTest(n_intervals,ode15iM2());
+            
+            func = @() obj.helper_get_eqD()'; %TODO: passt das?
+            anaDiff = obj.get_eqhess();
+            numDiff = obj.numDiff_nxnD_AllT(func);
+            
+            size_nDiff_i = (obj.dyn.robot.n_var) * (n_intervals +1 );
+            for i = 1:length(anaDiff)
+                numDiff_i = reshape(numDiff(i,:,:), [size_nDiff_i size_nDiff_i]);
+                obj.assertSize(anaDiff{1}, size(numDiff_i));
+                obj.assertLessThan(max(abs(anaDiff{i} - numDiff_i)), obj.tol);
+            end
+        end
+        
+        function test_get_ineqhess_ode15iM2(obj)
+            % TEST_GET_INEQHESS This method derives numerically get_ineqjac and
+            % compares it with get_ineqhess
+            n_intervals = uint16(10);
+            obj.setupTest(n_intervals,ode15iM2());
+            
+            func = @() obj.get_ineq_conD()'; %TODO: passt das?
+            anaDiff = obj.get_ineqhess();
+            numDiff = obj.numDiff_nxnD_AllT(func);
+            
+            size_nDiff_i = (obj.dyn.robot.n_var) * (n_intervals +1 );
+            for i = 1:length(anaDiff)
+                numDiff_i = reshape(numDiff(i,:,:), [size_nDiff_i size_nDiff_i]);
+                obj.assertSize(anaDiff{1}, size(numDiff_i));
+                obj.assertLessThan(max(abs(anaDiff{i} - numDiff_i)), obj.tol);
+            end
+        end
+        
     end
     
     methods
-        function setupTest(obj, n_intervals)
+        function setupTest(obj, n_intervals,integrator)
             
             n_int_ = n_intervals;
             % Quadrocopter soll 5 Meter hoch fliegen
@@ -359,9 +432,7 @@ classdef Constraints < GenConstraints & TestEnv
             
             robot = Quadrocopter();
             
-            FE = ForwEuler();
-            
-            dyn_ = BasisQDyn(robot, env, FE);
+            dyn_ = BasisQDyn(robot, env, integrator);
             dyn_.vec = rand(17 * (n_int_ + 1), 1);
             
             obj.dode = MultiShooting(dyn_);

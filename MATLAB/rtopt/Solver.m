@@ -197,6 +197,7 @@ classdef(Abstract) Solver < handle & TestEnv
             obj.vec_sav = obj.vec;  % Speichere alten vektor
             obj.vec = zeros(n_var, 1);
             old_intervals = obj.dyn.environment.n_intervals;
+            obj.n_intervalsInt = old_intervals;
             obj.dyn.environment.n_intervals = 0;
         end
         

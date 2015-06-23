@@ -23,6 +23,7 @@ classdef ode15iM2 < Solver
             odMi.dfdyPatternflag = true;
             odMi.dfdypPatternflag = true;
             odMi.flagBDot = true;
+            odMi.opts = odeset('RelTol',1e-3,'AbsTol',1e-4, 'Jacobian', @odMi.Jac);
         end
         
         function yp = helperCreateInitialConditionsDot(obj)
@@ -93,7 +94,7 @@ classdef ode15iM2 < Solver
             %f = obj.dyn.dot(obj.timepoint);
             Bx = tprod(Bdot_,[1 -1 2], xp0, [-1]);
             
-            % Test für spaeter
+            % Test fï¿½r spaeter
             % Bx = tprod(Bdot_,[1 -1 2], xp0, [-1]);
             
             JTilde = obj.dyn.getJTilde(x0, u0);
