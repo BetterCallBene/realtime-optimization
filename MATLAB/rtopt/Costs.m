@@ -183,14 +183,16 @@ classdef Costs < TestEnv
                 sparse(rindx,rindx,vindx,n_tp*(n_state+n_contr),n_tp*(n_state+n_contr))};
         end
         
-%         function cDD_val = get_costDD_approx(obj,t)
-%             %compute the approximated Hessian of the cost value
-%             [n_int, n_tp, n_state, n_contr] = getParams(obj);
-%             
-%             mesh        = obj.dyn.environment.mesh;
-%             
-%             
-%         end
+        function cDD_val = get_costDD_approx(obj,t)
+            %compute the approximated Hessian of the cost value
+            [n_int, n_tp, n_state, n_contr] = getParams(obj);
+            
+            CostD   = get_costD_xu(obj);
+            CostD_t = CostD((t-1)*(n_state+n_contr)+1: t*(n_state+n_contr));
+            
+            cDD_val = CostD_t * CostD_t' ;
+            
+        end
         
         function [n_int, n_tp, n_state, n_contr] = getParams(obj)
             n_int       = obj.dyn.environment.n_intervals;
