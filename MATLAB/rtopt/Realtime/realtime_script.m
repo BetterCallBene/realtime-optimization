@@ -18,7 +18,7 @@ xbc = [         ... Variablenname L�nge   Name
 ];    
 
 %Choose horizon
-horizon = 15;
+horizon = 12;
 
 env = Environment();
 env.horizon = horizon;
