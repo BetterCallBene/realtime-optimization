@@ -46,7 +46,7 @@ cMultShoot = MultiShooting(cBQD);
 cConst = Constraints(cMultShoot);
 
 % Initialisierung Kostenfunktion
-cCost = Costs(cBQD);
+cCost = CostsXU(cBQD, 3, 2);
 
 %% Choose starting values
 

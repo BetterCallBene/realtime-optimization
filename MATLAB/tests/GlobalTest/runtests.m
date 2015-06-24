@@ -17,8 +17,8 @@ TEST = true;
 % suiteConstraints = TestSuite.fromClass(?Constraints);
 % resultConstraints = run(suiteConstraints);                %Check
 
-suiteMultiShooting = TestSuite.fromClass(?MultiShooting);
-resultMultiShooting = run(suiteMultiShooting);                %Check
+% suiteMultiShooting = TestSuite.fromClass(?MultiShooting);
+% resultMultiShooting = run(suiteMultiShooting);                %Check
         
 % suiteForwEuler = TestSuite.fromClass(?ForwEuler);
 % resultForwEuler = run(suiteForwEuler);                    %NOT 
@@ -29,6 +29,8 @@ resultMultiShooting = run(suiteMultiShooting);                %Check
 % suiteCosts = TestSuite.fromClass(?Costs);
 % resultCosts = run(suiteCosts);                            %Check
 
+suiteCostsXU = TestSuite.fromClass(?CostsXU);
+resultCostsXU = run(suiteCostsXU);                        %Check
  
 % suiteRiccati = TestSuite.fromClass(?RiccatiManager);
 % resultRiccati = run(suiteRiccati);                        %Check
