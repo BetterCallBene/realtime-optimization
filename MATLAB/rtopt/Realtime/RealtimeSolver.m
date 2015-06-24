@@ -10,12 +10,15 @@ classdef RealtimeSolver < TestEnv
         
         est_y;      %A cell to store the estimated values at i at {i,:}
         res;        %A cekk to store the result at time i at {i,:}
-    end
-    
-    properties
+        
         horizon;
         cDyn;
         ricM;
+        
+        s;
+        lambda;
+        q;
+        mu;
     end
     
     methods
@@ -28,7 +31,7 @@ classdef RealtimeSolver < TestEnv
                 if ~(~isempty(TEST) && TEST == true)
                     error('wrong number of inputs');
                 end
-            elseif(nargin == 2)
+            elseif(nargin == 6)
                 %Check types of arguments
                 if ~isa(varargin{1},'Costs')
                     error('second variable must be of class Costs');
@@ -43,12 +46,17 @@ classdef RealtimeSolver < TestEnv
                 o.horizon = o.cDyn.environment.horizon;
                 o.ricM = RiccatiManager(o.horizon, o.cDyn.robot);
                 
+                o.lambda = varargin{3};
+                o.s = varargin{4};
+                o.q = varargin{5};
+                o.mu = varargin{6};
+                
             else
                 error('wrong number of inputs');
             end
         end
         
-        function [ res, est_y ] = fminrt(o, getLDD, n_timepoints,s,q,lambda, mu)
+        function [ res, est_y ] = fminrt(o, getLDD, n_timepoints)
             % FMINRT Solves the optimization problem in the SQP-Riccati approach
             
             %Initialize variables
@@ -57,24 +65,24 @@ classdef RealtimeSolver < TestEnv
             
             for i = 1:n_timepoints
                 % Set estimated values
-                vec = o.cDyn.getVecFromCells(s,q);
+                vec = o.cDyn.getVecFromCells(o.s,o.q);
                 o.cCost.vec = vec;
                 o.cConst.vec = vec;
                 
                 %Update active set
-                mu = o.cConst.checkIfActive(mu);
+                o.mu = o.cConst.checkIfActive(o.mu);
                 
                 % Calculate deltas with Riccati
-                o.calculateSolution(i, getLDD, s, lambda, q, mu);
+                o.calculateSolution(i, getLDD);
                 
                 %Perform Newton Step and setup for next iteration
-                [s, lambda, q, mu] = o.performNewtonAndShift(s, lambda, q, mu);
+                o.performNewtonAndShift();
                 
                 %Estimate values at last timestep, by duplicating the values from the previous last step
-                [s, lambda, q, mu] = o.estimateNewHorizonPoint(s, lambda, q, mu);
+                 o.estimateNewHorizonPoint();
                 
                 %Save the estimated values
-                o.storeEstimatedValues(i,s, lambda, q ,mu);
+                o.storeEstimatedValues(i);
                 
                 %Display the actual timepoint in the command window
                 disp(int2str(i));
@@ -90,8 +98,8 @@ classdef RealtimeSolver < TestEnv
                 function testActiveSetChecker(o)
         
                     hori = 20;
-                    n_timepoints = 50;
-                    [s, lambda, q, mu] = o.setupTest(hori);
+                    n_timepoints = 15;
+                    o.setupTest(hori);
         
                     %Initialize variables
                     o.est_y = cell(n_timepoints,4);
@@ -100,12 +108,12 @@ classdef RealtimeSolver < TestEnv
                     for i = 1:n_timepoints
                         
                         %Set values
-                        vec = o.cDyn.getVecFromCells(s,q);
+                        vec = o.cDyn.getVecFromCells(o.s,o.q);
                         o.cCost.vec = vec;
                         o.cConst.vec = vec;
         
                         %Update active set
-                        mu = o.cConst.checkIfActive(mu);
+                        o.mu = o.cConst.checkIfActive(o.mu);
         
                         %Check if active set is correct
                         for j = 1: hori
@@ -122,16 +130,16 @@ classdef RealtimeSolver < TestEnv
         
                         % Calculate deltas with Riccati
                         get_LDD = @(cost, const, t) getLDD(cost, const, t);
-                        o.calculateSolution(i, get_LDD, s, lambda, q, mu);
+                        o.calculateSolution(i, get_LDD);
         
                         %Perform Newton Step and setup for next iteration
-                        [s, lambda, q, mu] = o.performNewtonAndShift(s, lambda, q, mu);
+                        o.performNewtonAndShift();
         
                         %Estimate values at last timestep, by duplicating the values from the previous last step
-                        [s, lambda, q, mu] = o.estimateNewHorizonPoint(s, lambda, q, mu);
+                        o.estimateNewHorizonPoint();
         
                         %Save the estimated values
-                        o.storeEstimatedValues(i,s, lambda, q ,mu);
+                        o.storeEstimatedValues(i);
         
                         %Display the actual timepoint in the command window
                         disp(int2str(i));
@@ -147,21 +155,21 @@ classdef RealtimeSolver < TestEnv
         
                     % Initialize classes
                     hori = 15;
-                    [s, lambda, q, mu] = o.setupTest(hori);
+                    o.setupTest(hori);
         
                     %Set values
-                    vec = o.cDyn.getVecFromCells(s,q);
+                    vec = o.cDyn.getVecFromCells(o.s,o.q);
                     o.cCost.vec = vec;
                     o.cConst.vec = vec;
         
                     %Update active set
-                    mu = o.cConst.checkIfActive(mu);
+                    o.mu = o.cConst.checkIfActive(o.mu);
         
                     %Choose how to calculate the LDD (approximation or not)?
                     get_LDD = @(cost, const, t) getLDD(cost, const, t);
                     i = 1;
                     tic;
-                    o.calculateSolution(i,get_LDD,s, lambda,q,mu);
+                    o.calculateSolution(i,get_LDD);
         
                     %Build up delta
                     delta_ric = o.buildUpDelta_ric();
@@ -169,7 +177,6 @@ classdef RealtimeSolver < TestEnv
                     %Build up gradient and hesse
                     [grad_L, hesse_L] = o.buildUpGradHesse(get_LDD);
                     
-        
                     %Solve with \
                     delta_matlab = hesse_L \ grad_L;
         
@@ -182,38 +189,37 @@ classdef RealtimeSolver < TestEnv
             hori = 15;
             n_timepoints = 17;            
             
-            [s, lambda, q, mu] = o.setupTest(hori);
+            o.setupTest(hori);
             
             for i = 1: n_timepoints
                 
                 %Set values
-                vec = o.cDyn.getVecFromCells(s,q);
+                vec = o.cDyn.getVecFromCells(o.s,o.q);
                 o.cCost.vec = vec;
                 o.cConst.vec = vec;
                 
                 %Update active set
-                mu = o.cConst.checkIfActive(mu);
+                o.mu = o.cConst.checkIfActive(o.mu);
                 
                 %Save old values
-                old_s = s;
-                old_lambda = lambda;
-                old_q = q;
-                old_mu = mu;
+                old_s = o.s;
+                old_lambda = o.lambda;
+                old_q = o.q;
+                old_mu = o.mu;
                 
                 %Choose how to calculate the LDD (approximation or not)?
                 get_LDD = @(cost, const, t) getLDD(cost, const, t);
-                i = 1;
-                o.calculateSolution(i,get_LDD,s, lambda,q,mu);
+                o.calculateSolution(i,get_LDD);
                 
                 % Perform Newton Step and setup for next iteration
-                [s, lambda, q, mu] = o.performNewtonAndShift(s, lambda, q, mu);
+                o.performNewtonAndShift();
                 
                 %Build up delta and large gradient and hesse
                 [grad_L, hesse_L] = o.buildUpGradHesse(get_LDD);
                 delta_ric = o.buildUpDelta_ric();
                 
                 %Save the estimated values
-                o.storeEstimatedValues(i,s, lambda, q ,mu);
+                o.storeEstimatedValues(i);
                 
                 %Solve with \
                 delta_matlab = hesse_L \ grad_L;
@@ -227,7 +233,7 @@ classdef RealtimeSolver < TestEnv
                 if(n_var > 30)
                     delta_mu = zeros(8,1);
                     delta_mu(o.cConst.getActiveSet(1)) = delta_matlab(31:n_var);
-                    o.assertEqual( old_mu( (i-1) * o.cConst.n_addConstr +1 : i * o.cConst.n_addConstr) + delta_mu, o.res{i,4});
+                    o.assertEqual( old_mu( 1 : o.cConst.n_addConstr) + delta_mu, o.res{i,4});
                 end
                 last = last + n_var;
                 
@@ -248,21 +254,21 @@ classdef RealtimeSolver < TestEnv
         end
     end
     methods(Access=private)
-        function storeFirstIteration(o,i, s, lambda, q, mu)
-            o.res{i,1} = s{1} + o.ricM.delta_s{1};
-            o.res{i,2} = lambda{1} + o.ricM.delta_lambda{1};
-            o.res{i,3} = q{1} + o.ricM.delta_q{1};
-            o.res{i,4} = mu(1:o.cConst.n_addConstr) + o.ricM.assembleMu(o.cConst.getActiveSet(1),1);
+        function storeFirstIteration(o,i)
+            o.res{i,1} = o.s{1} + o.ricM.delta_s{1};
+            o.res{i,2} = o.lambda{1} + o.ricM.delta_lambda{1};
+            o.res{i,3} = o.q{1} + o.ricM.delta_q{1};
+            o.res{i,4} = o.mu(1:o.cConst.n_addConstr) + o.ricM.assembleMu(o.cConst.getActiveSet(1),1);
         end
         
-        function storeEstimatedValues(o, i, s, lambda, q, mu)
-            o.est_y{i,1} = s;
-            o.est_y{i,2} = lambda;
-            o.est_y{i,3} = q;
-            o.est_y{i,4} = mu;
+        function storeEstimatedValues(o, i)
+            o.est_y{i,1} = o.s;
+            o.est_y{i,2} = o.lambda;
+            o.est_y{i,3} = o.q;
+            o.est_y{i,4} = o.mu;
         end
         
-        function calculateSolution(o,i, getLDD,s,lambda,q,mu)
+        function calculateSolution(o,i, getLDD)
             %Perform Riccati Steps
             for j = o.horizon+1:-1:1
                 [LD, n_active_i] = getLD(o.cCost,o.cConst,j);
@@ -277,7 +283,7 @@ classdef RealtimeSolver < TestEnv
             %actualControl = q{1} + o.ricM.delta_q{1};
             
             %Store the result of the first iteration in res
-            o.storeFirstIteration(i, s, lambda, q, mu)
+            o.storeFirstIteration(i)
             
             %Solve the remaining steps to obtain a new iterate
             for j = 2:o.horizon+1
@@ -285,32 +291,32 @@ classdef RealtimeSolver < TestEnv
             end
         end
         
-        function [s, lambda, q, mu] = performNewtonAndShift(o, s, lambda, q, mu)
+        function performNewtonAndShift(o)
             % PERFORMNEWTONANDSHIFT Performs y + delta_y and shifts
             % every point to the left, as the actual timepoint increases by
             % one.
             for k = 2 : o.horizon
-                s{k-1} = s{k} + o.ricM.delta_s{k};
-                lambda{k-1} = lambda{k} + o.ricM.delta_lambda{k};
-                q{k-1} = q{k} + o.ricM.delta_q{k};
+                o.s{k-1} = o.s{k} + o.ricM.delta_s{k};
+                o.lambda{k-1} = o.lambda{k} + o.ricM.delta_lambda{k};
+                o.q{k-1} = o.q{k} + o.ricM.delta_q{k};
                 llI = (k-2) * o.cConst.n_addConstr +1 ;
                 rlI = (k-1) * o.cConst.n_addConstr ;
                 rrI = k * o.cConst.n_addConstr;
-                mu(  llI : rlI ) = mu(rlI+1: rrI) +  o.ricM.assembleMu(o.cConst.getActiveSet(k) ,k);
+                o.mu(  llI : rlI ) = o.mu(rlI+1: rrI) +  o.ricM.assembleMu(o.cConst.getActiveSet(k) ,k);
             end
             k = o.horizon + 1 ;
-            s{k-1} = s{k} + o.ricM.delta_s{k};
-            lambda{k-1} = lambda{k} + o.ricM.delta_lambda{k};
+            o.s{k-1} = o.s{k} + o.ricM.delta_s{k};
+            o.lambda{k-1} = o.lambda{k} + o.ricM.delta_lambda{k};
         end
         
-        function [s, lambda, q, mu] = estimateNewHorizonPoint(o, s, lambda, q, mu)
+        function estimateNewHorizonPoint(o)
             % ESTIMATENEWHORIZONPOINT This method estimateds the the new
             % horizon point by duplicating the old horizon point.
             k = o.horizon +1 ;
-            s{k} = s{k-1};
-            lambda{k} = lambda{k-1};
-            q{k-1} = q{k-2};
-            mu((k-1) * o.cConst.n_addConstr +1 : end )= mu((k-2) * o.cConst.n_addConstr+1 : (k-1) * o.cConst.n_addConstr);
+            o.s{k} = o.s{k-1};
+            o.lambda{k} = o.lambda{k-1};
+            o.q{k-1} = o.q{k-2};
+            o.mu((k-1) * o.cConst.n_addConstr +1 : end )= o.mu((k-2) * o.cConst.n_addConstr+1 : (k-1) * o.cConst.n_addConstr);
         end
         
         function [grad_L, hesse_L] = buildUpGradHesse(o,get_LDD)
@@ -350,7 +356,7 @@ classdef RealtimeSolver < TestEnv
             delta_ric = [delta_ric ; y];
         end
         
-        function [s, lambda, q, mu] = setupTest(o,hori)
+        function setupTest(o,hori)
             
             env = Environment();
             
@@ -368,19 +374,19 @@ classdef RealtimeSolver < TestEnv
             o.horizon = o.cDyn.environment.horizon;
             o.ricM = RiccatiManager(o.horizon, o.cDyn.robot);
             
-            s = cell(o.horizon +1,1);
-            q = cell(o.horizon,1);
-            lambda = cell(o.horizon +1 ,1);
-            mu = ones( o.cConst.n_addConstr * (o.horizon+1),1);
+            o.s = cell(o.horizon +1,1);
+            o.q = cell(o.horizon,1);
+            o.lambda = cell(o.horizon +1 ,1);
+            o.mu = ones( o.cConst.n_addConstr * (o.horizon+1),1);
             
             % Setup initial estimations
             for i = 1: o.horizon
-                s{i} = [zeros(6,1); 1; zeros(6,1)];
-                q{i} = zeros(4,1);
-                lambda{i} = ones(cQ.n_state,1);
+                o.s{i} = [zeros(6,1); 1; zeros(6,1)];
+                o.q{i} = zeros(4,1);
+                o.lambda{i} = ones(cQ.n_state,1);
             end
-            s{o.horizon +1} = [zeros(6,1); 1; zeros(6,1)];
-            lambda{o.horizon +1} = ones(cQ.n_state,1);
+            o.s{o.horizon +1} = [zeros(6,1); 1; zeros(6,1)];
+            o.lambda{o.horizon +1} = ones(cQ.n_state,1);
         end
     end
 end
