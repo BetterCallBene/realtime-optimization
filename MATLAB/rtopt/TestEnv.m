@@ -40,6 +40,7 @@ classdef TestEnv < matlab.unittest.TestCase
                     %Central difference
                     numDiff( : , ((timepoint-1) * n) + i) ...
                         = (func_p - func_n)/2/obj.eps;
+                    
                 end
             end
         end

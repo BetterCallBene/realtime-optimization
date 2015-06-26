@@ -242,7 +242,7 @@ classdef MultiShooting < TestEnv
             toc
             obj.assertSize(anaDiff, size(numDiff) );
 %             obj.assertSize(anaDiff, [n_intervals * 13 , (n_intervals+1)* 17 ]);
-%             obj.assertLessThan(max(abs(anaDiff - numDiff)), obj.tol);
+             obj.assertLessThan(max(abs(anaDiff - numDiff)), obj.tol);
         end
         
 %         function testhDD(obj)
