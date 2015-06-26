@@ -163,7 +163,7 @@ classdef Lagrange < TestEnv
             %TODO: implement
             horizon = 5;
             o.setupTest(horizon);
-                        
+
             func = @() o.getL(o.cSolverRT);
             numDiff = o.numDiff_nD_AllT(func)';
             
