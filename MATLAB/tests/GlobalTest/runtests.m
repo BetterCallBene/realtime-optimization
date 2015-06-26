@@ -28,7 +28,7 @@ TEST = true;
 
 % suiteCosts = TestSuite.fromClass(?Costs);
 % resultCosts = run(suiteCosts);                            %Check
-% 
+ 
 % suiteCostsXU = TestSuite.fromClass(?CostsXU);
 % resultCostsXU = run(suiteCostsXU);                        %Check
 

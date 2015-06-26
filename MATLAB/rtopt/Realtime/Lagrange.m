@@ -97,22 +97,25 @@ classdef Lagrange < TestEnv
             CD = CD(activeSet_t,:);
             ZERO = ZERO(activeSet_t,activeSet_t);
             
-            costDall = solverRT.cCost.get_costDD{1} ; %brauchen nur den Teil an der Stelle t
-            costD = costDall( (t-1)*(n_state+n_contr) + 1: t*(n_state+n_contr), (t-1)*(n_state+n_contr) + 1: t*(n_state+n_contr));
+            costDDall = solverRT.cCost.get_costDD{1} ; %brauchen nur den Teil an der Stelle t
+            costDD = costDDall( (t-1)*(n_state+n_contr) + 1: t*(n_state+n_contr), (t-1)*(n_state+n_contr) + 1: t*(n_state+n_contr));
             
-            eq_conDD = solverRT.cConst.get_eq_conDD(solverRt.cConst, solverRt.lambda{t+1});
+            %eq_conDDAll = solverRT.cConst.get_eq_conDD(solverRT.lambda{t+1});
+            %eq_conDDAll = eq_conDDAll{1};
+            eq_conDDAll = solverRT.cConst.get_eq_conDD_at_t(solverRT.lambda{t+1}, t);
+            eq_conDD = eq_conDDAll( (t-1)*(n_state+n_contr) + 1: t*(n_state+n_contr), (t-1)*(n_state+n_contr)+ 1: t*(n_state+n_contr));
             
             % for approximation
             % cost_approx_t = solverRT.cCost.get_costDD_approx(t);
             % costD = cost_approx_t;
             
             
-            if (t ~= cCost.dyn.environment.horizon +1 )
-                H = [costD +eq_conDD, CD' , AB' ;...
-                    CD , ZERO, sparse(size(ZERO,1),cConst.dyn.robot.n_state);...
-                    AB , sparse(cConst.dyn.robot.n_state,size(ZERO,1)) , sparse(cConst.dyn.robot.n_state,cConst.dyn.robot.n_state) ];
+            if (t ~= solverRT.cCost.dyn.environment.horizon +1 )
+                H = [costDD + eq_conDD, CD' , AB' ;...
+                    CD , ZERO, sparse(size(ZERO,1),n_state);...
+                    AB , sparse(n_state,size(ZERO,1)) , sparse(n_state,n_state) ];
             else
-                H = [costD+eq_conDD, CD'; CD, ZERO ];
+                H = [costDD + eq_conDD, CD'; CD, ZERO ];
             end
         end
         
@@ -159,27 +162,61 @@ classdef Lagrange < TestEnv
     
     methods(Test)
         
-        function testgetLD(o)
-            %TODO: implement
-            horizon = 5;
-            o.setupTest(horizon);
-
-            func = @() o.getL(o.cSolverRT);
-            numDiff = o.numDiff_nD_AllT(func)';
-            
-            for i = 1:horizon
-                
-                anaDiff = o.getLD(o.cSolverRT,i);
-                %Perform checks
-                o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30)), 1e-9); 
-                
-            end
-        end
+                function testgetLD(o)
+                    horizon = 15;
+                    o.setupTest(horizon);
+        
+                    func = @() o.getL(o.cSolverRT);
+                    numDiff = o.numDiff_nD_AllT(func)';
+        
+                    for i = 1:horizon
+        
+                        anaDiff = o.getLD(o.cSolverRT,i);
+                        %Perform checks
+                        o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30)), 1e-9);
+        
+                    end
+                end
         
         function testgetLDD(o)
-            %TODO implement
-            horizon = 5;
+            horizon = 15;
             o.setupTest(horizon);
+            
+            for i =1:horizon
+                
+                func = @() o.getLD(o.cSolverRT,i)';
+                anaDiff = o.getLDD(o.cSolverRT,i);
+                numDiff1 = o.numDiff_nxnD(i,func);
+                
+                %Extend values, to derive after mu as well
+                if i >= horizon
+                   o.setupTest(horizon+1);
+                   anaDiff = o.getLDD(o.cSolverRT,i);
+                   numDiff1 = o.numDiff_nxnD(i,func);
+                end
+                
+                numDiff2 = o.numDiff_nxnD(i+1,func);
+                func2 = @() o.getLD(o.cSolverRT,i+1)';
+                numDiff3 = o.numDiff_nxnD(i,func2);
+                
+                %Reshape the result
+                numDiff2 = reshape(numDiff2(1,:,:), 30,30);
+                numDiff3 = reshape(numDiff3(1,:,:),30,30);
+                numDiff1 = reshape(numDiff1(1,:,:), 30,30);
+                                
+                %Perform checks
+                QMR = anaDiff(1:17,1:17);
+                AB = anaDiff(18:end, 1:17);
+                ABtr = anaDiff(1:17, 18:end);
+                
+                o.assertLessThan( max(abs(anaDiff - anaDiff')), o.tol);
+                o.assertLessThan( max(abs(QMR  + numDiff1(14:end, 14:end))),o.tol);
+                if( i < horizon)
+                    o.assertLessThan( max(abs(AB + numDiff2(1:13, 14:end))), o.tol);
+                    o.assertLessThan( max(abs(ABtr + numDiff3(14:end, 1:13))), o.tol);
+                end
+                disp( [' Timestep: ', int2str(i), ' done'] );
+            end
         end
         
         function testgetLD_withMus(o)
@@ -251,6 +288,7 @@ classdef Lagrange < TestEnv
             else
                 error('i has infeasible value');
             end
+
             tmp = vec_p{cell_index};
             tmp2 = tmp{t};
             tmp2(j) = tmp2(j) + o.eps;
@@ -296,6 +334,7 @@ classdef Lagrange < TestEnv
             else
                 error('i has infeasible value');
             end
+   
             tmp = vec_n{cell_index};
             tmp2 = tmp{t};
             tmp2(j) = tmp2(j) - o.eps;

@@ -173,6 +173,21 @@ classdef Constraints < GenConstraints & TestEnv
             end
         end
         
+        function eq_conDD = get_eq_conDD_at_t(o, lambda, t)
+           % GET_EQ_CONDD_AT_T Returns the second derivative of the eq_constraints for timepoint t
+           
+           H = o.dode.hDD();
+           n_state = length(lambda);
+           if (~isempty(lambda))
+              eq_conDD = lambda(1) * H{ (t-1) * n_state +1 };
+              for i = 2:n_state
+                 eq_conDD = eq_conDD + lambda(i) * H{ (t-1) * n_state + i}; 
+              end
+           else
+               error('lambda should not be empty');
+           end
+        end
+        
         function mu = checkIfActive(o,mu)
             % CHECKIFACTIVE Checks which constraint is active and which isnt and stores it
             % in the activeSet property.
@@ -232,13 +247,13 @@ classdef Constraints < GenConstraints & TestEnv
             end
         end
         
-        %<<<<<<< HEAD
+    
         function activeSet_k = getActiveSet(o,k)
             % GETACTIVESET Gives you a boolean vector of size o.n_addConstr
             % indicating, which additional inequality constraint is active
             % and which isn't.
             activeSet_k = o.activeSet( (k-1) * o.n_addConstr +1 : k * o.n_addConstr);
-            %=======
+
         end
         
         function H = get_ineqhess(varargin)
