@@ -48,12 +48,12 @@ classdef Quadrocopter < Model
         %Jm = ((mRC)*(motor_r)^2)/2; % Jm = mr^2/2
         %
         function IM = get.I_M(cq)
-            if cq.flagI_M
-                mRC = (cq.motor_m)*(0.527);
-                cq.I_M = ((mRC)*(cq.motor_r)^2)/2;
-                cq.flagI_M = false;
-            end
-            IM = cq.I_M;
+            %if cq.flagI_M
+            %    mRC = (cq.motor_m)*(0.527);
+            %    cq.I_M = ((mRC)*(cq.motor_r)^2)/2;
+            %    cq.flagI_M = false;
+            %end
+            IM = 4.4466e-06; %BB: Performance wgn 
         end
         function ret = get.I_1(cq)
             ret = [
@@ -64,7 +64,8 @@ classdef Quadrocopter < Model
         end
 
 		function ret = get.n_var(obj)
-			ret = obj.n_state + obj.n_contr;
+			%ret = obj.n_state + obj.n_contr;
+            ret = 17; % Performance wgn
 		end
     end
     

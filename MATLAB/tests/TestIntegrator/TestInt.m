@@ -72,7 +72,7 @@ classdef TestInt < handle & TestEnv
     
     methods(Test)
         function testIntegratoren(testCase)
-            n_intervals = 10;
+            n_intervals = 50;
             %timepoint = 5;
             
             testCase.setupTest(n_intervals);
@@ -98,7 +98,9 @@ classdef TestInt < handle & TestEnv
                 numDiff2 = testCase.numDiff_nD(timepoint, func2, testCase.solver2);
                 testCase.solver2.postToDo(old_intervals);
                 %figure
+                timepoint
                 max(max(abs(J2 - numDiff2)))
+                
             end
             
             %func2 = @() testCase.solver2.odeTest(timepoint);

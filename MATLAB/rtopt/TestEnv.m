@@ -67,6 +67,7 @@ classdef TestEnv < matlab.unittest.TestCase
             
             numDiff  = zeros( m , n*n_timepoints,n*n_timepoints);
             for timepoint = 1:n_timepoints
+                
                 for i = 1:n
                     func_p = obj.plusEpsShift(i, timepoint, vec_old, func, n, dyn);
                     func_n = obj.minusEpsShift(i, timepoint, vec_old, func, n, dyn);

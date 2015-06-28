@@ -204,9 +204,9 @@ classdef MultiShooting < TestEnv
             model = Quadrocopter();
             integrator = ode15iM2();
             
-            load('TestData', 'data');
+            %load('TestData', 'data');
             cBQD = BasisQDyn(model, env, integrator);
-            cBQD.vec = data;
+            cBQD.vec = rand(17 * (n_intervals+1), 1);
             obj.dyn = cBQD;
         end
         
@@ -219,18 +219,52 @@ classdef MultiShooting < TestEnv
             m = m(1);
         end
         
+        function numDiff = numDiff_nD_AllT(obj, func)
+            % NUMDIFF_NDALLT This method calculates numericalle the
+            % derivative of func, but for all timepoints
+            
+            [vec_old, n, m, n_timepoints, dyn] = obj.setup(func);
+            numDiff = zeros(m , n * n_timepoints);
+            
+            for timepoint = 1:n_timepoints
+                tic;
+                timepoint
+                for i = 1:n
+                    func_p = obj.plusEpsShift(i,timepoint,vec_old, func, n, dyn);
+                    func_n = obj.minusEpsShift(i,timepoint,vec_old, func, n, dyn);
+                    
+                    %Central difference
+                    numDiff( : , ((timepoint-1) * n) + i) ...
+                        = (func_p - func_n)/2/obj.eps;
+                end
+                toc
+            end
+        end
+        
         function hD =  gethD(obj)
             [h, hD] = obj.h();
         end
         
         
+        
+        
     end
     
     methods(Test)
+        
+        function testh(obj)
+            n_intervals = 50;
+            obj.setupTest(n_intervals);
+            [n_int, n_state, n_contr, mesh] = getParams(obj);
+            tic
+            [h, anaDiff] = obj.h();
+            toc
+        end
+        
         function testhD(obj)
             % TESTHD This method derives numerically obj.h and compares it
             %with obj.hD
-            n_intervals = 2;
+            n_intervals = 5;
             obj.setupTest(n_intervals);
             [n_int, n_state, n_contr, mesh] = getParams(obj);
             tic

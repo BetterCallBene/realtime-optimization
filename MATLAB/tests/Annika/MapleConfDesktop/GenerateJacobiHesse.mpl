@@ -26,29 +26,18 @@ Theta := proc (q, v, omega) local res; res := Vector(6); res[1 .. 3] := m*CrossP
 # T(omega, u):= [[[0,],[0,],[-k[T]*(&sum;)u[i]^(2),],[M*u^(2)+[[[0,],[0,],[1,]]],x omega *I[M]*(u[1]-u[2]+u[3]-u[4])]]];
 T := proc (omega, u) local res, M; res := Vector(6); M := Matrix(3, 4, {(1, 1) = 0, (1, 2) = d*kT, (1, 3) = 0, (1, 4) = -d*kT, (2, 1) = -d*kT, (2, 2) = 0, (2, 3) = d*kT, (2, 4) = 0, (3, 1) = -kQ, (3, 2) = kQ, (3, 3) = -kQ, (3, 4) = kQ}); res[1 .. 3] := `<,>`(0, 0, kT*(u[1]^2+u[2]^2+u[3]^2+u[4]^2)); res[4 .. 6] := Multiply(M, `<,>`(u[1]^2, u[2]^2, u[3]^2, u[4]^2))+CrossProduct(`<,>`(0, 0, 1), omega)*IM*(u[1]-u[2]+u[3]-u[4]); return res end proc;
 
-# Massenmatrix B(x)
-B := proc (x) local vx, res; vx := Vector(x); res := Matrix(IdentityMatrix(13)); res[4 .. 7, 4 .. 7] := DiagonalMatrix(vx[4 .. 7]); return res end proc;
-;
-
 
 # dot(x):= [[[R(q)*v,],[1/(2)*q*[[[0,],[omega,]]],],[M^(-1)*(T(omega, u) - Theta(q, v, omega)),]]];
-getDot := proc (x) local vx, res, tmpQ, tmpV, tmpOmega, tmpU; vx := Vector(x); res := Vector(13); tmpQ := vx[4 .. 7]; tmpV := vx[8 .. 10]; tmpOmega := vx[11 .. 13]; tmpU := vx[14 .. 17]; res[1 .. 3] := Multiply(R(tmpQ), tmpV); res[4 .. 7] := (1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega)); res[8 .. 13] := Multiply(Minv, T(tmpOmega, tmpU)-Theta(tmpQ, tmpV, tmpOmega)); return res end proc;
-getDotTilde := proc (x) local vx, res, tmpQ, tmpV, tmpOmega, tmpU; vx := Vector(x); res := Vector(13); tmpQ := vx[4 .. 7]; tmpV := vx[8 .. 10]; tmpOmega := vx[11 .. 13]; tmpU := vx[14 .. 17]; res[1 .. 3] := Multiply(R(tmpQ), tmpV); res[4] := (-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[2]*q[2]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[3]*q[3]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[4]*q[4])[1]; res[5] := (-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[1]*q[1]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[3]*q[3]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[4]*q[4])[1]; res[6] := (-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[1]*q[1]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[2]*q[2]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[4]*q[4])[1]; res[7] := (-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[1]*q[1]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[2]*q[2]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[3]*q[3])[1]; res[8 .. 13] := Multiply(Minv, T(tmpOmega, tmpU)-Theta(tmpQ, tmpV, tmpOmega)); return res end proc;
+getDot := proc (x) local vx, res, tmpQ, tmpV, tmpOmega, tmpU; vx := Vector(x); res := Vector(13); tmpQ := vx[4 .. 7]; tmpV := vx[8 .. 10]; tmpOmega := vx[11 .. 13]; tmpU := vx[14 .. 17]; res[1 .. 3] := Multiply(R(tmpQ), tmpV); res[4] := (-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[2]*q[2]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[3]*q[3]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[4]*q[4])[1]; res[5] := (-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[1]*q[1]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[3]*q[3]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[4]*q[4])[1]; res[6] := (-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[1]*q[1]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[2]*q[2]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[4]*q[4])[1]; res[7] := (-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[1]*q[1]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[2]*q[2]-(1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega))[3]*q[3])[1]; res[8 .. 13] := Multiply(Minv, T(tmpOmega, tmpU)-Theta(tmpQ, tmpV, tmpOmega)); return res end proc;
 
 #  Ausführen von getDot(x)
 dot := getDot(x);
-dotTilde := getDotTilde(x);
-dot := simplify(dot, 'symbolic');
-dotTilde := simplify(dotTilde, 'symbolic');
 # Für den Matlabexport in eine Matrix umwandeln
 
 dotMatrix := convert(dot, Matrix);
-dotMatrixTilde := convert(dotTilde, Matrix);
+
 if DEB = true then dotMatrix[1 .. 3]; dotMatrix[4 .. 7]; dotMatrix[8 .. 13] end if;
-
-
-
-
+TestJ := Jacobian(dot, x);
 if DEB = true then print(TestJ[11 .. 13, 14 .. 17]) end if;
 # Berechnung der nicht Nulleinträge von Matrizen
 
@@ -66,10 +55,8 @@ getArray := proc (F, x) local m, n, JBtmp, CountJacobi, CountHesse, J, H, i, j, 
 
 # Ausgabe Hesse und Jacobi in Array
 J, H := getArray(dot, x);
-
-
 # 
-JTilde, HTilde := getArray(dotTilde, x);
+
 # Temporary Ordner finden
 tmpDir := TemporaryDirectory();
 # Temporary Ordner als aktuellen Ordner setzen.
@@ -77,7 +64,7 @@ currentdir(tmpDir);
 currentdir();
 # Optimieren in MATLAB und exportieren.
 
-if TEST = false then Matlab(eval(([codegen:-optimize])(dotMatrix, tryhard)), defaulttype = integer, output = tmpRTOptFunction); VectorCalculus:-`*`(VectorCalculus:-`*`(VectorCalculus:-`*`(VectorCalculus:-`*`(Matlab(eval(([codegen:-optimize])(J, tryhard)), defaulttype = integer, output = tmpRTOptJacobi), Matlab(eval(([codegen:-optimize])(H, tryhard)), defaulttype = integer, output = tmpRTOptHesse)), Matlab(eval(([codegen:-optimize])(dotMatrixTilde, tryhard)), defaulttype = integer, output = tmpRTOptFTilde)), Matlab(eval(([codegen:-optimize])(JTilde, tryhard)), defaulttype = integer, output = tmpRTOptJTilde)), Matlab(eval(([codegen:-optimize])(HTilde, tryhard)), defaulttype = integer, output = tmpRTOptHTilde)) else if DEB = false then Matlab(dotMatrix, defaulttype = integer) else  end if end if;
+if TEST = false then Matlab(eval(([codegen:-optimize])(dotMatrix, tryhard)), defaulttype = integer, output = tmpRTOptFunction); VectorCalculus:-`*`(Matlab(eval(([codegen:-optimize])(J, tryhard)), defaulttype = integer, output = tmpRTOptJacobi), Matlab(eval(([codegen:-optimize])(H, tryhard)), defaulttype = integer, output = tmpRTOptHesse)) else if DEB = false then Matlab(eval(([codegen:-optimize])(dotMatrix, tryhard)), defaulttype = integer); Matlab(eval(([codegen:-optimize])(J, tryhard)), defaulttype = integer); Matlab(eval(([codegen:-optimize])(H, tryhard)), defaulttype = integer) else  end if end if;
 
 
 

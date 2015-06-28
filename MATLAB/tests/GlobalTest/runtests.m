@@ -14,17 +14,17 @@ TEST = true;
 % suiteBasisQDyn = TestSuite.fromClass(?BasisQDyn);
 % resultDyn = run(suiteBasisQDyn);                          %Check
 
-% suiteConstraints = TestSuite.fromClass(?Constraints);
-% resultConstraints = run(suiteConstraints);                %Check
+%suiteConstraints = TestSuite.fromClass(?Constraints);
+%resultConstraints = run(suiteConstraints);                %Check
 
-suiteMultiShooting = TestSuite.fromClass(?MultiShooting);
-resultMultiShooting = run(suiteMultiShooting);                %Check
+%suiteMultiShooting =MultiShooting();
+%resultMultiShooting = run(suiteMultiShooting);                %Check
         
 % suiteForwEuler = TestSuite.fromClass(?ForwEuler);
 % resultForwEuler = run(suiteForwEuler);                    %NOT 
 
-%suiteODE15iM2 = TestSuite.fromClass(?ode15iM2);
-%resultODE15iM2 = run(suiteODE15iM2);                      %Check
+suiteODE15iM2 = ode15iM2(); 
+resultODE15iM2 = run(suiteODE15iM2, 'testOde');                      %Check
 
 % suiteCosts = TestSuite.fromClass(?Costs);
 % resultCosts = run(suiteCosts);                            %Check

@@ -23,7 +23,7 @@ classdef ode15iM2 < Solver
             odMi.dfdyPatternflag = true;
             odMi.dfdypPatternflag = true;
             odMi.flagBDot = true;
-            
+            odMi.optsF = odeset('RelTol',1e-3,'AbsTol',1e-4, 'Jacobian', @odMi.JacF);
         end
         
         function yp = helperCreateInitialConditionsDot(obj)
@@ -54,26 +54,24 @@ classdef ode15iM2 < Solver
                 yp0 = varargin{2};
             end
             %% Sparsity pattern of df/dy
-            
-            %opts_ = odeset('RelTol',1e-5,'AbsTol',1e-7);%, 'Jacobian', @odMi.Jac);
-            opts_ = odeset('RelTol',1e-5,'AbsTol',1e-6, 'Mass', @obj.mass, 'MassSingular', 'yes', 'InitialSlope', yp0);
-            sol = ode15s(func, meshGrid, y0, opts_);
+            opts_ = obj.opts;
+            sol = ode15i(@obj.odeF, meshGrid, y0, yp0, opts_);
             y = sol.y(:, end);
         end
         
-        function res = funcToIntegrate(obj, t, y)
+        function res = funcToIntegrateF(obj, t, varargin)
+            y = varargin{1};
+            yp = varargin{2};
+            
             u0 = obj.u0;
             [x0, M0, N0] = obj.helperCreateMatrizen(y);
-            %[xp0, M0Dot, N0Dot] = obj.helperCreateMatrizen( yp);
+            [xp0, M0Dot, N0Dot] = obj.helperCreateMatrizen( yp);
             
-            %M0
+            [res] = obj.odeF(t, x0, xp0, u0);
+            %[M, N] = obj.odeMN(t, x0, xp0, u0, M0, M0Dot, N0, N0Dot, B);
             
-            B = diag([ones(3, 1); y(4:7); ones(6, 1)]);
+            %res = obj.helperCreateVektor(F, M, N);
             
-            [F] =  obj.dyn.FTilde(x0, u0);
-            [M, N] = obj.odeMN(t, x0, u0, M0, N0, B);
-            
-            res = obj.helperCreateVektor(F, M, N);
         end
         
         function [F, J, M, N] = ode(obj, timepoint, varargin)
@@ -84,7 +82,14 @@ classdef ode15iM2 < Solver
             [F, J, M, N] = ode@Solver(obj, timepoint, y0, yp0);
         end
         
-        function [M, N] = odeMN(obj, t, x0, u0, M0, N0, B)
+        function [res] = odeF(obj, t, x, xp, u0)
+            B = obj.mass(t, x);
+            
+            ftilde  = obj.dyn.FTilde(x, u0);
+            res = B*xp - ftilde;
+        end
+        
+        function [M, N] = odeMN(obj, t, x0, xp0, u0, M0, M0dot, N0, N0dot, B)
             %[n_state] = obj.getParams();
             n_state = 13;
             M0_size_ = obj.M0_size;
@@ -92,13 +97,10 @@ classdef ode15iM2 < Solver
             
             Bdot_ = obj.massdot(t, x0);
             
-            obj.vec = [x0; u0];
+            %obj.vec = [x0; u0];
             
-            f = obj.dyn.dot(obj.timepoint);
-            J = obj.dyn.dotD(obj.timepoint);
-            Jx = J(1:n_state, 1:n_state);
-            
-            Bx = tprod(Bdot_,[1 -1 2], f, [-1]);
+            %f = obj.dyn.dot(obj.timepoint);
+            Bx = tprod(Bdot_,[1 -1 2], xp0, [-1]);
             
             % Test f�r spaeter
             % Bx = tprod(Bdot_,[1 -1 2], xp0, [-1]);
@@ -108,21 +110,15 @@ classdef ode15iM2 < Solver
             JTildeu = JTilde(1:n_state, n_state+1:end);
             
             
-            resM = JTildex * M0 - Bx * M0; %- B * Jx * M0;
-            resN = JTildex * N0 + JTildeu - Bx * N0; % - B * Jx * N0;
-            
-            resM
+            resM = Bx * M0 + B *M0dot - JTildex * M0;
+            resN = Bx * N0 + B *N0dot - JTildex * N0 - JTildeu;
             
             M = reshape(sparse(resM), [M0_size_, 1]);
             N = reshape(sparse(resN), [N0_size_, 1]);
         end
         
         function res = mass(obj, t, y)
-            Bdiag = diag([ones(3, 1); y(4:7); ones(6, 1)]);
-            res = sparse(blkdiag(Bdiag, Bdiag, Bdiag, Bdiag, Bdiag, ...
-                                Bdiag, Bdiag, Bdiag, Bdiag, Bdiag, ...
-                                Bdiag, Bdiag, Bdiag, Bdiag, Bdiag, ...
-                                Bdiag, Bdiag, Bdiag));
+            res = diag([ones(3, 1); y(4:7); ones(6, 1)]);
         end
         
         function res = massdot(obj, t, y)
@@ -146,8 +142,6 @@ classdef ode15iM2 < Solver
         
         function [dfdy, dfdyp] = Jac(obj, t, y, yp)
             [n_state, n_contr] = obj.getParams();
-            
-            
             
             u0 = obj.u0;
             [x0, M0, N0] = obj.helperCreateMatrizen(y);
@@ -211,49 +205,32 @@ classdef ode15iM2 < Solver
             
         end
         
-        function dfdyX = JacX(obj, M0, M0Dot, N0, N0Dot, Bdot_, Bx, JTildex, HTilde)
-            [n_state, n_contr] = obj.getParams();
+        function dfdyX = JacF(obj, t, y, yp)
             
-            Mx = zeros(n_state * n_state, n_state);
-            Nx = zeros(n_state * n_contr, n_state);
-            
-            %JTildeu = JTilde(1:n_state, n_state+1:end);
+            [x0] = obj.helperCreateMatrizen(y);
+            [xp0] = obj.helperCreateMatrizen( yp);
             
             
-            for i = 1:n_state
-                M0spalte = full(M0(:, i));
-                M0Dotspalte = full(M0Dot(:, i));
-                HTildexx = HTilde(:, 1:n_state, 1:n_state);
-                Mx((i-1)*n_state+1:i*n_state, :) = tprod(Bdot_, [1 -1 2], M0Dotspalte, [-1]) - tprod(HTildexx, [1 -1 2], M0spalte, [-1]);
-                if i <= n_contr
-                    N0spalte = full(N0(:, i));
-                    N0Dotspalte = full(N0Dot(:, i));
-                    
-                    Nx((i-1)*n_state+1:i*n_state, :) = tprod(Bdot_, [1 -1 2], N0Dotspalte, [-1]) - tprod(HTildexx, [1 -1 2], N0spalte, [-1])  ...
-                        - tprod(1, [-1],  HTilde(:, i + n_state, 1:n_state), [1 -1, 2]);
-                end
-            end
+            Bdot_ = obj.massdot(t, x0);
+            Bx = tprod(Bdot_,[1 -1 2], xp0, [-1]);
             
-            tmp = Bx -JTildex;
-            
-            dfdyX = [sparse(tmp);
-                sparse(Mx);
-                sparse(Nx);
-            ];
+            dfdyX = Bx -JTildex;
             
         end
         
-        function dfdyM = JacM(obj, Bx, JTildex)
+        function dfdyM = JacM(obj, t, y, yp)
+            
+            
+            
             Mdiag = Bx - JTildex;
             
-            dfdyM = [
-                    sparse(13, 169);
+            dfdyM = ...
                     sparse(blkdiag(Mdiag, Mdiag, Mdiag, Mdiag, Mdiag,...
                 Mdiag, Mdiag, Mdiag, Mdiag, Mdiag,....
                 Mdiag, Mdiag, Mdiag ...
             ));
-                sparse(4*13, 169);
-            ];
+                
+            
             
         end
         
@@ -496,10 +473,7 @@ classdef ode15iM2 < Solver
             model = Quadrocopter();
             
             obj.dyn = BasisQDyn(model, env, obj);
-            vec = rand(17* (n_intervals+1), 1);
-            vec(4:6) = zeros(3, 1);
-            vec(7) = 1;
-            obj.dyn.vec = vec;
+            obj.dyn.vec = rand(17* (n_intervals+1), 1);
             
             obj.nextStep(timepoint);
             [old_interval] = obj.preToDo();
@@ -520,7 +494,7 @@ classdef ode15iM2 < Solver
         
         function testJac(testCase)
             n_intervals = 4;
-            timepoint = 1;
+            timepoint = 3;
             
             [y0, yp0, old_interval, old_timepoint] = testCase.setupTest(n_intervals, timepoint);
             tspan = [(timepoint -1)*testCase.h, timepoint*testCase.h];
@@ -540,19 +514,19 @@ classdef ode15iM2 < Solver
         function testOde(testCase)
             
             n_intervals = 50;
-            timepoint = 1;
+            timepoint = 2;
             
             testCase.n_intervalsInt = 50;
             
             [y0, yp0, old_interval, old_timepoint] = testCase.setupTest(n_intervals, timepoint);
             [n_state] = testCase.getParams();
             
-            opts_ = odeset('RelTol',1e-6,'AbsTol',1e-7);%, 'Jacobian', @testCase.Jac);
+            opts_ = odeset('RelTol',1e-5,'AbsTol',1e-6, 'Jacobian', @testCase.Jac);
             testCase.opts = opts_;
             
             tspan = [(timepoint -1)*testCase.h, timepoint*testCase.h];
             tic;
-            [F] = testCase.odeTest(timepoint, y0, yp0);
+            [F, J] = testCase.odeTest(timepoint, y0, yp0);
             
             toc
             Q = norm(F(4:7));

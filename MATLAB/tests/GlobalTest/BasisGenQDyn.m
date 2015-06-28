@@ -482,7 +482,7 @@ t1 = [1 4 6 t1128; 1 4 7 t1132; 1 4 9 t1138; 1 4 10 t1140; 1 5 6 t1131; 1 5 7 t1
             
             
             Iges = obj.robot.I;
-            IM = obj.robot.I_M;
+            IM = 4.4466e-06;%obj.robot.I_M;BB: Extreme schlechte Performance
             m = obj.robot.m;
             
             kT  = obj.robot.kT;

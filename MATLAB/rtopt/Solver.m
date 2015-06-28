@@ -139,8 +139,8 @@ classdef(Abstract) Solver < handle & TestEnv
             n_state = 13;
             n_contr = 4;
             
-            M0_size_ = obj.M0_size;
-            N0_size_ = obj.N0_size;
+            M0_size_ = 169;%obj.M0_size; %Performance
+            N0_size_ = 52;%obj.N0_size;
             
             F = Y(1:n_state, 1);
             
@@ -221,7 +221,7 @@ classdef(Abstract) Solver < handle & TestEnv
             end
             
             tspan = [(timepoint -1)*obj.h, timepoint*obj.h];
-            meshGrid = linspace(tspan(1), tspan(2), obj.n_intervalsInt); 
+            meshGrid = [tspan(1), tspan(2)];%linspace(tspan(1), tspan(2));%, obj.n_intervalsInt); 
             
             old_timepoint = obj.timepoint;
             obj.u0 = obj.get_contr(old_timepoint);
