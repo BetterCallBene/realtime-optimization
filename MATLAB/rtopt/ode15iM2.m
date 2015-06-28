@@ -4,7 +4,6 @@ classdef ode15iM2 < Solver
     
     properties
         
-        opts;
         dfdyPattern;
         dfdypPattern;
         
@@ -17,9 +16,9 @@ classdef ode15iM2 < Solver
     
     methods
         
-        function odMi = ode15iM2()
+        function odMi = ode15iM2(varargin)
             %JP = JPat(N) | MvPat(N);?
-            odMi@Solver();
+            odMi@Solver(varargin);
             odMi.dfdyPatternflag = true;
             odMi.dfdypPatternflag = true;
             odMi.flagBDot = true;
@@ -30,16 +29,13 @@ classdef ode15iM2 < Solver
             
             [n_state, n_contr, n_var] = getParams(obj);
             
-            M0 = reshape(obj.M0, [obj.M0_size, 1]);
-            N0 = reshape(obj.N0, [obj.N0_size, 1]);
-            
             old_timepoint = obj.timepoint;
             obj.timepoint = 1;
             obj.dyn.vec =  obj.vec_sav((old_timepoint - 1) * n_var +1:(old_timepoint - 1) * n_var + n_var);
             
             xp = obj.dyn.dot(obj.timepoint);
-            Mp = obj.kM(M0);
-            Np = obj.kN(N0);
+            Mp = obj.kM(obj.M0);
+            Np = obj.kN(obj.N0);
             
             obj.timepoint = old_timepoint;
             
@@ -56,24 +52,56 @@ classdef ode15iM2 < Solver
             %% Sparsity pattern of df/dy
             
             %opts_ = odeset('RelTol',1e-5,'AbsTol',1e-7);%, 'Jacobian', @odMi.Jac);
-            opts_ = odeset('RelTol',1e-5,'AbsTol',1e-6, 'Mass', @obj.mass, 'MassSingular', 'yes', 'InitialSlope', yp0);
-            sol = ode15s(func, meshGrid, y0, opts_);
+            opts_ = obj.opts;
+            sol = ode15i(func, meshGrid, y0, yp0, opts_);
             y = sol.y(:, end);
         end
         
-        function res = funcToIntegrate(obj, t, y)
+        function res = funcToIntegrate(obj, t, y, yp)
+            
+            Fres = zeros(13, 1);
+            Mres = zeros(13, 13);
+            Nres = zeros(13, 4);
             u0 = obj.u0;
+            
             [x0, M0, N0] = obj.helperCreateMatrizen(y);
-            %[xp0, M0Dot, N0Dot] = obj.helperCreateMatrizen( yp);
+            [xp0, MDot, NDot] = obj.helperCreateMatrizen(yp);
             
-            %M0
+            if abs(x0(4)) < 1e-3
+                x0(4) = sign(x0(4))* 1e-3;
+            end
             
-            B = diag([ones(3, 1); y(4:7); ones(6, 1)]);
             
-            [F] =  obj.dyn.FTilde(x0, u0);
-            [M, N] = obj.odeMN(t, x0, u0, M0, N0, B);
+            obj.vec = [x0; u0];
             
-            res = obj.helperCreateVektor(F, M, N);
+            
+            s = ones(4, 3);
+            for i = 1:4
+                s(i, 2) = (i-1)+ 4;
+                s(i, 3) = xp0((i-1)+ 4);
+            end
+            
+            qdots = sparse(s(:, 1), s(:, 2), s(:, 3), 1, 13);
+            
+            
+            F =  obj.dyn.dot(obj.timepoint);
+            M = obj.kM(M0);
+            N = obj.kN(N0);
+            
+            Fres(1:3) = xp0(1:3) - F(1:3);
+            Fres(4:end-1) = xp0(5:end) - F(5:end);
+            Fres(end) = x0(4:7)'*xp0(4:7);
+            
+            Mres(1:3, :) = MDot(1:3, :) - M(1:3, :);
+            Mres(4:end-1, :) = MDot(5:end, :) - M(5:end, :);
+            Mres(end, :) = x0(4) * MDot(4, :) + qdots * M ; 
+            
+            Nres(1:3, :) = NDot(1:3, :) - N(1:3, :);
+            Nres(4:end-1, :) = NDot(5:end, :) - N(5:end, :);
+            Nres(end, :) = x0(4) * NDot(4, :) + qdots * N ;
+            
+            
+            res = obj.helperCreateVektor(Fres, sparse(Mres), sparse(Nres));
         end
         
         function [F, J, M, N] = ode(obj, timepoint, varargin)
@@ -84,38 +112,6 @@ classdef ode15iM2 < Solver
             [F, J, M, N] = ode@Solver(obj, timepoint, y0, yp0);
         end
         
-        function [M, N] = odeMN(obj, t, x0, u0, M0, N0, B)
-            %[n_state] = obj.getParams();
-            n_state = 13;
-            M0_size_ = obj.M0_size;
-            N0_size_ = obj.N0_size;
-            
-            Bdot_ = obj.massdot(t, x0);
-            
-            obj.vec = [x0; u0];
-            
-            f = obj.dyn.dot(obj.timepoint);
-            J = obj.dyn.dotD(obj.timepoint);
-            Jx = J(1:n_state, 1:n_state);
-            
-            Bx = tprod(Bdot_,[1 -1 2], f, [-1]);
-            
-            % Test f�r spaeter
-            % Bx = tprod(Bdot_,[1 -1 2], xp0, [-1]);
-            
-            JTilde = obj.dyn.getJTilde(x0, u0);
-            JTildex = JTilde(1:n_state, 1:n_state);
-            JTildeu = JTilde(1:n_state, n_state+1:end);
-            
-            
-            resM = JTildex * M0 - Bx * M0; %- B * Jx * M0;
-            resN = JTildex * N0 + JTildeu - Bx * N0; % - B * Jx * N0;
-            
-            resM
-            
-            M = reshape(sparse(resM), [M0_size_, 1]);
-            N = reshape(sparse(resN), [N0_size_, 1]);
-        end
         
         function res = mass(obj, t, y)
             Bdiag = diag([ones(3, 1); y(4:7); ones(6, 1)]);
@@ -496,10 +492,10 @@ classdef ode15iM2 < Solver
             model = Quadrocopter();
             
             obj.dyn = BasisQDyn(model, env, obj);
-            vec = rand(17* (n_intervals+1), 1);
-            vec(4:6) = zeros(3, 1);
-            vec(7) = 1;
-            obj.dyn.vec = vec;
+            val = [zeros(3, 1); 1; 0 ;0 ;0; zeros(6, 1)];
+            u = [10000; 10000; 10000+100; 10000];
+            vec = [val;u];
+            obj.dyn.vec = [vec; vec; vec];
             
             obj.nextStep(timepoint);
             [old_interval] = obj.preToDo();
@@ -539,10 +535,10 @@ classdef ode15iM2 < Solver
         
         function testOde(testCase)
             
-            n_intervals = 50;
+            n_intervals = 2;
             timepoint = 1;
             
-            testCase.n_intervalsInt = 50;
+            testCase.n_intervalsInt = n_intervals;
             
             [y0, yp0, old_interval, old_timepoint] = testCase.setupTest(n_intervals, timepoint);
             [n_state] = testCase.getParams();

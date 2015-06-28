@@ -3,7 +3,7 @@ classdef(Abstract) Solver < handle & TestEnv
     %   Detailed explanation goes here
     
     properties
-        
+        opts;
         dyn_;
         timepoint; % 
         M0;
@@ -17,7 +17,7 @@ classdef(Abstract) Solver < handle & TestEnv
         n_intervalsInt;
         
         h;
-        JDot;
+        
         vec_sav;
         
         flagM0;
@@ -30,7 +30,7 @@ classdef(Abstract) Solver < handle & TestEnv
     properties(Dependent)
         vec;
         dyn;
-        
+        JDot;
         JDot_u;
         JDot_x;
         contr;
@@ -98,9 +98,12 @@ classdef(Abstract) Solver < handle & TestEnv
             res = 52; %Performance
         end
         
+        function res = getJDot(obj)
+            res = obj.dyn.dotD(obj.timepoint);
+        end
+        
         function res = get.JDot(obj)
-            obj.JDot = obj.dyn.dotD(obj.timepoint);
-            res = obj.JDot;
+            res = obj.getJDot();
         end
         function res = get.JDot_x(obj)
             n_state = obj.dyn.robot.n_state;
@@ -111,17 +114,15 @@ classdef(Abstract) Solver < handle & TestEnv
             res = obj.JDot(:, n_state + 1:end);
         end
         
-        function M = kM(obj, y)
-            n_state  = obj.dyn.robot.n_state;
-            M0_ = reshape(y, [n_state, n_state]);
-            M = obj.JDot_x * M0_;
+        function M = kM(obj, M0_)
+           Jx = obj.JDot_x;
+           M = Jx * M0_;
         end
         
-        function N = kN(obj, y)
-            [n_state, n_contr] = getParams(obj);
-            
-            N0_ = reshape(y, [n_state, n_contr]);
-            N = obj.JDot_x * N0_ + obj.JDot_u;
+        function N = kN(obj, N0_)
+            Jx = obj.JDot_x;
+            Ju = obj.JDot_u;
+            N = Jx * N0_ +  Ju;
         end
         
     end
@@ -161,7 +162,7 @@ classdef(Abstract) Solver < handle & TestEnv
             state = obj.vec_sav((obj.timepoint - 1) * n_var +1:(obj.timepoint - 1) * n_var + n_state);
             y0 = obj.helperCreateVektor(state, obj.M0, obj.N0);
         end
-        function y = helperCreateVektor(obj, F, M, N)
+        function res = helperCreateVektor(obj, F, M, N)
             %[n_state] = obj.getParams();
             n_state = 13;
             M0_size_ = obj.M0_size;
@@ -171,11 +172,20 @@ classdef(Abstract) Solver < handle & TestEnv
             y(1:n_state, 1) = F;
             y(n_state + 1: n_state + M0_size_, 1) = reshape(M, [M0_size_, 1]);
             y(n_state + M0_size_ + 1: n_state + M0_size_ + N0_size_, 1) = reshape(N, [N0_size_, 1]);
+            res = sparse(y);
         end
     end
     
     methods
-        function s = Solver()
+        function s = Solver(varargin)
+            
+            if nargin == 1
+                opts_ = varargin{1};
+                s.opts = opts_{1};
+            else
+                s.opts = odeset('RelTol',1e-4,'AbsTol',1e-6);
+            end
+            
             s.flagM0_size = true;
             s.flagN0_size = true;
             s.flagM0 = true;

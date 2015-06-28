@@ -18,14 +18,19 @@ TEST = true;
 %resultForwEuler = run(suiteForwEuler);
 
 
-%suiteode15iM = ode15iM();
-%resultsuiteode15iM = run(suiteode15iM, 'testJac');
+
+%suiteode15sM = ode15sM();
+%resultsuiteode15sM = run(suiteode15sM, 'testJac');
+
+
+% suiteode45M = ode45M();
+% resultsuiteode45M = run(suiteode45M, 'testOde');
 
 % suiteode15iM2 = ode15iM2();
 % resultsuiteode15iM = run(suiteode15iM2, 'testOde');
 
-suiteode15iM2 = ode15iM2();
-resultsuiteode15iM = run(suiteode15iM2);
+%suiteode15iM2 = ode15iM2();
+%resultsuiteode15iM = run(suiteode15iM2);
 
 %suiteRungeKutta = RungeKutta();
 %resultRungeKuttaK1 = run(suiteRungeKutta, 'testOde');
@@ -34,8 +39,8 @@ resultsuiteode15iM = run(suiteode15iM2);
 %resultRungeKuttaK4 = run(suiteRungeKutta, 'testk4');
 %resulttestIntegrate = run(suiteRungeKutta, 'testIntegrate');
 
-%suiteInt = TestInt;
-%resultInt = run(suiteInt);
+suiteInt = TestInt;
+resultInt = run(suiteInt, 'testIntegratoren');
 
 %suiteOdeM = odeM();
 %resultOdeM = run(suiteOdeM);
