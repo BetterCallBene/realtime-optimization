@@ -26,7 +26,7 @@ classdef TestEnv < matlab.unittest.TestCase
         end
         
         function numDiff = numDiff_nD_AllT(obj, func)
-            % NUMDIFF_NDALLT This method calculates numericalle the
+            % NUMDIFF_NDALLT This method calculates numerically the
             % derivative of func, but for all timepoints
             
             [vec_old, n, m, n_timepoints, dyn] = obj.setup(func);
@@ -40,6 +40,7 @@ classdef TestEnv < matlab.unittest.TestCase
                     %Central difference
                     numDiff( : , ((timepoint-1) * n) + i) ...
                         = (func_p - func_n)/2/obj.eps;
+                    
                 end
             end
         end

@@ -17,24 +17,39 @@ TEST = true;
 %suiteConstraints = TestSuite.fromClass(?Constraints);
 %resultConstraints = run(suiteConstraints);                %Check
 
+<<<<<<< HEAD
 %suiteMultiShooting =MultiShooting();
 %resultMultiShooting = run(suiteMultiShooting);                %Check
+=======
+% suiteMultiShooting = TestSuite.fromClass(?MultiShooting);
+% resultMultiShooting = run(suiteMultiShooting);                %Check
+>>>>>>> baf2f11e89ea1743450eb56aef48cb2029dad76e
         
 % suiteForwEuler = TestSuite.fromClass(?ForwEuler);
 % resultForwEuler = run(suiteForwEuler);                    %NOT 
 
+<<<<<<< HEAD
 suiteODE15iM2 = ode15iM2(); 
 resultODE15iM2 = run(suiteODE15iM2, 'testOde');                      %Check
+=======
+% suiteODE15iM2 = TestSuite.fromClass(?ode15iM2);
+% resultODE15iM2 = run(suiteODE15iM2);                      %Check
+>>>>>>> baf2f11e89ea1743450eb56aef48cb2029dad76e
 
 % suiteCosts = TestSuite.fromClass(?Costs);
 % resultCosts = run(suiteCosts);                            %Check
-
  
+% suiteCostsXU = TestSuite.fromClass(?CostsXU);
+% resultCostsXU = run(suiteCostsXU);                        %Check
+
+suiteLagrange = TestSuite.fromClass(?Lagrange);
+resultLagrange = run(suiteLagrange);
+
 % suiteRiccati = TestSuite.fromClass(?RiccatiManager);
 % resultRiccati = run(suiteRiccati);                        %Check
 
-%suiteRTSolver = TestSuite.fromClass(?RealtimeSolver);
-%resultRTSolver = run(suiteRTSolver);                        %Check
+% suiteRTSolver = TestSuite.fromClass(?RealtimeSolver);
+% resultRTSolver = run(suiteRTSolver);                        %Check
 
 % 
 %Create Suite from SolverTest Class Definition File

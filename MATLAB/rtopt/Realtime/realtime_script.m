@@ -46,7 +46,7 @@ cMultShoot = MultiShooting(cBQD);
 cConst = Constraints(cMultShoot);
 
 % Initialisierung Kostenfunktion
-cCost = Costs(cBQD);
+cCost = CostsXU(cBQD, 3, 2);
 
 %% Choose starting values
 
@@ -71,7 +71,7 @@ lambda{horizon +1} = ones(cQ.n_state,1);
 getLDD = @(cost, const, t) getLDD(cost, const, t);
 
 % Initialisierung des Solvers
-cRTSolver = RealtimeSolver(cCost, cConst);
+cRTSolver = RealtimeSolver(cCost, cConst,lambda, s, q, mu);
 
 %% Calculate the solution with fminrt
 
