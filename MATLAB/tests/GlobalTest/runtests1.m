@@ -40,7 +40,7 @@ TEST = true;
 %resulttestIntegrate = run(suiteRungeKutta, 'testIntegrate');
 
 suiteInt = TestInt;
-resultInt = run(suiteInt, 'testIntegratoren');
+resultInt = run(suiteInt);
 
 %suiteOdeM = odeM();
 %resultOdeM = run(suiteOdeM);

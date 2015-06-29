@@ -4,24 +4,19 @@ classdef TestInt < handle & TestEnv
     
     properties
         dynOde45M;
-        dynOde15iM;
+        %dynOde15iM;
         dynOde15sM;
     end
     
     properties(Dependent)
-        solvers;
         solver1;
-        solver2;
+        %solver2;
         solver3;
     end
     
     methods
         function res = get.solver1(obj)
             res = obj.dynOde45M.solver;
-        end
-        
-        function res = get.solver2(obj)
-            res = obj.dynOde15iM.solver;
         end
         
         function res = get.solver3(obj)
@@ -100,7 +95,7 @@ classdef TestInt < handle & TestEnv
                 
                 %error(max(max(abs(J - numDiff))));
                 error(timepoint) = norm(J - numDiff, Inf);
-                norm_error(timepoint) = norm(F(4:7)) - 1;
+                norm_error(timepoint) = abs(norm(F(4:7)) - 1);
             end
         end
         
@@ -108,25 +103,43 @@ classdef TestInt < handle & TestEnv
     
     
     methods(Test)
-        function SpeedTestSolvers(testCase)
+        function testIntegratoren1(testCase)
             n_intervals = 20;
-           
+            
+            %testCase.setupTest(n_intervals);
             testCase.setupTest(n_intervals);
-            
-            solver = testCase.solver3;
-            
-            
-            %n_intervals = 50;
-            [old_intervals] = solver.preToDo();
-            tic
-            parfor timepoint = 1:n_intervals
-                [F3, J3] = solver.ode(timepoint);
-            end
-            toc
-            solver.postToDo(old_intervals);
+            % Fuer qualitative Aussagen mehrmals solver ausführen
+            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
+            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
+            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
+            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
+            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
+            disp('SpeedTest: Solver1');
+            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
+            disp(spd)
+            disp('SpeedTest: Solver3');
+            [spd] = testCase.speedTest(testCase.solver3, n_intervals);
+            disp(spd);
+            pause(1)
+            disp('Numerikvergleich von Solver1');
+            [error, norm_error] =  testCase.NumAnaTest(n_intervals, testCase.solver1);
+            disp('Error')
+            disp(error)
+            disp('Norm error')
+            pause(1)
+            disp(norm_error)
+            pause(1)
+            disp('Numerikvergleich von Solver3');
+            [error, norm_error] = testCase.NumAnaTest(n_intervals, testCase.solver3);
+            disp('Error')
+            disp(error)
+            pause(1)
+            disp('Norm error')
+            disp(norm_error)
             
         end
-        function testIntegratoren(testCase)
+        
+        function testIntegratoren2(testCase)
             n_intervals = 20;
             
             %testCase.setupTest(n_intervals);
@@ -143,20 +156,20 @@ classdef TestInt < handle & TestEnv
             disp('SpeedTest: Solver3');
             [spd] = testCase.speedTest(testCase.solver3, n_intervals);
             disp(spd);
-            pause
+            pause(1)
             disp('Numerikvergleich von Solver1');
             [error, norm_error] =  testCase.NumAnaTest(n_intervals, testCase.solver1);
             disp('Error')
             disp(error)
             disp('Norm error')
-            pause
+            pause(1)
             disp(norm_error)
-            pause
+            pause(1)
             disp('Numerikvergleich von Solver3');
             [error, norm_error] = testCase.NumAnaTest(n_intervals, testCase.solver3);
             disp('Error')
             disp(error)
-            pause
+            pause(1)
             disp('Norm error')
             disp(norm_error)
             
@@ -200,15 +213,15 @@ classdef TestInt < handle & TestEnv
             opts_ = odeset('RelTol',1e-4,'AbsTol',1e-6);
             
             solver1 = ode45M(opts_);%ForwEuler();
-            solver2 = ode15iM2(opts_);
+            %solver2 = ode15iM2(opts_);
             solver3 = ode15sM(opts_);
             
             
             obj.dynOde45M = BasisQDyn(model, env, solver1);
             obj.dynOde45M.vec = vec;
             
-            obj.dynOde15iM = BasisQDyn(model, env, solver2);
-            obj.dynOde15iM.vec = vec;
+            %obj.dynOde15iM = BasisQDyn(model, env, solver2);
+            %obj.dynOde15iM.vec = vec;
             
             obj.dynOde15sM = BasisQDyn(model, env, solver3);
             obj.dynOde15sM.vec = vec;
@@ -238,25 +251,25 @@ classdef TestInt < handle & TestEnv
             model = Quadrocopter();
             
             
-            val = [zeros(3, 1); 0; 0 ;0 ;1; zeros(6, 1)];
-            u = [10000, 10000, 10000, 10000+30000];
+            val = [zeros(3, 1); 1; 0 ;0 ;0; zeros(6, 1)];
+            u = [10000, 10000, 10000, 10000+500];
             vec = [val; u'];
             
             vec = repmat(vec, (n_intervals + 1), 1);
             %vec =rand(17 * (n_intervals + 1), 1); 
             
-            opts_ = odeset('RelTol',1e-5,'AbsTol',1e-7);
+            opts_ = odeset('RelTol',1e-2,'AbsTol',1e-3);
             
             solver1 = ode45M(opts_);%ForwEuler();
-            solver2 = ode15iM2(opts_);
+            %solver2 = ode15iM2(opts_);
             solver3 = ode15sM(opts_);
             
             
             obj.dynOde45M = BasisQDyn(model, env, solver1);
             obj.dynOde45M.vec = vec;
             
-            obj.dynOde15iM = BasisQDyn(model, env, solver2);
-            obj.dynOde15iM.vec = vec;
+            %obj.dynOde15iM = BasisQDyn(model, env, solver2);
+            %obj.dynOde15iM.vec = vec;
             
             obj.dynOde15sM = BasisQDyn(model, env, solver3);
             obj.dynOde15sM.vec = vec;
