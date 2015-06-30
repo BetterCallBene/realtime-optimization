@@ -148,10 +148,10 @@ classdef Lagrange < TestEnv
             costD = cost_approx_t;
             
             
-            if (t ~= cCost.dyn.environment.horizon +1 )
+            if (t ~= solverRT.cCost.dyn.environment.horizon +1 )
                 H = [costD , CD' , AB' ;...
-                    CD , ZERO, sparse(size(ZERO,1),cConst.dyn.robot.n_state);...
-                    AB , sparse(cConst.dyn.robot.n_state,size(ZERO,1)) , sparse(cConst.dyn.robot.n_state,cConst.dyn.robot.n_state) ];
+                    CD , ZERO, sparse(size(ZERO,1),n_state);...
+                    AB , sparse(n_state,size(ZERO,1)) , sparse(n_state,n_state) ];
             else
                 H = [costD, CD'; CD, ZERO ];
             end

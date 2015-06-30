@@ -11,7 +11,7 @@ classdef CostsComplet < Costs
     
     methods
         % constructor
-        function cC = CostsXU(varargin)
+        function cC = CostsComplet(varargin)
             cC@Costs(42,1337,pi); %Just some dummy variables
             if(nargin == 0)
                 global TEST;
@@ -96,9 +96,9 @@ classdef CostsComplet < Costs
             vindx((i-1)*n_state+4:(i-1)*n_state+7) = gamma_* state(4:7,i);
             vindx((i-1)*n_state+8:i*n_state)       = kappa_* state(8:end,i);
             
-            cD_val        = sparse(rind,ones(1,(n_tp-1)*n_contr),vind,...
+            cD_val = sparse(rind,ones(1,(n_tp-1)*n_contr),vind,...
                 n_tp*(n_state+n_contr),1) + ...
-                sparse(rindx,ones(1,n_tp*3),vindx,n_tp*(n_state+n_contr),1);
+                sparse(rindx,ones(1,n_tp*n_state),vindx,n_tp*(n_state+n_contr),1);
         end
         
         function cDD_val = get_costDD(obj)
@@ -176,10 +176,13 @@ classdef CostsComplet < Costs
         function setupTest(o,horizon)
             env = Environment();
             env.wind = @(s_t, t)  s_t + [rand(3,1); zeros(10,1)];
-            env.setUniformMesh(uint16(horizon));
+%             env.setUniformMesh(uint16(horizon));
+            env.setUniformMesh1(horizon +1,1);
             cQ = Quadrocopter();
             
-            cFE = ode15iM2();
+            tol = 1e-3;
+            opts = odeset('RelTol',tol,'AbsTol',0.1*tol);
+            cFE = ode15sM(opts);
             
             % Initialisierung der Dynamik
             cBQD = BasisQDyn(cQ, env,cFE);
@@ -190,6 +193,8 @@ classdef CostsComplet < Costs
             o.vec = o.dyn.vec;
             o.alpha = 2;
             o.beta = 3;
+            o.gamma = 42;
+            o.kappa = 1337;
             
         end
     end
