@@ -17,7 +17,7 @@ options.GradConstr      = 'on';
 %options.HessFcn         = @hessianAdapter;
 options.TolCon          = 1e-4;
 options.TolFun          = 1e-4;
-options.TolX            = 1e-8;
+options.TolX            = 1e-4;
 options.MaxFunEvals        = 6000;
 test = 20;
 
@@ -33,7 +33,7 @@ test = 20;
 % * TolX: $$(options.TolX)$$
 
 
-n_int = 20;
+n_int = 50;
 
 %% Gitter und Intervallaenge
 % * Intervallaenge: $(n_int)$
@@ -41,12 +41,12 @@ n_int = 20;
 
 xbc = [         ... Variablenname L�nge   Name
                 ... Anfangsbedingung
-    0, 0, 0,  ...     r           3      Ortsvektor
+    0, 0, 1,  ...     r           3      Ortsvektor
     1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
     0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
     0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
                 ... Endbedingung
-    0, 0, 5,    ...
+    0, 0, 1,    ...
     1, 0, 0, 0, ...
     0, 0, 0,    ...
     0, 0, 0     ...
@@ -81,7 +81,10 @@ opts_ = odeset('RelTol',1e-5,'AbsTol',1e-6);
 cIntegrator = ode15sM(opts_); %ode15sM(opts_);
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
-cBQD.vec = rand(cQ.n_var * (n_int+1), 1);
+point = cBQD.steadyPoint;
+cBQD.vec = repmat(point,(n_int+1), 1);  %rand(cQ.n_var * (n_int+1), 1);
+
+
 
 cMS = MultiShooting(cBQD);
 
