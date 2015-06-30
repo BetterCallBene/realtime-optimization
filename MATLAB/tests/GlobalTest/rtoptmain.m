@@ -15,9 +15,10 @@ options.GradObj         = 'on';
 options.GradConstr      = 'on';
 %options.Hessian         = 'user-supplied';
 %options.HessFcn         = @hessianAdapter;
-options.TolCon          = 1e-6;
-options.TolFun          = 1e-6;
-options.TolX            = 1e-10;
+options.TolCon          = 1e-4;
+options.TolFun          = 1e-4;
+options.TolX            = 1e-8;
+options.MaxFunEvals        = 6000;
 test = 20;
 
 %% fmincon options    
@@ -32,7 +33,7 @@ test = 20;
 % * TolX: $$(options.TolX)$$
 
 
-n_int = 50;
+n_int = 20;
 
 %% Gitter und Intervallaenge
 % * Intervallaenge: $(n_int)$
@@ -76,10 +77,10 @@ cQ = Quadrocopter();
 v0 = rand(cQ.n_var*(n_int+1),1);
 
 % Wahl des Integrators
-cFE = ode15iM2();
-
+opts_ = odeset('RelTol',1e-5,'AbsTol',1e-6);
+cIntegrator = ode15sM(opts_); %ode15sM(opts_);
 % Initialisierung der Dynamik
-cBQD = BasisQDyn(cQ, env, cFE);
+cBQD = BasisQDyn(cQ, env, cIntegrator);
 cBQD.vec = rand(cQ.n_var * (n_int+1), 1);
 
 cMS = MultiShooting(cBQD);

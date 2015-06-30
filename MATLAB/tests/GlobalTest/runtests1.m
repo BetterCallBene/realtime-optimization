@@ -11,44 +11,29 @@ TEST = true;
 %Create Suite from SolverTest Class
 %The fromClass method creates a suite from all Test methods in the SolverTest class.
 
-%suiteBasisQDyn = BasisQDyn();
+%suiteBasisQDyn = BasisQDyn(); %Check
 %resultDyn = run(suiteBasisQDyn);
 
-%suiteForwEuler = ForwEuler();
+%suiteForwEuler = ForwEuler(); %Check
 %resultForwEuler = run(suiteForwEuler);
 
 
 
-%suiteode15sM = ode15sM();
-%resultsuiteode15sM = run(suiteode15sM, 'testJac');
+%suiteode15sM = ode15sM(); %Check
+%resultsuiteode15sM = run(suiteode15sM);
+
+%suiteode45M = ode45M(); %Check
+%resultsuiteode45M = run(suiteode45M);
 
 
-% suiteode45M = ode45M();
-% resultsuiteode45M = run(suiteode45M, 'testOde');
+%suiteInt = TestInt; %Check
+%resultInt = run(suiteInt);
 
-% suiteode15iM2 = ode15iM2();
-% resultsuiteode15iM = run(suiteode15iM2, 'testOde');
 
-%suiteode15iM2 = ode15iM2();
-%resultsuiteode15iM = run(suiteode15iM2);
+suiteConstraints = TestSuite.fromClass(?Constraints);
+resultConstraints = run(suiteConstraints);
 
-%suiteRungeKutta = RungeKutta();
-%resultRungeKuttaK1 = run(suiteRungeKutta, 'testOde');
-%resultRungeKuttaK2 = run(suiteRungeKutta, 'testk2');
-%resultRungeKuttaK3 = run(suiteRungeKutta, 'testk3');
-%resultRungeKuttaK4 = run(suiteRungeKutta, 'testk4');
-%resulttestIntegrate = run(suiteRungeKutta, 'testIntegrate');
-
-suiteInt = TestInt;
-resultInt = run(suiteInt);
-
-%suiteOdeM = odeM();
-%resultOdeM = run(suiteOdeM);
-
-%suiteConstraints = TestSuite.fromClass(?Constraints);
-%resultConstraints = run(suiteConstraints);
-
-%suiteMultiShooting = TestSuite.fromClass(?MultiShooting);
+%suiteMultiShooting = TestSuite.fromClass(?MultiShooting); %Check
 %resultMultiShooting = run(suiteMultiShooting);
 
 

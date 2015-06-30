@@ -99,80 +99,62 @@ classdef TestInt < handle & TestEnv
             end
         end
         
+        function stressTestIntegrator(testCase, n_intervals)
+            
+            
+            solver1 =testCase.solver1;
+            opts1 = solver1.opts;
+            solver3 =testCase.solver3;
+            opts3 = solver3.opts;
+            
+            % Fuer qualitative Aussagen mehrmals solver ausführen
+            [spd] = testCase.speedTest(solver1, n_intervals);
+            [spd] = testCase.speedTest(solver1, n_intervals);
+            [spd] = testCase.speedTest(solver1, n_intervals);
+            [spd] = testCase.speedTest(solver1, n_intervals);
+            [spd] = testCase.speedTest(solver1, n_intervals);
+            disp('SpeedTest: ode45M');
+            [spd] = testCase.speedTest(solver1, n_intervals);
+            disp(spd)
+            disp('SpeedTest: ode15sM');
+            [spd] = testCase.speedTest(solver3, n_intervals);
+            disp(spd);
+            pause(1)
+            disp('Numerikvergleich von ode45M');
+            [error, norm_error] =  testCase.NumAnaTest(n_intervals, solver1);
+            testCase.assertLessThan(max(error), opts1.RelTol * 90);
+            testCase.assertLessThan(max(norm_error), 1e-7);
+            
+            disp('Numerikvergleich von ode15sM');
+            [error, norm_error] = testCase.NumAnaTest(n_intervals, solver3);
+            testCase.assertLessThan(max(error), opts3.RelTol * 90);
+            testCase.assertLessThan(max(norm_error), opts3.RelTol);
+            
+        end
+        
     end
     
     
     methods(Test)
         function testIntegratoren1(testCase)
-            n_intervals = 20;
+            n_intervals = 3;
             
             %testCase.setupTest(n_intervals);
             testCase.setupTest(n_intervals);
-            % Fuer qualitative Aussagen mehrmals solver ausführen
-            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
-            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
-            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
-            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
-            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
-            disp('SpeedTest: Solver1');
-            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
-            disp(spd)
-            disp('SpeedTest: Solver3');
-            [spd] = testCase.speedTest(testCase.solver3, n_intervals);
-            disp(spd);
-            pause(1)
-            disp('Numerikvergleich von Solver1');
-            [error, norm_error] =  testCase.NumAnaTest(n_intervals, testCase.solver1);
-            disp('Error')
-            disp(error)
-            disp('Norm error')
-            pause(1)
-            disp(norm_error)
-            pause(1)
-            disp('Numerikvergleich von Solver3');
-            [error, norm_error] = testCase.NumAnaTest(n_intervals, testCase.solver3);
-            disp('Error')
-            disp(error)
-            pause(1)
-            disp('Norm error')
-            disp(norm_error)
+            disp('TestInt: TestSetup 1');
+            
+            testCase.stressTestIntegrator(n_intervals);
             
         end
         
         function testIntegratoren2(testCase)
-            n_intervals = 20;
+            n_intervals = 3;
             
             %testCase.setupTest(n_intervals);
-            testCase.setupTest2(n_intervals);
-            % Fuer qualitative Aussagen mehrmals solver ausführen
-            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
-            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
-            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
-            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
-            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
-            disp('SpeedTest: Solver1');
-            [spd] = testCase.speedTest(testCase.solver1, n_intervals);
-            disp(spd)
-            disp('SpeedTest: Solver3');
-            [spd] = testCase.speedTest(testCase.solver3, n_intervals);
-            disp(spd);
-            pause(1)
-            disp('Numerikvergleich von Solver1');
-            [error, norm_error] =  testCase.NumAnaTest(n_intervals, testCase.solver1);
-            disp('Error')
-            disp(error)
-            disp('Norm error')
-            pause(1)
-            disp(norm_error)
-            pause(1)
-            disp('Numerikvergleich von Solver3');
-            [error, norm_error] = testCase.NumAnaTest(n_intervals, testCase.solver3);
-            disp('Error')
-            disp(error)
-            pause(1)
-            disp('Norm error')
-            disp(norm_error)
             
+            testCase.setupTest2(n_intervals);
+            disp('TestInt: TestSetup 2');
+            testCase.stressTestIntegrator(n_intervals);
         end
         
         %timepoint 5
@@ -210,7 +192,7 @@ classdef TestInt < handle & TestEnv
             %vec = [vec; vec; vec];
             vec =rand(17 * (n_intervals + 1), 1); 
             
-            opts_ = odeset('RelTol',1e-4,'AbsTol',1e-6);
+            opts_ = odeset('RelTol',1e-5,'AbsTol',1e-6);
             
             solver1 = ode45M(opts_);%ForwEuler();
             %solver2 = ode15iM2(opts_);
@@ -258,7 +240,7 @@ classdef TestInt < handle & TestEnv
             vec = repmat(vec, (n_intervals + 1), 1);
             %vec =rand(17 * (n_intervals + 1), 1); 
             
-            opts_ = odeset('RelTol',1e-2,'AbsTol',1e-3);
+            opts_ = odeset('RelTol',1e-3,'AbsTol',1e-4);
             
             solver1 = ode45M(opts_);%ForwEuler();
             %solver2 = ode15iM2(opts_);
