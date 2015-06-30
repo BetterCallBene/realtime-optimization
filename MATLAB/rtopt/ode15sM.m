@@ -8,7 +8,7 @@ classdef ode15sM < Solver
     methods
         
         function M15s = ode15sM(varargin)
-            M15s@Solver(varargin);
+            M15s@Solver(nargin, varargin); %Bug in Matlab
             M15s.opts.Jacobian = @M15s.Jac; 
         end
         

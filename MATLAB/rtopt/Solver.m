@@ -177,9 +177,9 @@ classdef(Abstract) Solver < handle & TestEnv
     end
     
     methods
-        function s = Solver(varargin)
+        function s = Solver(n, varargin)
             
-            if nargin == 1
+            if n == 1
                 opts_ = varargin{1};
                 s.opts = opts_{1};
             else

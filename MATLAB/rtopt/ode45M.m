@@ -5,7 +5,7 @@ classdef ode45M < Solver
     methods
         
         function M45 = ode45M(varargin)
-            M45@Solver(varargin);
+            M45@Solver(nargin, varargin); %Bug in Matlab
         end
         
         

@@ -62,20 +62,24 @@ classdef MultiShooting < TestEnv
                 
                 ind = 0;
                 [old_intervals] = obj.solver.preToDo();
-                for timepoint=1:n_int
+                
+                Fs = cell(n_int, 1);
+                Js = cell(n_int, 1);
+                %Parallelauswertung der odes
+                parfor timepoint=1:n_int
                     [F, J] = obj.solver.ode(timepoint);
+                    Fs{timepoint} = F;
+                    Js{timepoint} = J;
+                end
+                %Sortierung der F, J
+                for timepoint=1:n_int
+                    %[F, J] = obj.solver.ode(timepoint);
+                    F = Fs{timepoint};
+                    J = Js{timepoint};
                     % Bestimme h
                     H((timepoint-1)*n_state+1:timepoint*n_state) = F - state_val(:,timepoint+1);
-                    
+
                     % Bestimme hD
-                    
-%                     rvec(ind+1:ind+n_state)   = (timepoint-1)*n_state+1:timepoint*n_state;
-%                     cvec(ind+1:ind+n_state)   = (timepoint-1)*(n_var)+1:...
-%                         (timepoint-1)*(n_var)+n_state;
-%                     vvec(ind+1:ind+n_state)   = ones(1,n_state);
-%                     ind                     = ind + n_state;
-                    
-                     
                     [si,sj,sv]              = find(J);
                     sn                      = nnz(J);
                      
@@ -90,63 +94,15 @@ classdef MultiShooting < TestEnv
                     vvec(ind+1:ind+n_state)   = -ones(1,n_state);
                     ind                     = ind + n_state;
                 end
+                
                 HD = sparse(rvec(1:ind),cvec(1:ind),vvec(1:ind),...
-                      n_int*n_state,(n_int+1)*(n_var));
+                            n_int*n_state,(n_int+1)*(n_var));
                 obj.solver.postToDo(old_intervals);
             else
                 error('wrong state and control lengths wrt index.');
             end
         end
         
-%         %function val = hD(obj)
-%             % compute Jacobian of the equality constraints using forward euler
-%             [n_int, n_state, n_contr, mesh] = getParams(obj);
-%             
-%             
-%             if ((size(obj.dyn.contr,2)==n_int+1) && (size(obj.dyn.state,2)==n_int+1)...
-%                     &&(n_state == size(obj.dyn.state,1)) ...
-%                     &&(n_contr == size(obj.dyn.contr,1)))
-%                 
-%                 error('Inkonstruktion')
-%                 
-% %                 %val = sparse(n_int*n_var,(n_int+1)*(n_var+n_contr));
-% %                 % use vector notation to generate sparse matrix
-% %                 rvec = ones(1,n_int*(2*n_state+n_state*(n_state+n_contr)));
-% %                 cvec = ones(1,n_int*(2*n_state+n_state*(n_state+n_contr)));
-% %                 vvec = zeros(1,n_int*(2*n_state+n_state*(n_state+n_contr)));
-% %                 
-% %                 ind = 0;
-% %                 
-% %                 for i=1:n_int
-% %                     rvec(ind+1:ind+n_state)   = (i-1)*n_state+1:i*n_state;
-% %                     cvec(ind+1:ind+n_state)   = (i-1)*(n_state+n_contr)+1:...
-% %                         (i-1)*(n_state+n_contr)+n_state;
-% %                     vvec(ind+1:ind+n_state)   = ones(1,n_state);
-% %                     ind                     = ind + n_state;
-% %                     
-% %                     mat                     = mesh(i)*obj.dyn.dotD(i);
-% %                     [si,sj,sv]              = find(mat);
-% %                     sn                      = length(sv);
-% %                     
-% %                     rvec(ind+1:ind+sn)      = (i-1)*n_state+si;
-% %                     cvec(ind+1:ind+sn)      = (i-1)*(n_state+n_contr) + sj;
-% %                     vvec(ind+1:ind+sn)      = sv;
-% %                     ind                     = ind + sn;
-% %                     
-% %                     rvec(ind+1:ind+n_state)   = (i-1)*n_state+1:i*n_state;
-% %                     cvec(ind+1:ind+n_state)   = i*(n_state+n_contr)+1:...
-% %                         i*(n_state+n_contr)+n_state;
-% %                     vvec(ind+1:ind+n_state)   = -ones(1,n_state);
-% %                     ind                     = ind + n_state;
-% %                 end
-% %                 
-% %                 val = sparse(rvec(1:ind),cvec(1:ind),vvec(1:ind),...
-% %                     n_int*n_state,(n_int+1)*(n_state+n_contr));
-%             else
-%                 error('wrong state and control lengths wrt index.');
-%             end
-%         end
-        %Approximieren durch Euler
         function val = hDD(obj)
             % compute the Hessian the equality constraints using forward euler
             [n_int, n_state, n_contr, mesh] = getParams(obj);
@@ -202,7 +158,8 @@ classdef MultiShooting < TestEnv
             env.setUniformMesh(uint8(n_intervals));
             
             model = Quadrocopter();
-            integrator = ode15iM2();
+            opts_ = odeset('RelTol',1e-4,'AbsTol',1e-5);
+            integrator = ode15sM(opts_);
             
             %load('TestData', 'data');
             cBQD = BasisQDyn(model, env, integrator);
@@ -227,8 +184,6 @@ classdef MultiShooting < TestEnv
             numDiff = zeros(m , n * n_timepoints);
             
             for timepoint = 1:n_timepoints
-                tic;
-                timepoint
                 for i = 1:n
                     func_p = obj.plusEpsShift(i,timepoint,vec_old, func, n, dyn);
                     func_n = obj.minusEpsShift(i,timepoint,vec_old, func, n, dyn);
@@ -237,7 +192,6 @@ classdef MultiShooting < TestEnv
                     numDiff( : , ((timepoint-1) * n) + i) ...
                         = (func_p - func_n)/2/obj.eps;
                 end
-                toc
             end
         end
         
@@ -252,40 +206,41 @@ classdef MultiShooting < TestEnv
     
     methods(Test)
         
-        function testh(obj)
-            n_intervals = 50;
-            obj.setupTest(n_intervals);
-            [n_int, n_state, n_contr, mesh] = getParams(obj);
+        function testh(testCase)
+            n_intervals = 20;
+            testCase.setupTest(n_intervals);
+            [n_int, n_state, n_contr, mesh] = getParams(testCase);
             tic
-            [h, anaDiff] = obj.h();
+            [h, anaDiff] = testCase.h();
             toc
         end
         
-        function testhD(obj)
-            % TESTHD This method derives numerically obj.h and compares it
-            %with obj.hD
-            n_intervals = 5;
-            obj.setupTest(n_intervals);
-            [n_int, n_state, n_contr, mesh] = getParams(obj);
-            tic
-            [h, anaDiff] = obj.h();
-            toc
-            func = @() obj.h;
-            tic
-            numDiff = obj.numDiff_nD_AllT(func);
-            toc
-            obj.assertSize(anaDiff, size(numDiff) );
-%             obj.assertSize(anaDiff, [n_intervals * 13 , (n_intervals+1)* 17 ]);
-             obj.assertLessThan(max(abs(anaDiff - numDiff)), obj.tol);
+        function testhD(testCase)
+            n_intervals = 3;
+            testCase.setupTest(n_intervals);
+            [n_int, n_state, n_contr, mesh] = getParams(testCase);
+            
+            [h, anaDiff] = testCase.h();
+            
+            
+            opts_ = testCase.dyn.solver.opts;
+            
+            func = @() testCase.h();
+            numDiff = testCase.numDiff_nD_AllT(func);
+            testCase.assertSize(anaDiff, size(numDiff));
+            testCase.assertLessThan(max(abs(anaDiff - numDiff)), opts_.RelTol);
         end
         
+        %% ToDo: Eulerabfrage
 %         function testhDD(obj)
+%             
 %             % TESTHDD This methods derives numerically obj.hd and compares
 %             % it with obj.hDD
 %             n_intervals = 3;
 %             obj.setupTest(n_intervals);
 %             [n_int, n_state, n_contr, mesh, n_var] = getParams(obj);
 %             
+%             opts_ = obj.dyn.solver.opts;
 %             func = @() obj.gethD;
 %             numDiff = obj.numDiff_nxnD_AllT(func);
 %             anaDiff = obj.hDD();
@@ -294,7 +249,7 @@ classdef MultiShooting < TestEnv
 %             for i = 1:(n_int * n_state)
 %                 numDiff_i = reshape(numDiff(i,:,:), [size_nDiff_i size_nDiff_i]);
 %                 obj.assertSize(anaDiff{1}, size(numDiff_i));
-%                 obj.assertLessThan(max(abs(anaDiff{i} - numDiff_i)), obj.tol);
+%                 obj.assertLessThan(max(abs(anaDiff{i} - numDiff_i)), opts_.RelTol * 9);
 %             end
 %         end
     end

@@ -84,6 +84,25 @@ classdef Environment < handle
                 error('Input is no integer greater 1.');
             end
         end
+        
+        function [n_intervals] = setUniformMesh1(obj,horizon, points_per_sec)
+            % function to set a uniform mesh with specified number of
+            % intervals (without providing the actual mesh values)
+            if (horizon>1)
+                obj.mesh = linspace(0, horizon, horizon * points_per_sec + 1);
+                n_intervals = length(obj.mesh);
+                obj.n_intervals = n_intervals;
+            else
+                error('Input is no integer greater 1.');
+            end
+%             if ((isinteger(n_in))&&(n_in>1))
+%                 obj.mesh = ones(1,n_in)*(1.0/(double(n_in)));
+%                 obj.n_intervals = length(obj.mesh);
+%             else
+%                 error('Input is no integer greater 1.');
+%             end
+            
+        end
     end
 end
 
