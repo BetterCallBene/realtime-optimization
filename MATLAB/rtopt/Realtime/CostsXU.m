@@ -39,7 +39,7 @@ classdef CostsXU < Costs
             % compute the cost value with penalty term
             control = obj.dyn.contr;
             state   = obj.dyn.state;
-            cam_pos = [ 2; 0; 10];
+            cam_pos = [ 2; 0; 5];
             one_vec = ones(1,size(state,2));
             
             alpha_   = obj.alpha;
@@ -131,11 +131,13 @@ classdef CostsXU < Costs
             
             mesh        = obj.dyn.environment.mesh;
             
-            alpha_   = obj.alpha;
+            alpha_ = obj.alpha;
             beta_    = obj.beta;
-            
-            CostD_t = [beta*ones(3,1);sparse(n_state-3,1);mesh(t)*ones(n_contr)];
-            
+            if t >= n_tp
+                CostD_t = [beta_*ones(3,1);sparse(n_state-3,1); zeros(n_contr,1)];
+            else
+                CostD_t = [beta_*ones(3,1);sparse(n_state-3,1); alpha_ * mesh(t)*ones(n_contr,1)];
+            end
             cDD_val = CostD_t * CostD_t' ;
             
         end

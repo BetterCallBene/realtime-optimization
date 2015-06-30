@@ -259,10 +259,10 @@ classdef Constraints < GenConstraints & TestEnv
         function ineqCon = ineqCon(o)
             % INEQCON Calculates the inequality constraints, such that
             % for every control signal q_i holds: u_min <= q_i <= u_max
-            horizon = o.dyn.environment.horizon;
-            ineqCon = zeros(o.n_addConstr*(horizon+1),1);
+            n_intervals = o.dyn.environment.n_intervals;
+            ineqCon = zeros(o.n_addConstr*(n_intervals+1),1);
             
-            for i = 1:horizon+1
+            for i = 1:n_intervals+1
                 ineqCon( (i-1) * o.n_addConstr +1: i * o.n_addConstr) = ...
                     [ o.dyn.vec( (i-1) * o.dyn.robot.n_var + o.dyn.robot.n_state +1 : i * o.dyn.robot.n_var) - o.dyn.robot.u_max; ...
                     o.dyn.robot.u_min - o.dyn.vec( (i-1) * o.dyn.robot.n_var + o.dyn.robot.n_state +1 : i * o.dyn.robot.n_var)];

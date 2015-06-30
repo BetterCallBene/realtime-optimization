@@ -36,14 +36,14 @@ TEST = true;
 % suiteCostsXU = TestSuite.fromClass(?CostsXU);
 % resultCostsXU = run(suiteCostsXU);                        %Check
 
-suiteLagrange = TestSuite.fromClass(?Lagrange);
-resultLagrange = run(suiteLagrange);
+% suiteLagrange = TestSuite.fromClass(?Lagrange);
+% resultLagrange = run(suiteLagrange);
 
 % suiteRiccati = TestSuite.fromClass(?RiccatiManager);
 % resultRiccati = run(suiteRiccati);                        %Check
 
-% suiteRTSolver = TestSuite.fromClass(?RealtimeSolver);
-% resultRTSolver = run(suiteRTSolver);                        %Check
+suiteRTSolver = TestSuite.fromClass(?RealtimeSolver);
+resultRTSolver = run(suiteRTSolver);                        %Check
 
 % 
 %Create Suite from SolverTest Class Definition File

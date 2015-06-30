@@ -85,13 +85,13 @@ classdef Environment < handle
             end
         end
         
-        function [n_intervals] = setUniformMesh1(obj,horizon, points_per_sec)
-            % function to set a uniform mesh with specified number of
+        function [n_intervals] = setUniformMesh1(obj,n_tp, points_per_sec)
+            % SETUNIFROMMESH1 function to set a uniform mesh with specified number of
             % intervals (without providing the actual mesh values)
-            if (horizon>1)
-                obj.mesh = linspace(0, horizon, horizon * points_per_sec + 1);
-                n_intervals = length(obj.mesh);
-                obj.n_intervals = n_intervals;
+            if (n_tp>1)
+                obj.mesh = ones(1, n_tp-1) ./ points_per_sec;
+                obj.n_intervals = n_tp-1;
+                n_intervals = obj.n_intervals;
             else
                 error('Input is no integer greater 1.');
             end

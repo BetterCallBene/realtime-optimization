@@ -56,7 +56,7 @@ classdef RealtimeSolver < TestEnv
             end
         end
         
-        function [ res, est_y ] = fminrt(o, getLDD, n_timepoints)
+        function [ res, est_y ] = fminrt(o, getLD, getLDD, n_timepoints)
             % FMINRT Solves the optimization problem in the SQP-Riccati approach
             
             %Initialize variables
@@ -73,13 +73,13 @@ classdef RealtimeSolver < TestEnv
                 o.mu = o.cConst.checkIfActive(o.mu);
                 
                 % Calculate deltas with Riccati
-                o.calculateSolution(i, getLDD);
+                o.calculateSolution(i, getLD, getLDD);
                 
                 %Perform Newton Step and setup for next iteration
                 o.performNewtonAndShift();
                 
                 %Estimate values at last timestep, by duplicating the values from the previous last step
-                 o.estimateNewHorizonPoint();
+                o.estimateNewHorizonPoint();
                 
                 %Save the estimated values
                 o.storeEstimatedValues(i);
@@ -95,99 +95,106 @@ classdef RealtimeSolver < TestEnv
     
     methods(Test)
         
-                function testActiveSetChecker(o)
-        
-                    hori = 20;
-                    n_timepoints = 15;
-                    o.setupTest(hori);
-        
-                    %Initialize variables
-                    o.est_y = cell(n_timepoints,4);
-                    o.res = cell(n_timepoints,4);
-                    
-                    for i = 1:n_timepoints
-                        
-                        %Set values
-                        vec = o.cDyn.getVecFromCells(o.s,o.q);
-                        o.cCost.vec = vec;
-                        o.cConst.vec = vec;
-        
-                        %Update active set
-                        o.mu = o.cConst.checkIfActive(o.mu);
-        
-                        %Check if active set is correct
-                        for j = 1: hori
-                            aS_j = o.cConst.getActiveSet(j);
-                            %calculate inequalities
-                            is_leq_0 = o.cConst.get_ineq_con_at_t(j) >= 0;
-                            %TODO: refine
-                            o.assertEqual(sum(aS_j - is_leq_0) , 0);
-                            % TODO: Fehlen hier noch diverse Checks???
-        %                     subplot(3,1,1), plot(aS_j,'r+-');
-        %                     subplot(3,1,2), plot(is_leq_0,'r+-');
-        %                     subplot(3,1,3), plot(o.cConst.get_ineq_con_at_t(j),'r+-');
-                        end
-        
-                        % Calculate deltas with Riccati
-                        get_LDD = @(cost, const, t) getLDD(cost, const, t);
-                        o.calculateSolution(i, get_LDD);
-        
-                        %Perform Newton Step and setup for next iteration
-                        o.performNewtonAndShift();
-        
-                        %Estimate values at last timestep, by duplicating the values from the previous last step
-                        o.estimateNewHorizonPoint();
-        
-                        %Save the estimated values
-                        o.storeEstimatedValues(i);
-        
-                        %Display the actual timepoint in the command window
-                        disp(int2str(i));
-                        
-                    end
-        
-                end
-        
-                function testCalculateSolution(o)
-                    % TESTCALCULATESOLUTION Checks if the method calculateSolution
-                    % works correctly, using the \ operator and a tolerance of
-                    % 1e-15.
-        
-                    % Initialize classes
-                    hori = 15;
-                    o.setupTest(hori);
-        
-                    %Set values
-                    vec = o.cDyn.getVecFromCells(o.s,o.q);
-                    o.cCost.vec = vec;
-                    o.cConst.vec = vec;
-        
-                    %Update active set
-                    o.mu = o.cConst.checkIfActive(o.mu);
-        
-                    %Choose how to calculate the LDD (approximation or not)?
-                    get_LDD = @(cost, const, t) getLDD(cost, const, t);
-                    i = 1;
-                    tic;
-                    o.calculateSolution(i,get_LDD);
-        
-                    %Build up delta
-                    delta_ric = o.buildUpDelta_ric();
-                    toc;
-                    %Build up gradient and hesse
-                    [grad_L, hesse_L] = o.buildUpGradHesse(get_LDD);
-                    
-                    %Solve with \
-                    delta_matlab = hesse_L \ grad_L;
-        
-                    %Assert that both solutions are the same
-                    o.assertLessThan( norm(delta_matlab - delta_ric) , 1e-15 );
-                end
+%         function testActiveSetChecker(o)
+%             
+%             hori = 20;
+%             n_timepoints = 15;
+%             o.setupTest(hori);
+%             
+%             %Initialize variables
+%             o.est_y = cell(n_timepoints,4);
+%             o.res = cell(n_timepoints,4);
+%             
+%             for i = 1:n_timepoints
+%                 
+%                 %Set values
+%                 vec = o.cDyn.getVecFromCells(o.s,o.q);
+%                 o.cCost.vec = vec;
+%                 o.cConst.vec = vec;
+%                 
+%                 %Update active set
+%                 o.mu = o.cConst.checkIfActive(o.mu);
+%                 
+%                 %Check if active set is correct
+%                 for j = 1: hori
+%                     aS_j = o.cConst.getActiveSet(j);
+%                     %calculate inequalities
+%                     is_leq_0 = o.cConst.get_ineq_con_at_t(j) >= 0;
+%                     %TODO: refine
+%                     o.assertEqual(sum(aS_j - is_leq_0) , 0);
+%                     % TODO: Fehlen hier noch diverse Checks???
+%                     %                     subplot(3,1,1), plot(aS_j,'r+-');
+%                     %                     subplot(3,1,2), plot(is_leq_0,'r+-');
+%                     %                     subplot(3,1,3), plot(o.cConst.get_ineq_con_at_t(j),'r+-');
+%                 end
+%                 
+%                 % Calculate deltas with Riccati
+%                 cLagrange = Lagrange();
+%                 get_LD = @(cRTSolver, t) cLagrange.getLD(cRTSolver,t);
+%                 get_LDD = @(cRTSolver,t) cLagrange.getLDD_approx(cRTSolver, t) ;
+% 
+%                 o.calculateSolution(i,get_LD, get_LDD);
+%                 
+%                 %Perform Newton Step and setup for next iteration
+%                 o.performNewtonAndShift();
+%                 
+%                 %Estimate values at last timestep, by duplicating the values from the previous last step
+%                 o.estimateNewHorizonPoint();
+%                 
+%                 %Save the estimated values
+%                 o.storeEstimatedValues(i);
+%                 
+%                 %Display the actual timepoint in the command window
+%                 disp(int2str(i));
+%                 
+%             end
+%             
+%         end
+%         
+        function testCalculateSolution(o)
+            % TESTCALCULATESOLUTION Checks if the method calculateSolution
+            % works correctly, using the \ operator and a tolerance of
+            % 1e-15.
+            
+            % Initialize classes
+            hori = 15;
+            o.setupTest(hori);
+            
+            %Set values
+            vec = o.cDyn.getVecFromCells(o.s,o.q);
+            o.cCost.vec = vec;
+            o.cConst.vec = vec;
+            
+            %Update active set
+            o.mu = o.cConst.checkIfActive(o.mu);
+            
+            %Choose how to calculate the LDD (approximation or not)?
+            cLagrange = Lagrange();
+            get_LD = @(cRTSolver, t) cLagrange.getLD(cRTSolver,t);
+            get_LDD = @(cRTSolver,t) cLagrange.getLDD_approx(cRTSolver, t) ;
+
+            i = 1;
+            tic;
+            o.calculateSolution(i,get_LD, get_LDD);
+            toc;
+            
+            %Build up delta
+            delta_ric = o.buildUpDelta_ric();
+           
+            %Build up gradient and hesse
+            [grad_L, hesse_L] = o.buildUpGradHesse(get_LD, get_LDD);
+            
+            %Solve with \
+            delta_matlab = hesse_L \ grad_L;
+            
+            %Assert that both solutions are the same
+            o.assertLessThan( norm(delta_matlab - delta_ric) , 1e-8 );
+        end
         
         function testPerformNewtonAndShift(o)
             
             hori = 15;
-            n_timepoints = 17;            
+            n_timepoints = 17;
             
             o.setupTest(hori);
             
@@ -208,16 +215,19 @@ classdef RealtimeSolver < TestEnv
                 old_mu = o.mu;
                 
                 %Choose how to calculate the LDD (approximation or not)?
-                get_LDD = @(cost, const, t) getLDD(cost, const, t);
-                o.calculateSolution(i,get_LDD);
+                cLagrange = Lagrange();
+                get_LD = @(cRTSolver, t) cLagrange.getLD(cRTSolver,t);
+                get_LDD = @(cRTSolver,t) cLagrange.getLDD_approx(cRTSolver, t) ;
+               %Build up delta and large gradient and hesse
+                [grad_L, hesse_L] = o.buildUpGradHesse(get_LD, get_LDD);
                 
+
+                o.calculateSolution(i, get_LD, get_LDD);
+                
+                delta_ric = o.buildUpDelta_ric();
                 % Perform Newton Step and setup for next iteration
                 o.performNewtonAndShift();
-                
-                %Build up delta and large gradient and hesse
-                [grad_L, hesse_L] = o.buildUpGradHesse(get_LDD);
-                delta_ric = o.buildUpDelta_ric();
-                
+              
                 %Save the estimated values
                 o.storeEstimatedValues(i);
                 
@@ -227,25 +237,25 @@ classdef RealtimeSolver < TestEnv
                 % Compare results
                 last = 0;
                 n_var = 30  + sum(o.cConst.getActiveSet(1));
-                o.assertEqual( old_lambda{1} + delta_matlab(1:13), o.res{i,2});
-                o.assertEqual( old_s{1} + delta_matlab(14:26) , o.res{i,1});
-                o.assertEqual( old_q{1} + delta_matlab(27:30) ,o.res{i,3});
+                o.assertLessThan( norm( old_lambda{1} + delta_matlab(1:13)- o.res{i,2}), 1e-8);
+                o.assertLessThan( norm( old_s{1} + delta_matlab(14:26)- o.res{i,1}), 1e-8);
+                o.assertLessThan( norm(old_q{1} + delta_matlab(27:30) - o.res{i,3}), 1e-8);
                 if(n_var > 30)
                     delta_mu = zeros(8,1);
                     delta_mu(o.cConst.getActiveSet(1)) = delta_matlab(31:n_var);
-                    o.assertEqual( old_mu( 1 : o.cConst.n_addConstr) + delta_mu, o.res{i,4});
+                    o.assertLessThan( norm(old_mu( 1 : o.cConst.n_addConstr) + delta_mu - o.res{i,4}), 1e-8);
                 end
                 last = last + n_var;
                 
                 for l = 2:hori-1
                     n_var = 30  + sum(o.cConst.getActiveSet(l));
-                    o.assertEqual(old_lambda{l} + delta_matlab(last +1 : last +13), o.est_y{i,2}{l-1} );
-                    o.assertEqual(old_s{l} + delta_matlab(last+14 : last+26), o.est_y{i,1}{l-1});
-                    o.assertEqual(old_q{l} + delta_matlab(last+27 : last+30), o.est_y{i,3}{l-1});
+                    o.assertLessThan( norm(old_lambda{l} + delta_matlab(last +1 : last +13) - o.est_y{i,2}{l-1}), 1e-8 );
+                    o.assertLessThan( norm(old_s{l} + delta_matlab(last+14 : last+26) - o.est_y{i,1}{l-1}), 1e-8);
+                    o.assertLessThan( norm(old_q{l} + delta_matlab(last+27 : last+30) - o.est_y{i,3}{l-1}), 1e-8);
                     if(n_var > 30)
                         delta_mu = zeros(8,1);
                         delta_mu(o.cConst.getActiveSet(l-1)) = delta_matlab(last + 31:last +n_var);
-                        o.assertEqual(old_mu( (l-1) * o.cConst.n_addConstr +1 : l * o.cConst.n_addConstr) + delta_mu, o.est_y{i,4}( (l-2) *o.cConst.n_addConstr +1 : (l-1) * o.cConst.n_addConstr));
+                        o.assertLessThan( norm(old_mu( (l-1) * o.cConst.n_addConstr +1 : l * o.cConst.n_addConstr) + delta_mu  -o.est_y{i,4}( (l-2) *o.cConst.n_addConstr +1 : (l-1) * o.cConst.n_addConstr)), o.tol);
                     end
                     last = last + n_var;
                 end
@@ -268,11 +278,11 @@ classdef RealtimeSolver < TestEnv
             o.est_y{i,4} = o.mu;
         end
         
-        function calculateSolution(o,i, getLDD)
+        function calculateSolution(o,i, getLD, getLDD)
             %Perform Riccati Steps
             for j = o.horizon+1:-1:1
-                [LD, n_active_i] = getLD(o.cCost,o.cConst,j);
-                LDD = getLDD(o.cCost,o.cConst,j);
+                [LD, n_active_i] = getLD(o,j);
+                LDD = getLDD(o,j);
                 o.ricM.doStep(j,LDD, LD,n_active_i );
             end
             
@@ -319,7 +329,7 @@ classdef RealtimeSolver < TestEnv
             o.mu((k-1) * o.cConst.n_addConstr +1 : end )= o.mu((k-2) * o.cConst.n_addConstr+1 : (k-1) * o.cConst.n_addConstr);
         end
         
-        function [grad_L, hesse_L] = buildUpGradHesse(o,get_LDD)
+        function [grad_L, hesse_L] = buildUpGradHesse(o,get_LD, get_LDD)
             hesse_L = zeros(1);
             grad_L= zeros(5,1);
             last = 0;
@@ -328,15 +338,15 @@ classdef RealtimeSolver < TestEnv
                 n_var = 30  + sum(o.cConst.getActiveSet(k));
                 hesse_L(last + 1 : last + 13 ,last  + 13 +1 :last  + 26 ) =  -eye(13);
                 hesse_L(last  + 13 +1 : last  + 26 ,last  +1 :last + 13  ) =  -eye(13);
-                hesse_L(last  +13+1 : last  +13 + n_var, last  +13 +1 : last +13 + n_var) = get_LDD(o.cCost, o.cConst,k);
+                hesse_L(last  +13+1 : last  +13 + n_var, last  +13 +1 : last +13 + n_var) = get_LDD(o,k);
                 
-                grad_L(last+1 : last + n_var) = getLD(o.cCost, o.cConst, k);
+                grad_L(last+1 : last + n_var) = get_LD(o, k);
                 last = last + n_var;
             end
             k = o.horizon +1 ;
             
-            LDk = getLD(o.cCost, o.cConst, k);
-            LDDk = get_LDD(o.cCost, o.cConst,k);
+            LDk = get_LD(o, k);
+            LDDk = get_LDD(o,k);
             
             hesse_L( last +1:last +13  , last + 13+1: last + 26 ) = -eye(13);
             hesse_L( last + 13+1: last + 26 , last +1: last +13) = -eye(13);
@@ -364,10 +374,14 @@ classdef RealtimeSolver < TestEnv
             env.horizon = hori;
             env.setUniformMesh(uint16(hori));
             cQ = Quadrocopter();
-            cFE = ForwEuler(); %TODO: Replace with ode15iM2
-            cBQD = BasisQDyn(cQ,env,cFE);
-           
-            o.cCost = Costs(cBQD);
+            
+            
+            tol = 1e-2;
+            opts = odeset('RelTol',tol,'AbsTol',0.1*tol);
+            cIntegrator = ode15sM(opts);
+            cBQD = BasisQDyn(cQ,env,cIntegrator);
+            
+            o.cCost = CostsXU(cBQD,0.1, 50);
             multShoot = MultiShooting(cBQD);
             o.cConst = Constraints(multShoot);
             o.cDyn = o.cConst.dyn;

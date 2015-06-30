@@ -6,8 +6,8 @@ classdef ForwEuler < Solver
     end
     
     methods
-        function FE = ForwEuler()
-            FE@Solver(); %Bug von Matlab
+        function FE = ForwEuler(varargin)
+            FE@Solver(nargin, varargin); %Bug von Matlab
         end
         
         function y = integrate(obj, func, meshGrid, y0,yp0)
