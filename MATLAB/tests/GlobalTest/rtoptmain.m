@@ -19,7 +19,6 @@ options.TolCon          = 1e-4;
 options.TolFun          = 1e-4;
 options.TolX            = 1e-4;
 options.MaxFunEvals        = 6000;
-test = 20;
 
 %% fmincon options    
 % * Algorithm: $(options.Algorithm)$
@@ -77,7 +76,7 @@ cQ = Quadrocopter();
 v0 = rand(cQ.n_var*(n_int+1),1);
 
 % Wahl des Integrators
-opts_ = odeset('RelTol',1e-5,'AbsTol',1e-6);
+opts_ = odeset('RelTol',1e-3,'AbsTol',1e-4);
 cIntegrator = ode15sM(opts_); %ode15sM(opts_);
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
