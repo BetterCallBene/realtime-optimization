@@ -162,24 +162,60 @@ classdef Lagrange < TestEnv
     
     methods(Test)
         
-                function testgetLD(o)
-                    horizon = 15;
-                    o.setupTest(horizon);
+        function testgetLD_Euler(o)
+            horizon = 5;
+            tolerance = 1e-9;
+            o.setupTest(horizon);
+            
+            func = @() o.getL(o.cSolverRT);
+            numDiff = o.numDiff_nD_AllT(func)';
+            
+            for i = 1:horizon                
+                anaDiff = o.getLD(o.cSolverRT,i);
+                %Perform checks
+                o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30)), tolerance*10);
+            end
+            
+            disp('Test testgetLD_Euler finished');
+        end
         
-                    func = @() o.getL(o.cSolverRT);
-                    numDiff = o.numDiff_nD_AllT(func)';
+        function testgetLD_ode15sM(o)
+            horizon = 5;
+            tolerance = 1e-4;
+            o.setupTest(horizon, tolerance, 1);
+            
+            func = @() o.getL(o.cSolverRT);
+            numDiff = o.numDiff_nD_AllT(func)';
+            
+            for i = 1:horizon                
+                anaDiff = o.getLD(o.cSolverRT,i);
+                %Perform checks
+                o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30)), tolerance*10);
+            end
+            
+            disp('Test testgetLD_ode15sM finished');
+        end
         
-                    for i = 1:horizon
-        
-                        anaDiff = o.getLD(o.cSolverRT,i);
-                        %Perform checks
-                        o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30)), 1e-9);
-        
-                    end
-                end
-        
-        function testgetLDD(o)
-            horizon = 15;
+        function testgetLD_ode45M(o)
+            horizon = 5;
+            tolerance = 1e-3;
+            o.setupTest(horizon,tolerance, -1);
+            
+            func = @() o.getL(o.cSolverRT);
+            numDiff = o.numDiff_nD_AllT(func)';
+            
+            for i = 1:horizon                
+                anaDiff = o.getLD(o.cSolverRT,i);
+                %Perform checks
+                o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30)), tolerance*10);
+            end
+            
+            disp('Test testgetLD_ode45M finished');
+        end
+            
+        function testgetLDD_Euler(o)
+            horizon = 5;
+            tolerance = 1e-5;
             o.setupTest(horizon);
             
             for i =1:horizon
@@ -190,9 +226,9 @@ classdef Lagrange < TestEnv
                 
                 %Extend values, to derive after mu as well
                 if i >= horizon
-                   o.setupTest(horizon+1);
-                   anaDiff = o.getLDD(o.cSolverRT,i);
-                   numDiff1 = o.numDiff_nxnD(i,func);
+                    o.setupTest(horizon+1);
+                    anaDiff = o.getLDD(o.cSolverRT,i);
+                    numDiff1 = o.numDiff_nxnD(i,func);
                 end
                 
                 numDiff2 = o.numDiff_nxnD(i+1,func);
@@ -203,20 +239,64 @@ classdef Lagrange < TestEnv
                 numDiff2 = reshape(numDiff2(1,:,:), 30,30);
                 numDiff3 = reshape(numDiff3(1,:,:),30,30);
                 numDiff1 = reshape(numDiff1(1,:,:), 30,30);
-                                
+                
                 %Perform checks
                 QMR = anaDiff(1:17,1:17);
                 AB = anaDiff(18:end, 1:17);
                 ABtr = anaDiff(1:17, 18:end);
                 
                 o.assertLessThan( max(abs(anaDiff - anaDiff')), o.tol);
-                o.assertLessThan( max(abs(QMR  + numDiff1(14:end, 14:end))),o.tol);
+                o.assertLessThan( max(abs(QMR  + numDiff1(14:end, 14:end))),tolerance * 10);
                 if( i < horizon)
-                    o.assertLessThan( max(abs(AB + numDiff2(1:13, 14:end))), o.tol);
-                    o.assertLessThan( max(abs(ABtr + numDiff3(14:end, 1:13))), o.tol);
+                    o.assertLessThan( max(abs(AB + numDiff2(1:13, 14:end))), tolerance * 10);
+                    o.assertLessThan( max(abs(ABtr + numDiff3(14:end, 1:13))), tolerance * 10);
                 end
-                disp( [' Timestep: ', int2str(i), ' done'] );
+                disp( ['Timestep: ', int2str(i), ' done'] );
             end
+            disp('Test testgetLDD_Euler finished');
+        end
+        
+       function testgetLDD_ode45(o)
+            horizon = 3;
+            tolerance = 1e-5;
+            o.setupTest(horizon,tolerance, 42);
+            
+            for i =1:horizon
+                
+                func = @() o.getLD(o.cSolverRT,i)';
+                anaDiff = o.getLDD(o.cSolverRT,i);
+                numDiff1 = o.numDiff_nxnD(i,func);
+                
+                %Extend values, to derive after mu as well
+                if i >= horizon
+                    o.setupTest(horizon+1);
+                    anaDiff = o.getLDD(o.cSolverRT,i);
+                    numDiff1 = o.numDiff_nxnD(i,func);
+                end
+                
+                numDiff2 = o.numDiff_nxnD(i+1,func);
+                func2 = @() o.getLD(o.cSolverRT,i+1)';
+                numDiff3 = o.numDiff_nxnD(i,func2);
+                
+                %Reshape the result
+                numDiff2 = reshape(numDiff2(1,:,:), 30,30);
+                numDiff3 = reshape(numDiff3(1,:,:),30,30);
+                numDiff1 = reshape(numDiff1(1,:,:), 30,30);
+                
+                %Perform checks
+                QMR = anaDiff(1:17,1:17);
+                AB = anaDiff(18:end, 1:17);
+                ABtr = anaDiff(1:17, 18:end);
+                
+                o.assertLessThan( max(abs(anaDiff - anaDiff')), tolerance * 10);
+                o.assertLessThan( max(abs(QMR  + numDiff1(14:end, 14:end))),tolerance * 10);
+                if( i < horizon)
+                    o.assertLessThan( max(abs(AB + numDiff2(1:13, 14:end))), tolerance * 10);
+                    o.assertLessThan( max(abs(ABtr + numDiff3(14:end, 1:13))), tolerance * 10);
+                end
+                disp( ['Timestep: ', int2str(i), ' done'] );
+            end
+            disp('Test testgetLDD_Euler finished');
         end
         
         function testgetLD_withMus(o)
@@ -231,14 +311,26 @@ classdef Lagrange < TestEnv
     
     methods
         
-        function setupTest(o,horizon)
+        function setupTest(o,horizon,tol, varargin)
             
             cEnv = Environment();
             cEnv.horizon = horizon;
             cEnv.wind = @(s_t ,t ) s_t + [1;1;1; zeros(10,1)];
             cEnv.setUniformMesh(uint16(horizon));
             cQ = Quadrocopter();
-            cInt = ForwEuler();
+            
+            
+            if(nargin >=3)
+                opts = odeset('RelTol',tol,'AbsTol',0.1*tol);
+                switch varargin{1}
+                    case 1
+                        cInt = ode15sM(opts);
+                    otherwise
+                        cInt = ode45M(opts);
+                end
+            else
+                cInt = ForwEuler();
+            end
             cBQD = BasisQDyn(cQ,cEnv,cInt);
             cMultShoot = MultiShooting(cBQD);
             cConst = Constraints(cMultShoot);
@@ -288,7 +380,7 @@ classdef Lagrange < TestEnv
             else
                 error('i has infeasible value');
             end
-
+            
             tmp = vec_p{cell_index};
             tmp2 = tmp{t};
             tmp2(j) = tmp2(j) + o.eps;
@@ -334,7 +426,7 @@ classdef Lagrange < TestEnv
             else
                 error('i has infeasible value');
             end
-   
+            
             tmp = vec_n{cell_index};
             tmp2 = tmp{t};
             tmp2(j) = tmp2(j) - o.eps;

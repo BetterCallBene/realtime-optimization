@@ -41,7 +41,9 @@ classdef TestEnv < matlab.unittest.TestCase
                     numDiff( : , ((timepoint-1) * n) + i) ...
                         = (func_p - func_n)/2/obj.eps;
                     
+                    
                 end
+                disp(int2str(timepoint));
             end
         end
         

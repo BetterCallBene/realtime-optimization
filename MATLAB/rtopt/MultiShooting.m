@@ -45,7 +45,6 @@ classdef MultiShooting < TestEnv
         
         % other functions
         function [H, HD] = h(obj)
-            % compute the equality constraints using forward euler
             [n_int, n_state, n_contr, mesh, n_var] = obj.getParams();
                                     
             if ((size(obj.dyn.contr,2)==n_int+1) && (size(obj.dyn.state,2)==n_int+1)...
@@ -102,11 +101,13 @@ classdef MultiShooting < TestEnv
                 error('wrong state and control lengths wrt index.');
             end
         end
-        
+
         function val = hDD(obj)
             % compute the Hessian the equality constraints using forward euler
             [n_int, n_state, n_contr, mesh] = getParams(obj);
             
+            disp('for testing only');
+                       
             if ((size(obj.dyn.contr,2)==n_int+1) && (size(obj.dyn.state,2)==n_int+1)...
                     &&(n_state == size(obj.dyn.state,1)) ...
                     &&(n_contr == size(obj.dyn.contr,1)))

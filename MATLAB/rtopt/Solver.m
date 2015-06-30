@@ -252,8 +252,11 @@ classdef(Abstract) Solver < handle & TestEnv
             
             [n_state] = obj.getParams();
             
-            obj.vec = [y(1:n_state); obj.u0];
-            dy = obj.helperCreateVektor(obj.dyn.dot(obj.timepoint), obj.kM(y(n_state+1:n_state + obj.M0_size)), obj.kN(y(n_state + obj.M0_size+1:end)));
+           
+            [state, M0_, N0_] = obj.helperCreateMatrizen(y);            
+            
+            obj.vec = [state; obj.u0];
+            dy = obj.helperCreateVektor(obj.dyn.dot(obj.timepoint), obj.kM(M0_), obj.kN(N0_));
         end
         
         function nextStep(obj, timepoint)
