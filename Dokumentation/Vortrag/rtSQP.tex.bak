@@ -94,7 +94,8 @@
 %
 %\begin{document}
 
-\definecolor{green}{RGB}{50,190,50}
+\definecolor{green}{RGB}{0,190,45}
+\definecolor{green2}{RGB}{0,150,45}
 \definecolor{red}{RGB}{190,0,0}
 \definecolor{blue}{RGB}{0,0,190}
 
@@ -218,8 +219,34 @@ y_{t+1} = y_1 = y_0 + \Delta y_0 \\
 
 \begin{frame}{Riccati Recursion}
 
-Solves linear system fast \\
-TODO: Vergleich verschiedener Horizon\\
+Solves linear system fast
+\begin{figure}
+\begin{tikzpicture}
+%Draw bounding box
+\draw[black] (-1.5,-4.5) rectangle (3.5,0.5);
+
+\draw[blue,fill=blue] (-1,0.5) rectangle (-0.5, 0);
+\draw[blue,fill=blue] (-1.5,0) rectangle (-1, -0.5);
+\draw[blue,fill=blue] (-0.5,-0.5) rectangle (0.5, -1.5);
+\draw[blue,fill=blue] (0.5, -1.5) rectangle (1.5, -2.5);
+\draw[blue,fill=blue] (1.5, -2.5) rectangle (2.5, -3.5);
+\draw[blue,fill=blue] (2.5, -3.5) rectangle (3.5, -4.5);
+
+\draw<2->[red,fill=red] (-1,0.5) rectangle (-0.5, 0);
+\draw<2->[red,fill=red] (-1.5,0) rectangle (-1, -0.5);
+\draw<2->[red,fill=red] (-0.5,-0.5) rectangle (0.5, -1.5);
+\draw<2->[red,fill=red] (0.5, -1.5) rectangle (1.5, -2.5);
+\draw<2->[red,fill=red] (1.5, -2.5) rectangle (2.5, -3.5);
+\draw<2->[red,fill=red] (2.5, -3.5) rectangle (3.5, -4.5);
+
+\draw[blue,fill=blue] (-1,0) rectangle (0, -1);
+\draw[blue,fill=blue] (0,-1) rectangle (1, -2);
+\draw[blue,fill=blue] (1,-2) rectangle (2, -3);
+\draw[blue,fill=blue] (2,-3) rectangle (3, -4);
+\draw[blue,fill=blue] (3,-4) rectangle (3.5, -4.5);
+
+\end{tikzpicture} 
+\end{figure}
 
 %\textit{\begin{align*} 
 %  \scriptstyle{H^{t}(y^{t})} =
@@ -268,7 +295,7 @@ What happens in interval $ [ t-1 , t ] $ ?
 \begin{enumerate}
 \item<2-> {\color{red} calculate control $u_{t-1}$ (Riccati Part II)}
 \item<3-> {\color{blue} calculate $y$ (Riccati Part II)}
-\item<4-> {\color{green} prepare $u_t$ (Newton \& Riccati Part I)} 
+\item<4-> {\color{green2} prepare $u_t$ (Newton \& Riccati Part I)} 
 \end{enumerate}
 \end{frame}
 
