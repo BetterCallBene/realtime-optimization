@@ -3,11 +3,15 @@ classdef BasisQDyn < BasisGenQDyn
     properties
         backdoor_vec;
         
+        flagSteadyPoint;
+        
         dotDpatternflag;
         dotDDpatternflag;
         
         dotDCellpattern;
         dotDDCellpattern;
+        
+        steadyPoint;
     end
     
     properties(Dependent)
@@ -16,12 +20,14 @@ classdef BasisQDyn < BasisGenQDyn
         vec;
     end
     
+    
     methods
         function bQDyn = BasisQDyn(varargin)
             bQDyn@BasisGenQDyn();
             
             bQDyn.dotDpatternflag = true;
             bQDyn.dotDDpatternflag = true;
+            bQDyn.flagSteadyPoint = true;
             
             if (nargin >= 1)
                 mc = metaclass(varargin{1});
@@ -118,6 +124,27 @@ classdef BasisQDyn < BasisGenQDyn
                 val(:,i) = obj.vec((i-1)*(n_var+n_contr)+n_var + 1:...
                            i*(n_var+n_contr));
             end
+        end
+        
+        function ret = get.steadyPoint(obj)
+            if obj.flagSteadyPoint
+                %[q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = obj.getParams();
+                m = obj.robot.m;
+                kT = obj.robot.kT;
+                g = obj.environment.g;
+                estimator_u = sqrt(1/4 * m * g * 1/kT);
+                estimator = [zeros(3, 1);1;zeros(9, 1);repmat(estimator_u, 4, 1)];
+                options = optimoptions('fsolve', 'Algorithm', 'levenberg-marquardt');
+            
+                [obj.steadyPoint,fval,exitflag,output] = fsolve(@obj.helperF, estimator, options);
+                obj.flagSteadyPoint = false;
+            end
+            ret = obj.steadyPoint;
+        end
+        
+        function res = helperF(obj, y)
+            n_state       = obj.robot.n_state;
+            res = obj.FTilde(y(1:n_state), y(n_state+1:end));
         end
         
         
