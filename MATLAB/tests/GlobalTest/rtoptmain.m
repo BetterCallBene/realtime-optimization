@@ -8,17 +8,20 @@ PUBLISHABLE = true;
 global TEST;
 TEST = false;
 
+%parpool(8);
+
 options                 = optimoptions('fmincon');
 options.Algorithm       = 'interior-point';
 options.Display         = 'iter';
 options.GradObj         = 'on';
 options.GradConstr      = 'on';
-%options.Hessian         = 'user-supplied';
-%options.HessFcn         = @hessianAdapter;
-options.TolCon          = 1e-4;
-options.TolFun          = 1e-4;
-options.TolX            = 1e-4;
-options.MaxFunEvals        = 6000;
+options.Hessian         = 'user-supplied';
+options.HessFcn         = @hessianAdapter;
+options.TolCon          = 1e-1;
+options.TolFun          = 1e-1;
+options.TolX            = 1e-1;
+options.MaxFunEvals     = 1000000;
+options.MaxIter         = 1000000;
 
 %% fmincon options    
 % * Algorithm: $(options.Algorithm)$
@@ -76,8 +79,8 @@ cQ = Quadrocopter();
 v0 = rand(cQ.n_var*(n_int+1),1);
 
 % Wahl des Integrators
-opts_ = odeset('RelTol',1e-3,'AbsTol',1e-4);
-cIntegrator = ode15sM(opts_); %ode15sM(opts_);
+opts_ = odeset('RelTol',1e-4,'AbsTol',1e-5);
+cIntegrator =  ForwEuler(); ode15sM(opts_); %ForwEuler();%ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ode15sM(opts_);
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 point = cBQD.steadyPoint;
@@ -91,7 +94,7 @@ cMS = MultiShooting(cBQD);
 cC = Constraints(cMS);
 
 % Initialisierung Kostenfunktion
-cCost = Costs(cBQD);
+cCost = CostsXU(cBQD, 0.1, 50);
 
 %Variablen fuer fmincon verfuegbar machen
 global objectCost objectConstr;

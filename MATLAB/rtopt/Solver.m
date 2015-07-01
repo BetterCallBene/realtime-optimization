@@ -256,6 +256,7 @@ classdef(Abstract) Solver < handle & TestEnv
             [state, M0_, N0_] = obj.helperCreateMatrizen(y);            
             
             obj.vec = [state; obj.u0];
+            
             dy = obj.helperCreateVektor(obj.dyn.dot(obj.timepoint), obj.kM(M0_), obj.kN(N0_));
         end
         

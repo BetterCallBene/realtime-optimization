@@ -39,15 +39,15 @@ classdef Constraints < GenConstraints & TestEnv
         
         
         function ineq_con = get_ineq_con(obj)
-            ineq_con = obj.InEqCon;
+            ineq_con = [];%obj.InEqCon;
         end %Check
         
         function ineq_conD = get_ineq_conD(obj)
-            ineq_conD = obj.InEqConD';
+            ineq_conD = [];%obj.InEqConD';
         end 
         
         function ineq_conDD = get_ineq_conDD(obj)
-            ineq_conDD = obj.InEqConDD;
+            ineq_conDD = [];%obj.InEqConDD;
         end
         
 
@@ -116,7 +116,7 @@ classdef Constraints < GenConstraints & TestEnv
             
             eq_conD     = [hD(); sparse(srow,scol,sval,...
                 2*n_state,(n_int+1)*(n_state+n_contr)); ...
-                obj.EqConD ...
+                %obj.EqConD ...
                 ]';
             
         end
@@ -153,7 +153,7 @@ classdef Constraints < GenConstraints & TestEnv
                     eq_conDD{end-i} = sparse((n_int+1)*(n_state+n_contr),...
                         (n_int+1)*(n_state+n_contr));
                 end
-                eq_conDD = [eq_conDD; obj.EqConDD];
+                eq_conDD = [eq_conDD]; %obj.EqConDD];
             elseif (nargin == 2)
                 lambda      = varargin{2};
                 H           = varargin{1}.dode.hDD();

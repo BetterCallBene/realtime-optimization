@@ -6,9 +6,9 @@ global objectConstr;
 % setting new input vector
 objectConstr.vec = v;
 
-tic;
-[ineq_con, ineq_conD]     = objectConstr.get_ineq();
+
+%[ineq_con, ineq_conD]     = objectConstr.get_ineq();
+ineq_con = [];
+ineq_conD = [];
 
 [eq_con, eq_conD]   = objectConstr.get_eq();
-
-toc;
