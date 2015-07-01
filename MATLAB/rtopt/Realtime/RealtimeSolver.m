@@ -283,10 +283,12 @@ classdef RealtimeSolver < TestEnv
             for j = o.horizon+1:-1:1
                 [LD, n_active_i] = getLD(o,j);
                 LDD = getLDD(o,j);
+                disp(['do Step: ', int2str(j)]);
                 o.ricM.doStep(j,LDD, LD,n_active_i );
             end
             
             %Solve first Step
+            disp('solve Step: 1' );
             o.ricM.solveStep(1);
             
             %Calculate new controls to pass it to the engines imidiatley
@@ -297,6 +299,7 @@ classdef RealtimeSolver < TestEnv
             
             %Solve the remaining steps to obtain a new iterate
             for j = 2:o.horizon+1
+                disp(['solve Step: ',int2str(j)]);
                 o.ricM.solveStep(j);
             end
         end

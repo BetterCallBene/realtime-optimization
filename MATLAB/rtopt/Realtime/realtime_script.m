@@ -8,6 +8,8 @@ horizon = 12;
 pointPerSecond = 1;
 
 
+
+
 env = Environment();
 env.horizon = horizon;
 env.wind = @(s_t ,t ) s_t ; %+ [rand(3,1); zeros(10,1)];
@@ -32,7 +34,7 @@ cMultShoot = MultiShooting(cBQD);
 cConst = Constraints(cMultShoot);
 
 % Initialisierung Kostenfunktion
-cCost = CostsXU(cBQD, 0.1, 50);
+cCost = CostsComplet(cBQD, 0.1, 50,1,2);
 
 %% Choose starting values
 
@@ -44,15 +46,18 @@ lambda = cell(n_intervals +1 ,1);
 mu = ones( cConst.n_addConstr * (n_intervals+1),1);
 
 % Setup a initial estimation
-% TODO: Irgendwas besser f�r Startl�sung als rand finden
+steadyPoint = cBQD.steadyPoint;
+
+% Place Quadrocopter at the desired camera position 
+steadyPoint(1:3) = cCost.cam_pos;
 
 for i = 1: n_intervals 
-s{i} = [zeros(3,1); 1; zeros(9,1)];
-q{i} = 10000* ones(4,1);
+s{i} = steadyPoint(1:cQ.n_state);
+q{i} = steadyPoint(cQ.n_state + 1 : cQ.n_var); 
 lambda{i} = ones(cQ.n_state,1);
 end
 
-s{n_intervals +1} = [zeros(3,1); 1; zeros(9,1)];
+s{n_intervals +1} = steadyPoint(1:cQ.n_state);
 lambda{n_intervals +1} = ones(cQ.n_state,1);
 
 % Initialisierung des Solvers
@@ -61,7 +66,7 @@ cRTSolver = RealtimeSolver(cCost, cConst,lambda, s, q, mu);
 %Choose how to calculate the LDD (approximation or not)?
 cLagrange = Lagrange();
 getLD = @(cRTSolver, t) cLagrange.getLD(cRTSolver,t);
-getLDD = @(cRTSolver,t) cLagrange.getLDD(cRTSolver, t) ;
+getLDD = @(cRTSolver,t) cLagrange.getLDD_inv_approx(cRTSolver, t) ;
 
 %% Calculate the solution with fminrt
 

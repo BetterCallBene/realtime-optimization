@@ -84,6 +84,17 @@ classdef RiccatiManager < TestEnv
                 if(n_mu_i == 0)
                     % Benutze Regel aus Riccati_woConstr
                     
+                    
+                    cond = rcond(full( o.R{i} + o.B{i}' * o.P{i+1}  * o.B{i} ));
+                    
+                    if (cond > 1e4 || cond < 1e-4  )
+                        ges = full(o.R{i} + o.B{i}' * o.P{i+1}  * o.B{i}) ;
+                        Ri = full(o.R{i});
+                        Bi = full(o.B{i});
+                        Pip1 = full(o.P{i+1});
+                    end
+                                          
+                    
                     o.P{i} = o.Q{i} + (o.A{i}' * o.P{i+1} * o.A{i}) - ...
                         (o.M{i} + o.A{i}' * o.P{i+1} * o.B{i}) * ...
                         ((o.R{i} + o.B{i}' * o.P{i+1}  * o.B{i}) \ ...
@@ -138,6 +149,28 @@ classdef RiccatiManager < TestEnv
             %solve for delta_q and delta_mu
             if( i ~= o.horizon +1)
                 if ( o.n_mu{i} == 0)
+                    cond = rcond(full(o.R{i} + o.B{i}' * o.P{i+1} * o.B{i}));
+                    
+                    rhs = full( ...
+                        o.nabla_q{i} + ...
+                        o.B{i}' * o.P{i+1} * o.nabla_lambda{i+1} + ...
+                        o.B{i}' * o.nabla_s_star{i+1} - ...
+                        ( o.M{i}' + o.B{i}' * o.P{i+1} * o.A{i} ) * o.delta_s{i} );
+                    
+                    if( cond < 1e-4 || cond > 1e4)
+                        Bi = o.B{i};
+                        Pip1 = o.P{i+1};
+                        nlip1 = o.nabla_lambda{i+1};
+                        nsip1 = o.nabla_s_star{i+1};
+                        Mi = o.M{i};
+                        Ai = o.A{i};
+                        dsi = o.delta_s{i};
+                    end
+                    
+%                     if(rhs < 1e-2 || rhs > 1e2)
+%                         why;
+%                     end
+                    
                     o.delta_q{i} = (o.R{i} + o.B{i}' * o.P{i+1} * o.B{i}) \ ...
                         ( ...
                         o.nabla_q{i} + ...
@@ -157,6 +190,9 @@ classdef RiccatiManager < TestEnv
         
         function delta_mu = assembleMu(o,activeSet_i,i)
             % ASSEMBLEMU builds a mu, which also considers the inactive constraints
+            if( i ==13)
+                why;
+            end
             delta_mu = zeros(length(activeSet_i),1);
             delta_mu(activeSet_i) = o.delta_mu{i};
         end
