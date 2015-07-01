@@ -165,11 +165,11 @@ classdef RiccatiManager < TestEnv
     methods(Test)
         
         function testRiccati_0(o)
-            o.doTestWithHorizon(0,0,o.tol);
+            o.doTestWithHorizon(0,0,1e-8);
         end
         
         function testRiccati_1(o)
-            o.doTestWithHorizon(1,0,o.tol);
+            o.doTestWithHorizon(1,0,1e-8);
         end
         
         function testRiccati_20(o)
@@ -181,15 +181,15 @@ classdef RiccatiManager < TestEnv
         end
         
         function testRiccatiwConstr_0(o)
-            o.doTestWithHorizon(0,randi(4,1),1e-10);
+            o.doTestWithHorizon(0,randi(4,1),1e-9);
         end
         
         function testRiccatiwConstr_1(o)
-            o.doTestWithHorizon(1,randi(3,1),1e-10);
+            o.doTestWithHorizon(1,randi(3,1),1e-7);
         end
         
         function testRiccatiwConstr_20(o)
-            o.doTestWithHorizon(20,2,1e-6);
+            o.doTestWithHorizon(20,2,1e-4);
         end
         
     end

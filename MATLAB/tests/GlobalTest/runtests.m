@@ -30,17 +30,20 @@ TEST = true;
 % suiteODE15sM = TestSuite.fromClass(?ode15sM);
 % resultODE15sM = run(suiteODE15sM);                      %Check
 
-% suiteCosts = TestSuite.fromClass(?Costs);
-% resultCosts = run(suiteCosts);                            %Check
+suiteCosts = TestSuite.fromClass(?Costs);
+resultCosts = run(suiteCosts);                            %Check
  
-% suiteCostsXU = TestSuite.fromClass(?CostsXU);
-% resultCostsXU = run(suiteCostsXU);                        %Check
+suiteCostsXU = TestSuite.fromClass(?CostsXU);
+resultCostsXU = run(suiteCostsXU);                        %Check
+
+suiteCostsComplete = TestSuite.fromClass(?CostsComplet);
+resultCostsComplete = run(suiteCostsComplete);            %Check
 
 % suiteLagrange = TestSuite.fromClass(?Lagrange);
 % resultLagrange = run(suiteLagrange);
 
-% suiteRiccati = TestSuite.fromClass(?RiccatiManager);
-% resultRiccati = run(suiteRiccati);                        %Check
+suiteRiccati = TestSuite.fromClass(?RiccatiManager);
+resultRiccati = run(suiteRiccati);                        %Check
 
 suiteRTSolver = TestSuite.fromClass(?RealtimeSolver);
 resultRTSolver = run(suiteRTSolver);                        %Check
@@ -51,3 +54,22 @@ resultRTSolver = run(suiteRTSolver);                        %Check
 
 %suiteFile = TestSuite.fromFile('SolverTest.m');
 %result = run(suiteFile);
+
+% If every test ran successfully, notify user
+myvars  = who;
+someflag = true;
+for i = 1:length(myvars)
+    tmp = myvars(i);
+    tmp = tmp{1};
+   if isa(eval(tmp),  'matlab.unittest.TestResult')
+     if ~ eval([tmp, '.Passed'])
+       someflag = false;
+       break;
+     end
+   end
+end
+
+if someflag
+    load handel
+    sound(y,Fs);
+end
