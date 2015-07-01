@@ -7,6 +7,8 @@ classdef CostsComplet < Costs
         beta;  % weight of the cost function for the state term
         gamma; % weight of the cost function for the quadrions
         kappa; % weight of the cost function for the velocitys
+        
+        cam_pos = [ 2; 0; 5];
     end
     
     methods
@@ -27,9 +29,11 @@ classdef CostsComplet < Costs
                     error('wrong class type for problem parameter');
                 end
                 
-                if (nargin == 3)
+                if (nargin == 5)
                     cC.alpha = varargin{2};
                     cC.beta = varargin{3};
+                    cC.gamma = varargin{4};
+                    cC.kappa = varargin{5};
                     
                 else
                     error('wrong number of inputs');
@@ -41,7 +45,7 @@ classdef CostsComplet < Costs
             % compute the cost value with penalty term
             control = obj.dyn.contr;
             state   = obj.dyn.state;
-            cam_pos = [ 2; 0; 10];
+            
             one_vec = ones(1,size(state,2));
             
             alpha_   = obj.alpha;
@@ -51,7 +55,7 @@ classdef CostsComplet < Costs
             
             mesh    = obj.dyn.environment.mesh;
             c_val   = alpha_* 0.5*sum((control(:,1:end-1).^2)*mesh') + ...
-                beta_ * 0.5*sum(((state(1:3,1:end) - kron(one_vec,cam_pos)).^2)*one_vec') + ...
+                beta_ * 0.5*sum(((state(1:3,1:end) - kron(one_vec,obj.cam_pos)).^2)*one_vec') + ...
                 gamma_ * 0.5*sum((state(4:7,1:end).^2)*one_vec') + ...
                 kappa_ * 0.5*sum((state(8:end,1:end).^2)*one_vec');
         end
@@ -63,7 +67,7 @@ classdef CostsComplet < Costs
             control     = obj.dyn.contr;
             mesh        = obj.dyn.environment.mesh;
             state   = obj.dyn.state;
-            cam_pos = [ 2; 0; 10];
+            
             
             alpha_   = obj.alpha;
             beta_    = obj.beta;
@@ -84,7 +88,7 @@ classdef CostsComplet < Costs
                 
                 rindx((i-1)*n_state+1:i*n_state) = (i-1)*(n_state+n_contr) + 1:...
                     (i-1)*(n_state+n_contr)+n_state;
-                vindx((i-1)*n_state+1:(i-1)*n_state+3) = beta_ * (state(1:3,i) - cam_pos);
+                vindx((i-1)*n_state+1:(i-1)*n_state+3) = beta_ * (state(1:3,i) - obj.cam_pos);
                 vindx((i-1)*n_state+4:(i-1)*n_state+7) = gamma_* state(4:7,i);
                 vindx((i-1)*n_state+8:i*n_state)       = kappa_* state(8:end,i);
             end
@@ -92,7 +96,7 @@ classdef CostsComplet < Costs
             i = n_tp;
             rindx((i-1)*n_state+1:i*n_state) = (i-1)*(n_state+n_contr) + 1:...
                     (i-1)*(n_state+n_contr)+n_state;
-            vindx((i-1)*n_state+1:(i-1)*n_state+3) = beta_ * (state(1:3,i) - cam_pos);
+            vindx((i-1)*n_state+1:(i-1)*n_state+3) = beta_ * (state(1:3,i) - obj.cam_pos);
             vindx((i-1)*n_state+4:(i-1)*n_state+7) = gamma_* state(4:7,i);
             vindx((i-1)*n_state+8:i*n_state)       = kappa_* state(8:end,i);
             

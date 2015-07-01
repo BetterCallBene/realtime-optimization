@@ -156,6 +156,44 @@ classdef Lagrange < TestEnv
             end
         end
         
+         function [ H ] = getLDD_inv_approx(o,solverRT, t )
+            % GETLDD
+            % Initialize
+            n_state = solverRT.cConst.dyn.robot.n_state;
+            n_contr = solverRT.cConst.dyn.robot.n_contr;
+            
+            % In the last block, there are no eq_conD considered
+            if( t ~= solverRT.horizon +1 )
+                AB = solverRT.cConst.get_eq_conD_block_t(t);
+            else
+                AB = [];
+            end
+            % Compute ineq_conD
+            CD = solverRT.cConst.get_ineq_conD_block_t(t);
+            ZERO = sparse(size(CD,1),size(CD,1)); %needed to fill matrix up
+            
+            % Active Set
+            activeSet_t = solverRT.cConst.getActiveSet(t);
+            CD = CD(activeSet_t,:);
+            ZERO = ZERO(activeSet_t,activeSet_t);
+            
+            % Would be the exact solution
+            %             costDall = solverRT.cCost.get_costDD{1} ; %brauchen nur den Teil an der Stelle t
+            %             costD = costDall( (t-1)*(n_state+n_contr) + 1: t*(n_state+n_contr), (t-1)*(n_state+n_contr) + 1: t*(n_state+n_contr));
+            
+            costDD = solverRT.cCost.get_costDD();
+            costDD = costDD{1};
+            costDD = costDD( (t-1) * (n_state+n_contr) +1 : t * (n_state + n_contr),(t-1) * (n_state+n_contr) +1 : t * (n_state + n_contr));
+            
+            if (t ~= solverRT.cCost.dyn.environment.horizon +1 )
+                H = [costDD , CD' , AB' ;...
+                    CD , ZERO, sparse(size(ZERO,1),n_state);...
+                    AB , sparse(n_state,size(ZERO,1)) , sparse(n_state,n_state) ];
+            else
+                H = [costDD, CD'; CD, ZERO ];
+            end
+        end
+        
     end
     
     
