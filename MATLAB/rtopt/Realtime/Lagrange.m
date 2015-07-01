@@ -47,7 +47,7 @@ classdef Lagrange < TestEnv
             activeSet_i = solverRT.cConst.getActiveSet(i);
             n_active_i = sum(activeSet_i);
             ineq_constr = ineq_constr(activeSet_i);
-            
+             
             %Calculate the cost derivative at the right place
             costDall = solverRT.cCost.get_costD;
             costD = costDall( (i-1)*(n_state+n_contr) + 1: i*(n_state+n_contr));
@@ -71,7 +71,7 @@ classdef Lagrange < TestEnv
                 lambda = zeros(n_state + n_contr,1);
             end
             % Fill it up
-            J = -[ eq_constr( (i-1)*n_state +1 : i*n_state); costD + lambda + eqConD + ineqConD ; ineq_constr ];
+             J = -[ eq_constr( (i-1)*n_state +1 : i*n_state); costD + lambda + eqConD + ineqConD ; ineq_constr ];
             
             
         end
@@ -102,6 +102,7 @@ classdef Lagrange < TestEnv
             
             %eq_conDDAll = solverRT.cConst.get_eq_conDD(solverRT.lambda{t+1});
             %eq_conDDAll = eq_conDDAll{1};
+            if (t ~= solverRT.cCost.dyn.environment.horizon +1 )
             eq_conDDAll = solverRT.cConst.get_eq_conDD_at_t(solverRT.lambda{t+1}, t);
             eq_conDD = eq_conDDAll( (t-1)*(n_state+n_contr) + 1: t*(n_state+n_contr), (t-1)*(n_state+n_contr)+ 1: t*(n_state+n_contr));
             
@@ -109,13 +110,11 @@ classdef Lagrange < TestEnv
             % cost_approx_t = solverRT.cCost.get_costDD_approx(t);
             % costD = cost_approx_t;
             
-            
-            if (t ~= solverRT.cCost.dyn.environment.horizon +1 )
                 H = [costDD + eq_conDD, CD' , AB' ;...
                     CD , ZERO, sparse(size(ZERO,1),n_state);...
                     AB , sparse(n_state,size(ZERO,1)) , sparse(n_state,n_state) ];
             else
-                H = [costDD + eq_conDD, CD'; CD, ZERO ];
+                H = [costDD , CD'; CD, ZERO ];
             end
         end
         
