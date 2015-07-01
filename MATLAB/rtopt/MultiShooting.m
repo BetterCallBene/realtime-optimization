@@ -76,6 +76,7 @@ classdef MultiShooting < TestEnv
                     F = Fs{timepoint};
                     J = Js{timepoint};
                     % Bestimme h
+                    
                     H((timepoint-1)*n_state+1:timepoint*n_state) = F - state_val(:,timepoint+1);
 
                     % Bestimme hD

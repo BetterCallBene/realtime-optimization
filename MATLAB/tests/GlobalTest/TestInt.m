@@ -60,7 +60,7 @@ classdef TestInt < handle & TestEnv
             % of func at timepoint t, when func only depends on obj.vec and has m dim output
             [vec_old, n, m, timepoints] = obj.setup(func,solver);
             numDiff = zeros(m,n);
-            parfor i=1:n
+            for i=1:n
                 func_p = obj.plusEpsShift(i,timepoint,vec_old,func, n, solver);
                 func_n = obj.minusEpsShift(i,timepoint,vec_old,func, n, solver);
                 
@@ -73,7 +73,7 @@ classdef TestInt < handle & TestEnv
             
             [old_intervals] = solver.preToDo();
             tic;
-            parfor timepoint = 1:n_intervals
+            for timepoint = 1:n_intervals
                 [F, J] = solver.ode(timepoint);
             end
             spd = toc;
@@ -83,7 +83,7 @@ classdef TestInt < handle & TestEnv
         function [error, norm_error] = NumAnaTest(obj, n_intervals, solver)
             error = zeros(n_intervals, 1);
             norm_error = zeros(n_intervals, 1);
-            parfor timepoint = 1:n_intervals
+            for timepoint = 1:n_intervals
                 [old_intervals] = solver.preToDo();
                 [F, J] = solver.ode(timepoint);
                 solver.postToDo(old_intervals);
@@ -200,13 +200,15 @@ classdef TestInt < handle & TestEnv
             
             
             obj.dynOde45M = BasisQDyn(model, env, solver1);
-            obj.dynOde45M.vec = vec;
+            %obj.dynOde45M.vec = vec;
+            obj.dynOde45M.backdoor_vec = vec;
             
             %obj.dynOde15iM = BasisQDyn(model, env, solver2);
             %obj.dynOde15iM.vec = vec;
             
             obj.dynOde15sM = BasisQDyn(model, env, solver3);
-            obj.dynOde15sM.vec = vec;
+            %obj.dynOde15sM.vec = vec;
+            obj.dynOde15sM.backdoor_vec = vec;
             
         end
         function setupTest2(obj,n_intervals)
@@ -248,13 +250,13 @@ classdef TestInt < handle & TestEnv
             
             
             obj.dynOde45M = BasisQDyn(model, env, solver1);
-            obj.dynOde45M.vec = vec;
+            obj.dynOde45M.backdoor_vec = vec;
             
             %obj.dynOde15iM = BasisQDyn(model, env, solver2);
             %obj.dynOde15iM.vec = vec;
             
             obj.dynOde15sM = BasisQDyn(model, env, solver3);
-            obj.dynOde15sM.vec = vec;
+            obj.dynOde15sM.backdoor_vec = vec;
             
         end
     end

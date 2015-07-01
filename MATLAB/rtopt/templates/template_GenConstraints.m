@@ -23,7 +23,8 @@ classdef(Abstract) GenConstraints < handle
     %setter;
     methods
         function set.vec(obj, vec_)
-            obj.dyn.backdoor_vec = vec_;
+            %obj.dyn.backdoor_vec = vec_;
+            obj.dyn.vec = vec_;
         end
     end
     

@@ -15,11 +15,11 @@ options.Algorithm       = 'interior-point';
 options.Display         = 'iter';
 options.GradObj         = 'on';
 options.GradConstr      = 'on';
-options.Hessian         = 'user-supplied';
-options.HessFcn         = @hessianAdapter;
-options.TolCon          = 1e-1;
-options.TolFun          = 1e-1;
-options.TolX            = 1e-1;
+%options.Hessian         = 'user-supplied';
+%options.HessFcn         = @hessianAdapter;
+options.TolCon          = 1e-2;
+options.TolFun          = 1e-2;
+options.TolX            = 1e-2;
 options.MaxFunEvals     = 1000000;
 options.MaxIter         = 1000000;
 
@@ -43,12 +43,12 @@ n_int = 50;
 
 xbc = [         ... Variablenname L�nge   Name
                 ... Anfangsbedingung
-    0, 0, 1,  ...     r           3      Ortsvektor
+    2, 0, 5,  ...     r           3      Ortsvektor
     1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
     0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
     0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
                 ... Endbedingung
-    0, 0, 1,    ...
+    2, 0, 5,    ...
     1, 0, 0, 0, ...
     0, 0, 0,    ...
     0, 0, 0     ...
@@ -80,10 +80,11 @@ v0 = rand(cQ.n_var*(n_int+1),1);
 
 % Wahl des Integrators
 opts_ = odeset('RelTol',1e-4,'AbsTol',1e-5);
-cIntegrator =  ForwEuler(); ode15sM(opts_); %ForwEuler();%ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ode15sM(opts_);
+cIntegrator =  ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %% %ForwEuler();%ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ode15sM(opts_);
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 point = cBQD.steadyPoint;
+point(1:3, 1)  = [2; 0;5];
 cBQD.vec = repmat(point,(n_int+1), 1);  %rand(cQ.n_var * (n_int+1), 1);
 
 

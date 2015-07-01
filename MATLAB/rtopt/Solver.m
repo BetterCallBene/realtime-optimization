@@ -236,8 +236,14 @@ classdef(Abstract) Solver < handle & TestEnv
             old_timepoint = obj.timepoint;
             obj.u0 = obj.get_contr(old_timepoint);
             obj.timepoint = 1;
-            
+            if((norm(y0(4:7)) - 1) > 1e-3)
+                error('Quaternioen ist nicht normiert');
+            end
             y = obj.integrate(@obj.funcToIntegrate, meshGrid, y0, yp0);
+            
+            if((norm(y(4:7)) - 1) > 1e-3)
+                error('Quaternioen ist nicht normiert');
+            end
             
             obj.timepoint = old_timepoint;
             [F, M, N, J] = obj.helperCreateMatrizen(y);

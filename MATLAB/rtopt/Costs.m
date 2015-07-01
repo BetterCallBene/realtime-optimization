@@ -42,7 +42,8 @@ classdef Costs < TestEnv
     %set methods
     function set.vec(obj, vec_)
     % set new input vector
-    obj.dyn.backdoor_vec = vec_;
+    %obj.dyn.backdoor_vec = vec_;
+    obj.dyn.vec = vec_;
     end
     
     function vec = get.vec(obj)
