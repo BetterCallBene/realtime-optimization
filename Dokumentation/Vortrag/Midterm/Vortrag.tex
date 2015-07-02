@@ -1,0 +1,177 @@
+\documentclass[12pt]{beamer}
+
+\usepackage{pgfpages} %This is needed for notes presentation!
+%\setbeameroption{}
+
+\usepackage{enumerate, amsmath, amssymb,amsthm, amstext,color}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}   
+\usepackage{dsfont}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{plotmarks}
+\usetikzlibrary{arrows, positioning}
+\usepackage{lmodern}
+\usepackage{textcomp}
+\usepackage{textpos}
+
+\usepackage{float}
+\usepackage{color}
+\usepackage{hyperref}
+% \usepackage{algorithmicx}
+% \usepackage{algpseudocode}
+\usepackage{fancybox}
+\usepackage{float}
+\usepackage{sidecap}
+\usepackage[ngerman]{babel}
+
+%\setbeamertamplate[circle]
+
+
+
+\newcommand{\lk}{\left}
+\newcommand{\rk}{\right}
+\newcommand{\rel}{\sqsubseteq}
+\newcommand{\rhn}{\mathds{R}^n}
+ 
+\usetheme{Madrid} % Antibes, Berlin, darmstadt, default, Frankfurt; JuanLesPins
+%\usetheme{
+%	AnnArbor | Antibes | Bergen |
+%	Berkeley | Berlin | Boadilla |
+%	boxes | CambridgeUS | Copenhagen |
+%	Darmstadt | default | Dresden |
+%	Frankfurt | Goettingen |Hannover |
+%	Ilmenau | JuanLesPins | Luebeck |
+%	Madrid | Malmoe | Marburg |
+%	Montpellier | PaloAlto | Pittsburgh |
+%	Rochester | Singapore | Szeged |
+%	Warsaw
+%}
+\usecolortheme{beaver}
+% \usecolortheme{
+% 	albatross | beaver | beetle |
+% 	crane | default | dolphin |
+% 	dove | fly | lily | orchid |
+% 	rose |seagull | seahorse |
+% 	sidebartab | structure |
+% 	whale | wolverine
+% }
+
+\useinnertheme{rounded}
+% \useinnertheme{
+% 	circles | default | inmargin |
+% 	rectangles | rounded
+% }
+
+\useoutertheme{infolines}
+% \useoutertheme{
+% 	default | infolines | miniframes |
+% 	shadow | sidebar | smoothbars |
+% 	smoothtree | split | tree
+% }
+
+\usefonttheme{default}
+% \usefonttheme{
+% 	default | professionalfonts | serif |
+% 	structurebold | structureitalicserif |
+% 	structuresmallcapsserif
+% }
+
+% Seitenzahlen
+\setbeamertemplate{footline}[frame number]
+
+\title{Midterm presentation}
+\author{The Quadrocopters}
+\institute{Technische Universität München}
+\date{\today}
+% \titlegraphic{\pgfimage[width=1cm,height=1cm]{MA_Web}}
+%\logo{\pgfimage[width=1.2cm,height=1.2cm]{MA_Web}}
+
+\beamertemplatenavigationsymbolsempty
+% kleine Symbole zur Nvigation wegmachen
+
+\setcounter{MaxMatrixCols}{20}
+
+%\AtBeginSection[]
+%{
+%	\begin{frame}
+%	\frametitle{Overview}
+%	\tableofcontents[currentsection]
+%	\end{frame}
+%}
+
+
+\begin{document}
+
+
+\begin{frame}
+\maketitle
+\end{frame}
+
+\begin{frame}{Overview}
+\tableofcontents
+\end{frame}
+
+%Der Befehl \include{datei} setzt dann hier die Datei datei.tex ,welche im selben Ordner liegt ein. Diese darf keinen Header enthalten
+%\include{datei}
+
+\input{Motivation}
+\begin{frame}{ }
+\begin{block}{ }
+\centering
+\LARGE
+ \vspace{1ex}
+Model \\
+\vspace{1ex}
+\end{block}
+\end{frame}
+\input{Modell}
+\begin{frame}{ }
+\begin{block}{ }
+\centering
+\LARGE
+ \vspace{1ex}
+Realtime Optimization Approach\\
+\vspace{1ex}
+\end{block}
+\end{frame}
+\input{rtSQP}
+
+\section{Results}
+\begin{frame}{ }
+\begin{block}{ }
+\centering
+\LARGE
+ \vspace{1ex}
+Results\\
+\vspace{1ex}
+\end{block}
+\end{frame}
+
+\begin{frame}{ }
+\begin{block}{ }
+\centering
+\LARGE
+ \vspace{1ex}
+Questions? \\
+\vspace{1ex}
+\end{block}
+\end{frame}
+
+\nocite{Boyd2009}
+\nocite{Diehl2001}
+\nocite{Diehl2002}
+\nocite{Diehl2005}
+\nocite{Diebel2006}
+\nocite{Garcia2013}
+\nocite{Richter-Gebert2009}
+\nocite{Reyes-Valeria2013}
+\nocite{Hartmann2014}
+
+%\begin{frame}
+% \frametitle{References}
+	\bibliography{Literaturliste}
+	\bibliographystyle{abbrvnat}
+%\end{frame}
+\end{document}
