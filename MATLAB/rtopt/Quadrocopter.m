@@ -11,7 +11,7 @@ classdef Quadrocopter < Model
         % Tr�gheitsmoment gesamt in kg m^2
         m   = 1.022;                                % Gesamtgewicht des Quadrokopters in kg
         %I_M = 0.0001;     %ToDo                              % Tr�gheitsmoment der Motoren/Rotoren in kg m^2
-        kT  = 1.5e-07;                              % N/(RPM^2)
+        kT  = 1.5e-01;                              % N/(RPM^2)
         kQ  = 3e-09;                                % N*m/(RPM)^2
         d   = 0.22;                                 % Abstand in m
         motor_m = 0.075;                            % Masse Motor
