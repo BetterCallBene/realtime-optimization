@@ -6,6 +6,12 @@ classdef MultiShooting < TestEnv
     
     properties
         dyn;   % handle for the classDyn object providing the right hand side of the ODE
+        flag_h;
+        flag_hDD;
+        
+        cacheH;
+        cacheHD;
+        cacheHDD;
     end
     
     properties(Dependent)
@@ -45,89 +51,109 @@ classdef MultiShooting < TestEnv
         
         % other functions
         function [H, HD] = h(obj)
-            [n_int, n_state, n_contr, mesh, n_var] = obj.getParams();
-                                    
-            if ((size(obj.dyn.contr,2)==n_int+1) && (size(obj.dyn.state,2)==n_int+1)...
-                    &&(n_state == size(obj.dyn.state,1)) ...
-                    &&(n_contr == size(obj.dyn.contr,1)))
-                
-                H        = zeros(n_int*n_state,1);
-                state_val   = obj.dyn.state;
-                
-                % use vector notation to generate sparse matrix
-                rvec = ones(1,n_int*(2*n_state+n_state*(n_state+n_contr)));
-                cvec = ones(1,n_int*(2*n_state+n_state*(n_state+n_contr)));
-                vvec = zeros(1,n_int*(2*n_state+n_state*(n_state+n_contr)));
-                
-                ind = 0;
-                [old_intervals] = obj.solver.preToDo();
-                
-                Fs = cell(n_int, 1);
-                Js = cell(n_int, 1);
-                %Parallelauswertung der odes
-                parfor timepoint=1:n_int
-                    [F, J] = obj.solver.ode(timepoint);
-                    Fs{timepoint} = F;
-                    Js{timepoint} = J;
-                end
-                %Sortierung der F, J
-                for timepoint=1:n_int
-                    %[F, J] = obj.solver.ode(timepoint);
-                    F = Fs{timepoint};
-                    J = Js{timepoint};
-                    % Bestimme h
-                    H((timepoint-1)*n_state+1:timepoint*n_state) = F - state_val(:,timepoint+1);
-
-                    % Bestimme hD
-                    [si,sj,sv]              = find(J);
-                    sn                      = nnz(J);
-                     
-                    rvec(ind+1:ind+sn)      = (timepoint-1)*n_state+si;
-                    cvec(ind+1:ind+sn)      = (timepoint-1)*(n_state+n_contr) + sj;
-                    vvec(ind+1:ind+sn)      = sv;
-                    ind                     = ind + sn;
-                     
-                    rvec(ind+1:ind+n_state)   = (timepoint-1)*n_state+1:timepoint*n_state;
-                    cvec(ind+1:ind+n_state)   = timepoint*(n_var)+1:...
-                                     timepoint*(n_var)+n_state;
-                    vvec(ind+1:ind+n_state)   = -ones(1,n_state);
-                    ind                     = ind + n_state;
-                end
-                
-                HD = sparse(rvec(1:ind),cvec(1:ind),vvec(1:ind),...
-                            n_int*n_state,(n_int+1)*(n_var));
-                obj.solver.postToDo(old_intervals);
+            
+            if obj.flag_h
+                H = obj.cacheH;
+                HD = obj.cacheHD;
             else
-                error('wrong state and control lengths wrt index.');
+                
+                
+                [n_int, n_state, n_contr, mesh, n_var] = obj.getParams();
+                
+                if ((size(obj.dyn.contr,2)==n_int+1) && (size(obj.dyn.state,2)==n_int+1)...
+                        &&(n_state == size(obj.dyn.state,1)) ...
+                        &&(n_contr == size(obj.dyn.contr,1)))
+                    
+                    H        = zeros(n_int*n_state,1);
+                    state_val   = obj.dyn.state;
+                    
+                    % use vector notation to generate sparse matrix
+                    rvec = ones(1,n_int*(2*n_state+n_state*(n_state+n_contr)));
+                    cvec = ones(1,n_int*(2*n_state+n_state*(n_state+n_contr)));
+                    vvec = zeros(1,n_int*(2*n_state+n_state*(n_state+n_contr)));
+                    
+                    ind = 0;
+                    [old_intervals] = obj.solver.preToDo();
+                    
+                    Fs = cell(n_int, 1);
+                    Js = cell(n_int, 1);
+                    %Parallelauswertung der odes
+                    parfor timepoint=1:n_int
+                        [F, J] = obj.solver.ode(timepoint);
+                        Fs{timepoint} = F;
+                        Js{timepoint} = J;
+                    end
+                    %Sortierung der F, J
+                    for timepoint=1:n_int
+                        %[F, J] = obj.solver.ode(timepoint);
+                        F = Fs{timepoint};
+                        J = Js{timepoint};
+                        % Bestimme h
+                        H((timepoint-1)*n_state+1:timepoint*n_state) = F - state_val(:,timepoint+1);
+                        
+                        % Bestimme hD
+                        [si,sj,sv]              = find(J);
+                        sn                      = nnz(J);
+                        
+                        rvec(ind+1:ind+sn)      = (timepoint-1)*n_state+si;
+                        cvec(ind+1:ind+sn)      = (timepoint-1)*(n_state+n_contr) + sj;
+                        vvec(ind+1:ind+sn)      = sv;
+                        ind                     = ind + sn;
+                        
+                        rvec(ind+1:ind+n_state)   = (timepoint-1)*n_state+1:timepoint*n_state;
+                        cvec(ind+1:ind+n_state)   = timepoint*(n_var)+1:...
+                            timepoint*(n_var)+n_state;
+                        vvec(ind+1:ind+n_state)   = -ones(1,n_state);
+                        ind                     = ind + n_state;
+                    end
+                    
+                    HD = sparse(rvec(1:ind),cvec(1:ind),vvec(1:ind),...
+                        n_int*n_state,(n_int+1)*(n_var));
+                    obj.solver.postToDo(old_intervals);
+                    
+                    obj.cacheH = H;
+                    obj.cacheHD = HD;
+                    obj.flag_h  = true;
+                    
+                else
+                    error('wrong state and control lengths wrt index.');
+                end
             end
         end
-
-        function val = hDD(obj)
-            % compute the Hessian the equality constraints using forward euler
-            [n_int, n_state, n_contr, mesh] = getParams(obj);
-            
-            disp('for testing only');
-                       
-            if ((size(obj.dyn.contr,2)==n_int+1) && (size(obj.dyn.state,2)==n_int+1)...
-                    &&(n_state == size(obj.dyn.state,1)) ...
-                    &&(n_contr == size(obj.dyn.contr,1)))
-                
-                val     = cell(n_int*n_state,1);
-                
-                for i=1:n_int
-                    dotDD       = obj.dyn.dotDD(i);
-                    
-                    for j=1:length(dotDD)
-                        [si,sj,sv]  = find(mesh(i)*dotDD{j});
-                        si          = si + (i-1)*(n_state+n_contr);
-                        sj          = sj + (i-1)*(n_state+n_contr);
-                        
-                        val{(i-1)*n_state+j} = sparse(si,sj,sv,...
-                            (n_int+1)*(n_state+n_contr),(n_int+1)*(n_state+n_contr));
-                    end
-                end
+        
+        function HDD = hDD(obj)
+            if obj.flag_hDD
+                HDD = obj.cacheHDD;
             else
-                error('wrong state and control lengths wrt index.');
+                % compute the Hessian the equality constraints using forward euler
+                [n_int, n_state, n_contr, mesh] = getParams(obj);
+                
+                disp('for testing only');
+                
+                if ((size(obj.dyn.contr,2)==n_int+1) && (size(obj.dyn.state,2)==n_int+1)...
+                        &&(n_state == size(obj.dyn.state,1)) ...
+                        &&(n_contr == size(obj.dyn.contr,1)))
+                    
+                    HDD     = cell(n_int*n_state,1);
+                    
+                    for i=1:n_int
+                        dotDD       = obj.dyn.dotDD(i);
+                        
+                        for j=1:length(dotDD)
+                            [si,sj,sv]  = find(mesh(i)*dotDD{j});
+                            si          = si + (i-1)*(n_state+n_contr);
+                            sj          = sj + (i-1)*(n_state+n_contr);
+                            
+                            HDD{(i-1)*n_state+j} = sparse(si,sj,sv,...
+                                (n_int+1)*(n_state+n_contr),(n_int+1)*(n_state+n_contr));
+                        end
+                    end
+                    
+                    obj.cacheHDD = HDD;
+                    obj.flag_hDD = true;
+                else
+                    error('wrong state and control lengths wrt index.');
+                end
             end
         end
         
@@ -233,25 +259,25 @@ classdef MultiShooting < TestEnv
         end
         
         %% ToDo: Eulerabfrage
-%         function testhDD(obj)
-%             
-%             % TESTHDD This methods derives numerically obj.hd and compares
-%             % it with obj.hDD
-%             n_intervals = 3;
-%             obj.setupTest(n_intervals);
-%             [n_int, n_state, n_contr, mesh, n_var] = getParams(obj);
-%             
-%             opts_ = obj.dyn.solver.opts;
-%             func = @() obj.gethD;
-%             numDiff = obj.numDiff_nxnD_AllT(func);
-%             anaDiff = obj.hDD();
-%             
-%             size_nDiff_i = (n_var) * (n_intervals +1 );
-%             for i = 1:(n_int * n_state)
-%                 numDiff_i = reshape(numDiff(i,:,:), [size_nDiff_i size_nDiff_i]);
-%                 obj.assertSize(anaDiff{1}, size(numDiff_i));
-%                 obj.assertLessThan(max(abs(anaDiff{i} - numDiff_i)), opts_.RelTol * 9);
-%             end
-%         end
+        %         function testhDD(obj)
+        %
+        %             % TESTHDD This methods derives numerically obj.hd and compares
+        %             % it with obj.hDD
+        %             n_intervals = 3;
+        %             obj.setupTest(n_intervals);
+        %             [n_int, n_state, n_contr, mesh, n_var] = getParams(obj);
+        %
+        %             opts_ = obj.dyn.solver.opts;
+        %             func = @() obj.gethD;
+        %             numDiff = obj.numDiff_nxnD_AllT(func);
+        %             anaDiff = obj.hDD();
+        %
+        %             size_nDiff_i = (n_var) * (n_intervals +1 );
+        %             for i = 1:(n_int * n_state)
+        %                 numDiff_i = reshape(numDiff(i,:,:), [size_nDiff_i size_nDiff_i]);
+        %                 obj.assertSize(anaDiff{1}, size(numDiff_i));
+        %                 obj.assertLessThan(max(abs(anaDiff{i} - numDiff_i)), opts_.RelTol * 9);
+        %             end
+        %         end
     end
 end

@@ -68,8 +68,13 @@ classdef RealtimeSolver < TestEnv
                 vec = o.cDyn.getVecFromCells(o.s,o.q);
                 o.cCost.vec = vec;
                 o.cConst.vec = vec;
+                o.cCost.timepoint = i;
                 
-                disp(o.cCost.get_cost());
+                if(i == 19)
+                    why
+                end
+                
+                disp(['Cost function: ', num2str( o.cCost.get_cost())]);
                 
                 %Update active set
                 o.mu = o.cConst.checkIfActive(o.mu);

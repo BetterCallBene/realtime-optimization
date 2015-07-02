@@ -8,7 +8,9 @@ classdef CostsComplet < Costs
         gamma; % weight of the cost function for the quadrions
         kappa; % weight of the cost function for the velocitys
         
-        cam_pos = [ 2; 0; 5];
+        cam_pos 
+        
+        timepoint;
     end
     
     methods
@@ -25,6 +27,7 @@ classdef CostsComplet < Costs
             elseif (nargin >= 1)
                 if (isa(varargin{1}, 'Dyn'))
                     cC.dyn = varargin{1};
+                    cC.cam_pos = @(timepoint) [ 2; 0; 5];
                 else
                     error('wrong class type for problem parameter');
                 end
@@ -55,7 +58,7 @@ classdef CostsComplet < Costs
             
             mesh    = obj.dyn.environment.mesh;
             c_val   = alpha_* 0.5*sum((control(:,1:end-1).^2)*mesh') + ...
-                beta_ * 0.5*sum(((state(1:3,1:end) - kron(one_vec,obj.cam_pos)).^2)*one_vec') + ...
+                beta_ * 0.5*sum(((state(1:3,1:end) - kron(one_vec,obj.cam_pos(obj.timepoint) )).^2)*one_vec') + ...
                 gamma_ * 0.5*sum((state(4:7,1:end).^2)*one_vec') + ...
                 kappa_ * 0.5*sum((state(8:end,1:end).^2)*one_vec');
         end
@@ -88,7 +91,7 @@ classdef CostsComplet < Costs
                 
                 rindx((i-1)*n_state+1:i*n_state) = (i-1)*(n_state+n_contr) + 1:...
                     (i-1)*(n_state+n_contr)+n_state;
-                vindx((i-1)*n_state+1:(i-1)*n_state+3) = beta_ * (state(1:3,i) - obj.cam_pos);
+                vindx((i-1)*n_state+1:(i-1)*n_state+3) = beta_ * (state(1:3,i) - obj.cam_pos(obj.timepoint));
                 vindx((i-1)*n_state+4:(i-1)*n_state+7) = gamma_* state(4:7,i);
                 vindx((i-1)*n_state+8:i*n_state)       = kappa_* state(8:end,i);
             end
@@ -96,7 +99,7 @@ classdef CostsComplet < Costs
             i = n_tp;
             rindx((i-1)*n_state+1:i*n_state) = (i-1)*(n_state+n_contr) + 1:...
                     (i-1)*(n_state+n_contr)+n_state;
-            vindx((i-1)*n_state+1:(i-1)*n_state+3) = beta_ * (state(1:3,i) - obj.cam_pos);
+            vindx((i-1)*n_state+1:(i-1)*n_state+3) = beta_ * (state(1:3,i) - obj.cam_pos(obj.timepoint));
             vindx((i-1)*n_state+4:(i-1)*n_state+7) = gamma_* state(4:7,i);
             vindx((i-1)*n_state+8:i*n_state)       = kappa_* state(8:end,i);
             
@@ -192,13 +195,15 @@ classdef CostsComplet < Costs
             cBQD = BasisQDyn(cQ, env,cFE);
             cBQD.vec = rand(cQ.n_var * (horizon +1),1);
             
-            % CostsXU parametrisieren     
+            % Parametrisieren     
             o.dyn = cBQD;
             o.vec = o.dyn.vec;
             o.alpha = 2;
             o.beta = 3;
             o.gamma = 42;
-            o.kappa = 1337;
+            o.kappa = 1337;            
+            o.timepoint = 23;
+            o.cam_pos = @(timepoint) [ 2; 0; 5];
             
         end
     end

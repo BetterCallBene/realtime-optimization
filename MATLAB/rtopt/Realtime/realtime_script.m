@@ -12,17 +12,19 @@ pointPerSecond = 1;
 
 env = Environment();
 env.horizon = horizon;
-env.wind = @(s_t ,t ) s_t ; %+ [rand(3,1); zeros(10,1)];
+env.wind = @(s_t ,t ) s_t ; % + 0.1 * [rand(3,1); zeros(10,1)];
+
+
 
 %Die Dynamik wird nur auf dem Horizon betrachtet:
 n_intervals = env.setUniformMesh1(horizon+1,pointPerSecond); 
 cQ = Quadrocopter();
 
 % Wahl des Integrators
-tol = 1e-2;
+tol = 1e-4;
 opts = odeset('RelTol',tol,'AbsTol',0.1*tol);
-%cIntegrator = ode15sM(opts);
-cIntegrator = ForwEuler();
+cIntegrator = ode15sM(opts);
+%cIntegrator = ForwEuler();
 
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env,cIntegrator);
@@ -34,11 +36,14 @@ cMultShoot = MultiShooting(cBQD);
 cConst = Constraints(cMultShoot);
 
 % Initialisierung Kostenfunktion
-cCost = CostsComplet(cBQD, 0.1, 1,0.1,0.01);
+cCost = CostsComplet(cBQD, 0.1, 2, 1, 1);
+
+n_timepoints = 20 ; %How many timepoints, do we want to calculate.
+
+%Define Cam Position function
+cCost.cam_pos = @(t) ((t-1) * [-20 ; 0 ;5]  + (n_timepoints - t ) * [20; 0; 5]) / (n_timepoints - 1);
 
 %% Choose starting values
-
-n_timepoints = 15 ; %How many timepoints, do we want to calculate.
 
 s = cell(n_intervals +1,1);
 q = cell(n_intervals,1);
@@ -49,7 +54,7 @@ mu = ones( cConst.n_addConstr * (n_intervals+1),1);
 steadyPoint = cBQD.steadyPoint;
 
 % Place Quadrocopter at the desired camera position 
-steadyPoint(1:3) = cCost.cam_pos;
+steadyPoint(1:3) = cCost.cam_pos(1);
 
 for i = 1: n_intervals 
 s{i} = steadyPoint(1:cQ.n_state);
@@ -66,7 +71,7 @@ cRTSolver = RealtimeSolver(cCost, cConst,lambda, s, q, mu);
 %Choose how to calculate the LDD (approximation or not)?
 cLagrange = Lagrange();
 getLD = @(cRTSolver, t) cLagrange.getLD(cRTSolver,t);
-getLDD = @(cRTSolver,t) cLagrange.getLDD(cRTSolver, t) ;
+getLDD = @(cRTSolver,t) cLagrange.getLDD_inv_approx(cRTSolver, t) ;
 
 %% Calculate the solution with fminrt
 

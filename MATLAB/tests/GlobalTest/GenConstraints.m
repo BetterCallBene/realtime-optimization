@@ -24,6 +24,8 @@ classdef(Abstract) GenConstraints < handle
     methods
         function set.vec(obj, vec_)
             obj.dyn.backdoor_vec = vec_;
+            obj.dode.flag_h = false;
+            obj.dode.flag_hDD = false;
         end
     end
     

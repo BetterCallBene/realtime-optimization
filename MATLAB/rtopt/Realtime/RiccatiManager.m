@@ -85,14 +85,14 @@ classdef RiccatiManager < TestEnv
                     % Benutze Regel aus Riccati_woConstr
                     
                     
-                    cond = rcond(full( o.R{i} + o.B{i}' * o.P{i+1}  * o.B{i} ));
-                    
-                    if (cond > 1e4 || cond < 1e-4  )
-                        ges = full(o.R{i} + o.B{i}' * o.P{i+1}  * o.B{i}) ;
-                        Ri = full(o.R{i});
-                        Bi = full(o.B{i});
-                        Pip1 = full(o.P{i+1});
-                    end
+%                     cond = rcond(full( o.R{i} + o.B{i}' * o.P{i+1}  * o.B{i} ));
+%                     
+%                     if (cond > 1e4 || cond < 1e-4  )
+%                         ges = full(o.R{i} + o.B{i}' * o.P{i+1}  * o.B{i}) ;
+%                         Ri = full(o.R{i});
+%                         Bi = full(o.B{i});
+%                         Pip1 = full(o.P{i+1});
+%                     end
                                           
                     
                     o.P{i} = o.Q{i} + (o.A{i}' * o.P{i+1} * o.A{i}) - ...
@@ -149,23 +149,23 @@ classdef RiccatiManager < TestEnv
             %solve for delta_q and delta_mu
             if( i ~= o.horizon +1)
                 if ( o.n_mu{i} == 0)
-                    cond = rcond(full(o.R{i} + o.B{i}' * o.P{i+1} * o.B{i}));
-                    
-                    rhs = full( ...
-                        o.nabla_q{i} + ...
-                        o.B{i}' * o.P{i+1} * o.nabla_lambda{i+1} + ...
-                        o.B{i}' * o.nabla_s_star{i+1} - ...
-                        ( o.M{i}' + o.B{i}' * o.P{i+1} * o.A{i} ) * o.delta_s{i} );
-                    
-                    if( cond < 1e-4 || cond > 1e4)
-                        Bi = o.B{i};
-                        Pip1 = o.P{i+1};
-                        nlip1 = o.nabla_lambda{i+1};
-                        nsip1 = o.nabla_s_star{i+1};
-                        Mi = o.M{i};
-                        Ai = o.A{i};
-                        dsi = o.delta_s{i};
-                    end
+%                     cond = rcond(full(o.R{i} + o.B{i}' * o.P{i+1} * o.B{i}));
+%                     
+%                     rhs = full( ...
+%                         o.nabla_q{i} + ...
+%                         o.B{i}' * o.P{i+1} * o.nabla_lambda{i+1} + ...
+%                         o.B{i}' * o.nabla_s_star{i+1} - ...
+%                         ( o.M{i}' + o.B{i}' * o.P{i+1} * o.A{i} ) * o.delta_s{i} );
+%                     
+%                     if( cond < 1e-4 || cond > 1e4)
+%                         Bi = o.B{i};
+%                         Pip1 = o.P{i+1};
+%                         nlip1 = o.nabla_lambda{i+1};
+%                         nsip1 = o.nabla_s_star{i+1};
+%                         Mi = o.M{i};
+%                         Ai = o.A{i};
+%                         dsi = o.delta_s{i};
+%                     end
                     
                     o.delta_q{i} = (o.R{i} + o.B{i}' * o.P{i+1} * o.B{i}) \ ...
                         ( ...
