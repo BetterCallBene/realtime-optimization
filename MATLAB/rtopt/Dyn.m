@@ -1,14 +1,10 @@
 classdef(Abstract) Dyn < handle  & TestEnv
-    % DYN Diese Klasse repräsentiert die Dynamik
+    % DYN Zentrale Klasse der Dynamik
     
     properties(SetAccess = public, GetAccess= public)
         environment; % in this object all outside parameters are stored, like gravity, wind, time mesh,...
         robot; % handle for a classRobot element providing the mass matrix and the coriolis terms
         solver; % handle of a Solver
-    end
-    
-    properties
-        resetSolverFlag;
     end
     
     properties(Abstract)
@@ -46,7 +42,6 @@ classdef(Abstract) Dyn < handle  & TestEnv
                 obj.assertLessThan(max(abs(ana_dotD - numDiff)), obj.tol);
             end
         end
-        
         function testdotDD(obj)
             % TESTDOTDD This method nummericaly derives dotD and compares
             % it with dotDD
@@ -110,7 +105,6 @@ classdef(Abstract) Dyn < handle  & TestEnv
     
     methods
         function setupTest(obj,n_intervals)
-            % Quadrocopter soll 5 Meter hoch fliegen
             xbc = [         ... Variablenname L�nge   Name
                 ... Anfangsbedingung
                 0, 0, 0,    ...     r           3      Ortsvektor
