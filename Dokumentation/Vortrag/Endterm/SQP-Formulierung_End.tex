@@ -1,0 +1,53 @@
+\begin{frame}
+	\frametitle{Optimal Control Formulation}
+	\begin{block}{}
+		\begin{center}
+		 \parbox{9.5cm}{\( \min \limits_{x,u} J(x,u) \qquad  \) s.t. \parbox{\textwidth}{
+				\( \qquad \left. \begin{array}{c} \tilde{h}(x,u)=0 \\  \dot{x} = f(x,u) \end{array} \right.\)	}}
+				\begin{align*}
+					x: & \quad \text{state} \\
+					u: & \quad \text{control}
+				\end{align*}
+		\end{center}
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Optimal Control Formulation}
+	\begin{block}{}
+		\begin{center}
+		 \parbox{9.5cm}{\( \min \limits_{x,u} J(x,u) \qquad  \) s.t. \parbox{\textwidth}{
+				\( \qquad \left. \begin{array}{c} \tilde{h}(x,u)=0 \\  \dot{x} = f(x,u) \end{array} \right\} \Rightarrow h(x,u) = 0 \)	}}
+				\begin{align*}
+					x: & \quad \text{state} \\
+					u: & \quad \text{control}
+				\end{align*}
+		\end{center}
+	\end{block}
+\end{frame}
+
+%\begin{frame}
+	%\frametitle{SQP-Formulation}
+	%
+	%\begin{block}{}
+		%\centering
+			%\parbox{7cm}{\( \min \limits_{x,u} J(x,u) \qquad \text{s.t.} \qquad h(x,u) = 0 \)	}
+%\end{block}
+	%
+	%\uncover<2>{
+		%\center{
+		%reformulation as SQP-Problem \\
+		%\vspace{1ex}
+		%\(\Downarrow\)
+		%\vspace{1em}
+		%}
+		%
+		%
+		%\begin{block}{}
+		%\centering
+			%\parbox{7cm}{\[ \min \limits_{s} \nabla J(x,u)^T s + \frac{1}{2}s^T \nabla^2 J(x,u)s \]
+			 %\[ \text{s.t.} \quad  h(x,u) + \nabla h(x,u)^Ts = 0 \]	}
+	%\end{block}
+	%}
+	%
+%\end{frame}
