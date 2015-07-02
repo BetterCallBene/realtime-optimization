@@ -43,12 +43,12 @@ n_int = 50;
 
 xbc = [         ... Variablenname L�nge   Name
                 ... Anfangsbedingung
-    0, 0, 1,  ...     r           3      Ortsvektor
+    2, 0, 5,  ...     r           3      Ortsvektor
     1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
     0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
     0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
                 ... Endbedingung
-    0, 0, 1,    ...
+    2, 0, 5,    ...
     1, 0, 0, 0, ...
     0, 0, 0,    ...
     0, 0, 0     ...
@@ -79,8 +79,9 @@ cQ = Quadrocopter();
 v0 = rand(cQ.n_var*(n_int+1),1);
 
 % Wahl des Integrators
-opts_ = odeset('RelTol',1e-4,'AbsTol',1e-5);
-cIntegrator =  ForwEuler(); ode15sM(opts_); %ForwEuler();%ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ode15sM(opts_);
+
+opts_ = odeset('RelTol',1e-2,'AbsTol',1e-3);
+cIntegrator =  ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %% %ForwEuler();%ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ode15sM(opts_);
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 point = cBQD.steadyPoint;

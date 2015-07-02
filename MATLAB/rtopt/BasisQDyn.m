@@ -135,16 +135,18 @@ classdef BasisQDyn < BasisGenQDyn
                 estimator_u = sqrt(1/4 * m * g * 1/kT);
                 estimator = [zeros(3, 1);1;zeros(9, 1);repmat(estimator_u, 4, 1)];
                 options = optimoptions('fsolve', 'Algorithm', 'levenberg-marquardt');
-                
+                n_int_sav = obj.environment.n_intervals;
+                obj.environment.n_intervals = 0;
                 [obj.steadyPoint,fval,exitflag,output] = fsolve(@obj.helperF, estimator, options);
+                obj.environment.n_intervals = n_int_sav ;
                 obj.flagSteadyPoint = false;
             end
             ret = obj.steadyPoint;
         end
         
         function res = helperF(obj, y)
-            n_state       = obj.robot.n_state;
-            res = obj.FTilde(y(1:n_state), y(n_state+1:end));
+            obj.backdoor_vec = y;
+            res = obj.dot(1);
         end
         
         

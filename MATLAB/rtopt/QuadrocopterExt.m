@@ -1,4 +1,4 @@
-classdef QuadrocopterExt < BasisQDyn & Quadrocpter
+classdef QuadrocopterExt < BasisQDyn & Quadrocopter
     % QuadrocopterExt Erweitert die Quadrocopterdynamik durch aeußere Einfluesse, Wind etc.
     methods
     end
