@@ -69,6 +69,8 @@ classdef RealtimeSolver < TestEnv
                 o.cCost.vec = vec;
                 o.cConst.vec = vec;
                 
+                disp(o.cCost.get_cost());
+                
                 %Update active set
                 o.mu = o.cConst.checkIfActive(o.mu);
                 

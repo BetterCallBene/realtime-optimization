@@ -167,16 +167,16 @@ classdef RiccatiManager < TestEnv
                         dsi = o.delta_s{i};
                     end
                     
-%                     if(rhs < 1e-2 || rhs > 1e2)
-%                         why;
-%                     end
-                    
                     o.delta_q{i} = (o.R{i} + o.B{i}' * o.P{i+1} * o.B{i}) \ ...
                         ( ...
                         o.nabla_q{i} + ...
                         o.B{i}' * o.P{i+1} * o.nabla_lambda{i+1} + ...
                         o.B{i}' * o.nabla_s_star{i+1} - ...
                         ( o.M{i}' + o.B{i}' * o.P{i+1} * o.A{i} ) * o.delta_s{i} );
+                    
+                    % We to reset delta_mu, such that the previous solution
+                    % is overwriten.
+                    o.delta_mu{i} = [];
                     
                 else
                     z6 = o.z3{i} \ (o.z5{i} - (o.z4{i} * o.delta_s{i}));
@@ -190,9 +190,6 @@ classdef RiccatiManager < TestEnv
         
         function delta_mu = assembleMu(o,activeSet_i,i)
             % ASSEMBLEMU builds a mu, which also considers the inactive constraints
-            if( i ==13)
-                why;
-            end
             delta_mu = zeros(length(activeSet_i),1);
             delta_mu(activeSet_i) = o.delta_mu{i};
         end

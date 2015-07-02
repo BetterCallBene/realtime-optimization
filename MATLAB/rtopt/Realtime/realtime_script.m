@@ -34,7 +34,7 @@ cMultShoot = MultiShooting(cBQD);
 cConst = Constraints(cMultShoot);
 
 % Initialisierung Kostenfunktion
-cCost = CostsComplet(cBQD, 0.1, 50,1,2);
+cCost = CostsComplet(cBQD, 0.1, 1,0.1,0.01);
 
 %% Choose starting values
 
@@ -54,10 +54,10 @@ steadyPoint(1:3) = cCost.cam_pos;
 for i = 1: n_intervals 
 s{i} = steadyPoint(1:cQ.n_state);
 q{i} = steadyPoint(cQ.n_state + 1 : cQ.n_var); 
-lambda{i} = ones(cQ.n_state,1);
+lambda{i} = i *ones(cQ.n_state,1);
 end
 
-s{n_intervals +1} = steadyPoint(1:cQ.n_state);
+s{n_intervals +1} = 2 * steadyPoint(1:cQ.n_state);
 lambda{n_intervals +1} = ones(cQ.n_state,1);
 
 % Initialisierung des Solvers
@@ -66,7 +66,7 @@ cRTSolver = RealtimeSolver(cCost, cConst,lambda, s, q, mu);
 %Choose how to calculate the LDD (approximation or not)?
 cLagrange = Lagrange();
 getLD = @(cRTSolver, t) cLagrange.getLD(cRTSolver,t);
-getLDD = @(cRTSolver,t) cLagrange.getLDD_inv_approx(cRTSolver, t) ;
+getLDD = @(cRTSolver,t) cLagrange.getLDD(cRTSolver, t) ;
 
 %% Calculate the solution with fminrt
 
