@@ -79,7 +79,6 @@ cQ = Quadrocopter();
 v0 = rand(cQ.n_var*(n_int+1),1);
 
 % Wahl des Integrators
-
 opts_ = odeset('RelTol',1e-2,'AbsTol',1e-3);
 cIntegrator =  ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %% %ForwEuler();%ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ode15sM(opts_);
 % Initialisierung der Dynamik
