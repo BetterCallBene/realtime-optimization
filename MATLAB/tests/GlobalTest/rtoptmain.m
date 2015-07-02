@@ -11,15 +11,15 @@ TEST = false;
 %parpool(8);
 
 options                 = optimoptions('fmincon');
-options.Algorithm       = 'interior-point';
+options.Algorithm       = 'interior-point'; %'interior-point';
 options.Display         = 'iter';
 options.GradObj         = 'on';
 options.GradConstr      = 'on';
 %options.Hessian         = 'user-supplied';
 %options.HessFcn         = @hessianAdapter;
-options.TolCon          = 1e-2;
-options.TolFun          = 1e-2;
-options.TolX            = 1e-2;
+options.TolCon          = 1e-6;
+options.TolFun          = 1e-6;
+options.TolX            = 1e-6;
 options.MaxFunEvals     = 1000000;
 options.MaxIter         = 1000000;
 
@@ -43,12 +43,12 @@ n_int = 50;
 
 xbc = [         ... Variablenname L�nge   Name
                 ... Anfangsbedingung
-    2, 0, 5,  ...     r           3      Ortsvektor
+    2, 0, 5.5,  ...     r           3      Ortsvektor
     1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
     0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
     0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
                 ... Endbedingung
-    2, 0, 5,    ...
+    2, 0, 6.5,    ...
     1, 0, 0, 0, ...
     0, 0, 0,    ...
     0, 0, 0     ...
@@ -76,7 +76,7 @@ cQ = Quadrocopter();
 % * motor_r: $$(cQ.motor_r)$$
 
 
-v0 = rand(cQ.n_var*(n_int+1),1);
+%v0 = rand(cQ.n_var*(n_int+1),1);
 
 % Wahl des Integrators
 opts_ = odeset('RelTol',1e-4,'AbsTol',1e-5);
@@ -85,7 +85,8 @@ cIntegrator =  ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ForwEuler(); %ode
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 point = cBQD.steadyPoint;
 point(1:3, 1)  = [2; 0;5];
-cBQD.vec = repmat(point,(n_int+1), 1);  %rand(cQ.n_var * (n_int+1), 1);
+v0 = repmat(point,(n_int+1), 1); 
+cBQD.vec = v0;  %rand(cQ.n_var * (n_int+1), 1);
 
 
 
@@ -95,7 +96,7 @@ cMS = MultiShooting(cBQD);
 cC = Constraints(cMS);
 
 % Initialisierung Kostenfunktion
-cCost = CostsXU(cBQD, 0.1, 50);
+cCost = CostsXU(cBQD, 0.1, 0);
 
 %Variablen fuer fmincon verfuegbar machen
 global objectCost objectConstr;
