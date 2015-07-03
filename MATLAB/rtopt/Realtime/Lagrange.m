@@ -184,7 +184,9 @@ classdef Lagrange < TestEnv
             costDD = solverRT.cCost.get_costDD();
             costDD = costDD{1};
             costDD = costDD( (t-1) * (n_state+n_contr) +1 : t * (n_state + n_contr),(t-1) * (n_state+n_contr) +1 : t * (n_state + n_contr));
-            
+            % CostDD + Gewichtige Gradient der Equalty Constraints
+            % CostDD + alpha * I: alpha klein aber groß genug das keine
+            % Singularitaet gibt
             if (t ~= solverRT.cCost.dyn.environment.horizon +1 )
                 H = [costDD , CD' , AB' ;...
                     CD , ZERO, sparse(size(ZERO,1),n_state);...

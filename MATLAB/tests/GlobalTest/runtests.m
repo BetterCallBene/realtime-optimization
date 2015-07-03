@@ -14,8 +14,8 @@ TEST = true;
 %suiteBasisQDyn = BasisQDyn(); %Check
 %resultDyn = run(suiteBasisQDyn);
 
-suiteForwEuler = ForwEuler(); %Check
-resultForwEuler = run(suiteForwEuler);
+%suiteForwEuler = ForwEuler(); %Check
+%resultForwEuler = run(suiteForwEuler);
 
 
 
@@ -26,8 +26,11 @@ resultForwEuler = run(suiteForwEuler);
 %resultsuiteode45M = run(suiteode45M);
 
 
-suiteInt = TestInt; %Check
-resultInt = run(suiteInt);
+%suiteInt = TestInt; %Check
+%resultInt = run(suiteInt);
+
+suiteQuadrocopterExt = QuadrocopterExt; 
+resultQuadrocopterExt = run(suiteQuadrocopterExt, 'testWind'); % Nur Windfunktion testen
 
 
 %suiteConstraints = TestSuite.fromClass(?Constraints);

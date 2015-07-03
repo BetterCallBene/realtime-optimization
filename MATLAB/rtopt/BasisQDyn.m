@@ -29,7 +29,15 @@ classdef BasisQDyn < BasisGenQDyn
             bQDyn.dotDDpatternflag = true;
             bQDyn.flagSteadyPoint = true;
             
-            if (nargin >= 1)
+            nargin_tmp = nargin;
+            m = metaclass(bQDyn);
+            
+            if strcmp(m.Name, 'BasisQDyn') == false %Supclass?
+                varargin = varargin{1};
+                nargin_tmp = length(varargin);
+            end
+            
+            if (nargin_tmp >= 1)
                 mc = metaclass(varargin{1});
                 if strcmp(mc.SuperclassList(1).Name, 'Model')
                     bQDyn.robot = varargin{1};
@@ -37,7 +45,7 @@ classdef BasisQDyn < BasisGenQDyn
                     error('First argument must be instance of Model');
                 end
             end
-            if (nargin >= 2)
+            if (nargin_tmp >= 2)
                 if isa(varargin{2}, 'Environment')
                     bQDyn.environment = varargin{2};
                 else
@@ -45,7 +53,7 @@ classdef BasisQDyn < BasisGenQDyn
                 end
             end
             
-            if (nargin >= 3)
+            if (nargin_tmp >= 3)
                 if isa(varargin{3}, 'Solver')
                     bQDyn.solver = varargin{3};
                     bQDyn.solver.dyn = bQDyn;
@@ -146,7 +154,7 @@ classdef BasisQDyn < BasisGenQDyn
         
         function res = helperF(obj, y)
             obj.backdoor_vec = y;
-            res = obj.dot(1);
+            res = obj.F(:, 1);
         end
         
         

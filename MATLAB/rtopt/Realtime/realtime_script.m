@@ -21,7 +21,7 @@ n_intervals = env.setUniformMesh1(horizon+1,pointPerSecond);
 cQ = Quadrocopter();
 
 % Wahl des Integrators
-tol = 1e-4;
+tol = 1e-2;
 opts = odeset('RelTol',tol,'AbsTol',0.1*tol);
 cIntegrator = ode15sM(opts);
 %cIntegrator = ForwEuler();
@@ -38,7 +38,7 @@ cConst = Constraints(cMultShoot);
 % Initialisierung Kostenfunktion
 cCost = CostsComplet(cBQD, 0.1, 2, 1, 1);
 
-n_timepoints = 200 ; %How many timepoints, do we want to calculate.
+n_timepoints = 50 ; %How many timepoints, do we want to calculate.
 
 %Define Cam Position function
 cCost.cam_pos = @(t) ((t-1) * [-20 ; 0 ;5]  + (n_timepoints - t ) * [20; 0; 5]) / (n_timepoints - 1);

@@ -57,7 +57,7 @@ classdef(Abstract) Dyn < handle  & TestEnv
                 ana_dotDD = obj.dotDD(timepoint);
                 for j = 1:length(ana_dotDD)
                     num_dotDD = reshape(numDiff(j,:,:), [17 17] );
-                    obj.assertLessThan(max(abs(ana_dotDD{j} - num_dotDD)),obj.tol);
+                    obj.assertLessThan(max(abs(ana_dotDD(j, :, :) - num_dotDD)),obj.tol);
                 end
             end
         end
