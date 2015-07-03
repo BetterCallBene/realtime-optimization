@@ -12,12 +12,10 @@ pointPerSecond = 1;
 
 env = Environment();
 env.horizon = horizon;
-env.wind = @(s_t ,t ) s_t ; % + 0.1 * [rand(3,1); zeros(10,1)];
-
-
-
 %Die Dynamik wird nur auf dem Horizon betrachtet:
 n_intervals = env.setUniformMesh1(horizon+1,pointPerSecond); 
+
+
 cQ = Quadrocopter();
 
 % Wahl des Integrators
@@ -26,8 +24,15 @@ opts = odeset('RelTol',tol,'AbsTol',0.1*tol);
 cIntegrator = ode15sM(opts);
 %cIntegrator = ForwEuler();
 
+
+cQExt = QuadrocopterExt(cQ, env, cIntegrator);
+cQExt.hForceExt = @() rand(3, 1);
+cQExt.hMomentExt = @() rand(3, 1);
+%Neue Windfunktion
+%env.wind = @(s_t, t) s_t + 0.1 *cQExt.wind(t); %@(s_t ,t ) s_t ; % + 0.1 * [rand(3,1); zeros(10,1)];
+env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
 % Initialisierung der Dynamik
-cBQD = BasisQDyn(cQ, env,cIntegrator);
+cBQD = BasisQDyn(cQ, env, cIntegrator);
 
 % Initialisierung des Multiple Shootings
 cMultShoot = MultiShooting(cBQD);
