@@ -60,6 +60,7 @@ classdef MultiShooting < TestEnv
                 
                 [n_int, n_state, n_contr, mesh, n_var] = obj.getParams();
                 
+<<<<<<< HEAD
                 if ((size(obj.dyn.contr,2)==n_int+1) && (size(obj.dyn.state,2)==n_int+1)...
                         &&(n_state == size(obj.dyn.state,1)) ...
                         &&(n_contr == size(obj.dyn.contr,1)))
@@ -117,6 +118,39 @@ classdef MultiShooting < TestEnv
                     
                 else
                     error('wrong state and control lengths wrt index.');
+=======
+                Fs = cell(n_int, 1);
+                Js = cell(n_int, 1);
+                %Parallelauswertung der odes
+                parfor timepoint=1:n_int
+                    [F, J] = obj.solver.ode(timepoint);
+                    Fs{timepoint} = F;
+                    Js{timepoint} = J;
+                end
+                %Sortierung der F, J
+                for timepoint=1:n_int
+                    %[F, J] = obj.solver.ode(timepoint);
+                    F = Fs{timepoint};
+                    J = Js{timepoint};
+                    % Bestimme h
+                    
+                    H((timepoint-1)*n_state+1:timepoint*n_state) = F - state_val(:,timepoint+1);
+
+                    % Bestimme hD
+                    [si,sj,sv]              = find(J);
+                    sn                      = nnz(J);
+                     
+                    rvec(ind+1:ind+sn)      = (timepoint-1)*n_state+si;
+                    cvec(ind+1:ind+sn)      = (timepoint-1)*(n_state+n_contr) + sj;
+                    vvec(ind+1:ind+sn)      = sv;
+                    ind                     = ind + sn;
+                     
+                    rvec(ind+1:ind+n_state)   = (timepoint-1)*n_state+1:timepoint*n_state;
+                    cvec(ind+1:ind+n_state)   = timepoint*(n_var)+1:...
+                                     timepoint*(n_var)+n_state;
+                    vvec(ind+1:ind+n_state)   = -ones(1,n_state);
+                    ind                     = ind + n_state;
+>>>>>>> master
                 end
             end
         end

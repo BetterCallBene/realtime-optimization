@@ -11,6 +11,7 @@ classdef Costs < TestEnv
     
     properties  (Dependent)
         vec;  % optimization vector combining all control and state values
+        backdoor_vec;
     end
     
     methods
@@ -42,7 +43,15 @@ classdef Costs < TestEnv
     %set methods
     function set.vec(obj, vec_)
     % set new input vector
-    obj.dyn.backdoor_vec = vec_;
+    %obj.dyn.backdoor_vec = vec_;
+    obj.dyn.vec = vec_;
+    end
+    
+    %set methods
+    function set.backdoor_vec(obj, vec_) %BB: Keine Normierung
+    % set new input vector
+    %obj.dyn.backdoor_vec = vec_;
+        obj.dyn.backdoor_vec = vec_;
     end
     
     function vec = get.vec(obj)

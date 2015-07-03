@@ -17,7 +17,7 @@ classdef Quadrocopter < Model
         motor_m = 0.075;                            % Masse Motor
         motor_r = 0.015;                            % Motor R 1.5 cm
         u_min = 0.1;                                  % Minimale Umdrehungen pro Minute
-        u_max = 15000;                                % Maximale Umdrehungen pro Minute
+        u_max = 15;                                % Maximale Umdrehungen pro Minute
     end
     
     %

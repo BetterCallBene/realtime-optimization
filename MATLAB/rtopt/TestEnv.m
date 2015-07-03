@@ -4,8 +4,10 @@ classdef TestEnv < matlab.unittest.TestCase
     
     properties(Constant)
         eps = 1e-2;
-        tol = 1e-10;
-        
+        %tol = 1e-10;
+        %Toleranz auf 1e-3 Heraufgesetzt, da x^3 Terme nur mit O(h^2)
+        %angenaehert werden koennen
+        tol = 1e-3;
         tolRK = 1e-5;
     end
     

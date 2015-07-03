@@ -398,7 +398,7 @@ classdef Lagrange < TestEnv
             o.cSolverRT.cConst.checkIfActive(mu);
             
         end
-        
+        %BB: Normierung der Quaternionen überarbeitet
         function func_p = plusEpsShift(o, i,t,vec_old, func,n,dyn)
             vec_p = vec_old;
             if (i > 0 && i <=13)
@@ -426,8 +426,8 @@ classdef Lagrange < TestEnv
             
             %Set value
             vec = dyn.getVecFromCells(vec_p{2}, vec_p{3});
-            o.cSolverRT.cCost.vec = vec;
-            o.cSolverRT.cConst.vec = vec;
+            o.cSolverRT.cCost.backdoor_vec = vec; %BB: Keine Normierung
+            o.cSolverRT.cConst.backdoor_vec = vec;%BB: Keine Normierung
             o.cSolverRT.lambda = vec_p{1};
             o.cSolverRT.s = vec_p{2};
             o.cSolverRT.q = vec_p{3};
@@ -437,14 +437,14 @@ classdef Lagrange < TestEnv
             func_p = func();
             %Reset value
             vec = dyn.getVecFromCells(vec_old{2}, vec_old{3});
-            o.cSolverRT.cCost.vec = vec;
-            o.cSolverRT.cConst.vec = vec;
+            o.cSolverRT.cCost.backdoor_vec = vec; %BB: Keine Normierung
+            o.cSolverRT.cConst.backdoor_vec = vec;%BB: Keine Normierung
             o.cSolverRT.lambda = vec_old{1};
             o.cSolverRT.s = vec_old{2};
             o.cSolverRT.q = vec_old{3};
             o.cSolverRT.mu = vec_old{4};
         end
-        
+        %BB: Normierung der Quaternionen überarbeitet
         function func_n =  minusEpsShift(o, i, t, vec_old, func, n, dyn)
             vec_n = vec_old;
             if (i > 0 && i <=13)
@@ -472,8 +472,8 @@ classdef Lagrange < TestEnv
             
             %Set value
             vec = dyn.getVecFromCells(vec_n{2}, vec_n{3});
-            o.cSolverRT.cCost.vec = vec;
-            o.cSolverRT.cConst.vec = vec;
+            o.cSolverRT.cCost.backdoor_vec = vec; %BB: Keine Normierung
+            o.cSolverRT.cConst.backdoor_vec = vec;%BB: Keine Normierung
             o.cSolverRT.lambda = vec_n{1};
             o.cSolverRT.s = vec_n{2};
             o.cSolverRT.q = vec_n{3};
@@ -483,8 +483,8 @@ classdef Lagrange < TestEnv
             func_n = func();
             %Reset value
             vec = dyn.getVecFromCells(vec_old{2}, vec_old{3});
-            o.cSolverRT.cCost.vec = vec;
-            o.cSolverRT.cConst.vec = vec;
+            o.cSolverRT.cCost.backdoor_vec = vec; %BB: Keine Normierung
+            o.cSolverRT.cConst.backdoor_vec = vec;%BB: Keine Normierung
             o.cSolverRT.lambda = vec_old{1};
             o.cSolverRT.s = vec_old{2};
             o.cSolverRT.q = vec_old{3};

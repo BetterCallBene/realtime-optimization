@@ -18,11 +18,20 @@ classdef(Abstract) GenConstraints < handle
     
     properties(Dependent)
         vec;
+        backdoor_vec;
     end
     
     %setter;
     methods
         function set.vec(obj, vec_)
+            %obj.dyn.backdoor_vec = vec_;
+            obj.dyn.vec = vec_;
+        end
+        
+        %set methods
+        function set.backdoor_vec(obj, vec_)
+        % set new input vector
+        %obj.dyn.backdoor_vec = vec_;
             obj.dyn.backdoor_vec = vec_;
         end
     end

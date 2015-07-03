@@ -73,7 +73,7 @@ classdef Constraints < GenConstraints & TestEnv
                                 %obj.EqCon ...
                           ];
             eq_conD     = [HD; sparse(srow,scol,sval,...
-                                2*n_state,(n_int+1)*(n_var)); ...
+                               2*n_state,(n_int+1)*(n_var)); ...
                                 %obj.EqConD ...
                           ]';          
             
@@ -102,24 +102,24 @@ classdef Constraints < GenConstraints & TestEnv
         end
         
         
-        function eq_conD = get_eq_conD(obj)
-            % the Jacobian of the equality contraints of the ocp
-            [r,q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
-            
-            %q           = state_mat(4:7, :);
-            
-            srow        = 1:2*n_state;
-            scol        = [1:n_state,...
-                n_int*(n_state+n_contr)+1:n_int*(n_state+n_contr)+n_state];
-            sval        = ones(1,2*n_state);
-            [h,hD]      = obj.dode.h();
-            
-            eq_conD     = [hD(); sparse(srow,scol,sval,...
-                2*n_state,(n_int+1)*(n_state+n_contr)); ...
-                %obj.EqConD ...
-                ]';
-            
-        end
+%         function eq_conD = get_eq_conD(obj)
+%             % the Jacobian of the equality contraints of the ocp
+%             [r,q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
+%             
+%             %q           = state_mat(4:7, :);
+%             
+%             srow        = 1:2*n_state;
+%             scol        = [1:n_state,...
+%                 n_int*(n_state+n_contr)+1:n_int*(n_state+n_contr)+n_state];
+%             sval        = ones(1,2*n_state);
+%             [h,hD]      = obj.dode.h();
+%             
+%             eq_conD     = [hD(); sparse(srow,scol,sval,...
+%                 2*n_state,(n_int+1)*(n_state+n_contr)); ...
+%                 %obj.EqConD ...
+%                 ]';
+%             
+%         end
         
         function eq_conD = get_eq_conD_block_t(obj,t)
             % the Jacobian of the equality contraints of the ocp
@@ -153,7 +153,7 @@ classdef Constraints < GenConstraints & TestEnv
                     eq_conDD{end-i} = sparse((n_int+1)*(n_state+n_contr),...
                         (n_int+1)*(n_state+n_contr));
                 end
-                eq_conDD = [eq_conDD]; %obj.EqConDD];
+                eq_conDD = obj.dode.hDD(); %obj.EqConDD];
             elseif (nargin == 2)
                 lambda      = varargin{2};
                 H           = varargin{1}.dode.hDD();
