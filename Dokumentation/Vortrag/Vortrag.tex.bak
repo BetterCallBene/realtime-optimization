@@ -151,24 +151,26 @@
 					top color=white, bottom color=red!50},
 					fertig/.style ={
 					rectangle, minimum size=9mm, minimum width=3cm, rounded corners=2mm,
-					very thick, draw=green,
-					top color=white, bottom color=green!50}]
+					very thick, draw=green!70,
+					top color=white, bottom color=green!35}]
 
 %\draw (-1,0) rectangle (10,-5);
-\draw  node[neutral, minimum width=9cm] (r) {Results}
-	node[neutral, above=of r.east, anchor=east] (f) {Realtime}
-	node[neutral, above=of f.east,anchor=east] (e) {Riccati}
-	node[neutral, above=of r.west, minimum width=5.5cm, anchor=west] (d) {Problemformulation}
-	node[neutral, anchor=west] (b) {Modell} 
-	node[neutral, anchor=west] (c) {Discretization}
-	node[neutral, anchor=west] (a) {Quadrionen}
+\draw  
+	node[neutral, minimum width=10.5cm] (r) {Results}
+	node[aktiv, above=of r.east, anchor=east] (f) {Realtime}
+	node[fertig, above=of f.east, anchor=east] (e) {Riccati}
+	node[neutral, above=of r.west, minimum width=7cm, anchor=west] (d) {Problemformulation}
+	node[neutral, above=of d.west, anchor=west] (b) {Modell} 
+	node[neutral, above=of d.east, anchor=east] (c) {Discretization}
+	node[neutral, above=of b.west, anchor=west] (a) {Quadrionen}
 	;
-
 	
 	\draw[very thick,->] (a) -- +(0,-0.8);
 	\draw[very thick,->] (b) -- +(0,-0.8);
 	\draw[very thick,->] (c) -- +(0,-0.8);
 	\draw[very thick,->] (d) -- +(0,-0.8);
+	\draw[very thick,->] (e) -- +(0,-0.8);
+	\draw[very thick,->] (f) -- +(0,-0.8);
 \end{tikzpicture}
 \end{figure}
 \end{frame}
