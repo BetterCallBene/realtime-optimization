@@ -61,7 +61,7 @@ classdef RealtimeSolver < TestEnv
             
             %Initialize variables
             o.est_y = cell(n_timepoints,4);
-            o.res = cell(n_timepoints,4);
+            o.res = cell(n_timepoints,5);
             
             for i = 1:n_timepoints
                 % Set estimated values
@@ -70,11 +70,11 @@ classdef RealtimeSolver < TestEnv
                 o.cConst.vec = vec;
                 o.cCost.timepoint = i;
                 
-                if(i == 19)
-                    why
-                end
                 
-                disp(['Cost function: ', num2str( o.cCost.get_cost())]);
+                if( i ~= 1)
+                    o.res{i-1, 5} = o.cCost.get_cost();
+                    disp(['Cost function: ', num2str( o.res{i-1, 5} )]);
+                end
                 
                 %Update active set
                 o.mu = o.cConst.checkIfActive(o.mu);
@@ -92,72 +92,82 @@ classdef RealtimeSolver < TestEnv
                 o.storeEstimatedValues(i);
                 
                 %Display the actual timepoint in the command window
-                disp(int2str(i));
+                %                 disp(int2str(i));
             end
+            
+            vec = o.cDyn.getVecFromCells(o.s,o.q);
+            o.cCost.vec = vec;
+            o.cConst.vec = vec;
+            o.cCost.timepoint = n_timepoints;
+            
+            o.res{i, 5} = o.cCost.get_cost();
+            disp(['Cost function: ', num2str( o.res{i, 5} )]);
             
             res = o.res;
             est_y = o.est_y;
+            
         end
     end
     
     methods(Test)
         
-%         function testActiveSetChecker(o)
-%             
-%             hori = 20;
-%             n_timepoints = 15;
-%             o.setupTest(hori);
-%             
-%             %Initialize variables
-%             o.est_y = cell(n_timepoints,4);
-%             o.res = cell(n_timepoints,4);
-%             
-%             for i = 1:n_timepoints
-%                 
-%                 %Set values
-%                 vec = o.cDyn.getVecFromCells(o.s,o.q);
-%                 o.cCost.vec = vec;
-%                 o.cConst.vec = vec;
-%                 
-%                 %Update active set
-%                 o.mu = o.cConst.checkIfActive(o.mu);
-%                 
-%                 %Check if active set is correct
-%                 for j = 1: hori
-%                     aS_j = o.cConst.getActiveSet(j);
-%                     %calculate inequalities
-%                     is_leq_0 = o.cConst.get_ineq_con_at_t(j) >= 0;
-%                     %TODO: refine
-%                     o.assertEqual(sum(aS_j - is_leq_0) , 0);
-%                     % TODO: Fehlen hier noch diverse Checks???
-%                     %                     subplot(3,1,1), plot(aS_j,'r+-');
-%                     %                     subplot(3,1,2), plot(is_leq_0,'r+-');
-%                     %                     subplot(3,1,3), plot(o.cConst.get_ineq_con_at_t(j),'r+-');
-%                 end
-%                 
-%                 % Calculate deltas with Riccati
-%                 cLagrange = Lagrange();
-%                 get_LD = @(cRTSolver, t) cLagrange.getLD(cRTSolver,t);
-%                 get_LDD = @(cRTSolver,t) cLagrange.getLDD_approx(cRTSolver, t) ;
-% 
-%                 o.calculateSolution(i,get_LD, get_LDD);
-%                 
-%                 %Perform Newton Step and setup for next iteration
-%                 o.performNewtonAndShift();
-%                 
-%                 %Estimate values at last timestep, by duplicating the values from the previous last step
-%                 o.estimateNewHorizonPoint();
-%                 
-%                 %Save the estimated values
-%                 o.storeEstimatedValues(i);
-%                 
-%                 %Display the actual timepoint in the command window
-%                 disp(int2str(i));
-%                 
-%             end
-%             
-%         end
-%         
+        %         function testActiveSetChecker(o)
+        %
+        %             hori = 20;
+        %             n_timepoints = 15;
+        %             o.setupTest(hori);
+        %
+        %             %Initialize variables
+        %             o.est_y = cell(n_timepoints,4);
+        %             o.res = cell(n_timepoints,4);
+        %
+        %             for i = 1:n_timepoints
+        %
+        %                 %Set values
+        %                 vec = o.cDyn.getVecFromCells(o.s,o.q);
+        %                 o.cCost.vec = vec;
+        %                 o.cConst.vec = vec;
+        %
+        %                 %Update active set
+        %                 o.mu = o.cConst.checkIfActive(o.mu);
+        %
+        %                 %Check if active set is correct
+        %                 for j = 1: hori
+        %                     aS_j = o.cConst.getActiveSet(j);
+        %                     %calculate inequalities
+        %                     is_leq_0 = o.cConst.get_ineq_con_at_t(j) >= 0;
+        %                     %TODO: refine
+        %                     o.assertEqual(sum(aS_j - is_leq_0) , 0);
+        %                     % TODO: Fehlen hier noch diverse Checks???
+        %                     %                     subplot(3,1,1), plot(aS_j,'r+-');
+        %                     %                     subplot(3,1,2), plot(is_leq_0,'r+-');
+        %                     %                     subplot(3,1,3), plot(o.cConst.get_ineq_con_at_t(j),'r+-');
+        %                 end
+        %
+        %                 % Calculate deltas with Riccati
+        %                 cLagrange = Lagrange();
+        %                 get_LD = @(cRTSolver, t) cLagrange.getLD(cRTSolver,t);
+        %                 get_LDD = @(cRTSolver,t) cLagrange.getLDD_approx(cRTSolver, t) ;
+        %
+        %                 o.calculateSolution(i,get_LD, get_LDD);
+        %
+        %                 %Perform Newton Step and setup for next iteration
+        %                 o.performNewtonAndShift();
+        %
+        %                 %Estimate values at last timestep, by duplicating the values from the previous last step
+        %                 o.estimateNewHorizonPoint();
+        %
+        %                 %Save the estimated values
+        %                 o.storeEstimatedValues(i);
+        %
+        %                 %Display the actual timepoint in the command window
+        %                 disp(int2str(i));
+        %
+        %             end
+        %
+        %         end
+        %
+        
         function testCalculateSolution(o)
             % TESTCALCULATESOLUTION Checks if the method calculateSolution
             % works correctly, using the \ operator and a tolerance of
@@ -179,7 +189,7 @@ classdef RealtimeSolver < TestEnv
             cLagrange = Lagrange();
             get_LD = @(cRTSolver, t) cLagrange.getLD(cRTSolver,t);
             get_LDD = @(cRTSolver,t) cLagrange.getLDD_approx(cRTSolver, t) ;
-
+            
             i = 1;
             tic;
             o.calculateSolution(i,get_LD, get_LDD);
@@ -187,7 +197,7 @@ classdef RealtimeSolver < TestEnv
             
             %Build up delta
             delta_ric = o.buildUpDelta_ric();
-           
+            
             %Build up gradient and hesse
             [grad_L, hesse_L] = o.buildUpGradHesse(get_LD, get_LDD);
             
@@ -225,16 +235,16 @@ classdef RealtimeSolver < TestEnv
                 cLagrange = Lagrange();
                 get_LD = @(cRTSolver, t) cLagrange.getLD(cRTSolver,t);
                 get_LDD = @(cRTSolver,t) cLagrange.getLDD_approx(cRTSolver, t) ;
-               %Build up delta and large gradient and hesse
+                %Build up delta and large gradient and hesse
                 [grad_L, hesse_L] = o.buildUpGradHesse(get_LD, get_LDD);
                 
-
+                
                 o.calculateSolution(i, get_LD, get_LDD);
                 
                 delta_ric = o.buildUpDelta_ric();
                 % Perform Newton Step and setup for next iteration
                 o.performNewtonAndShift();
-              
+                
                 %Save the estimated values
                 o.storeEstimatedValues(i);
                 
@@ -270,6 +280,7 @@ classdef RealtimeSolver < TestEnv
             end
         end
     end
+    
     methods(Access=private)
         function storeFirstIteration(o,i)
             o.res{i,1} = o.s{1} + o.ricM.delta_s{1};
@@ -290,12 +301,12 @@ classdef RealtimeSolver < TestEnv
             for j = o.horizon+1:-1:1
                 [LD, n_active_i] = getLD(o,j);
                 LDD = getLDD(o,j);
-                disp(['do Step: ', int2str(j)]);
+                %                 disp(['do Step: ', int2str(j)]);
                 o.ricM.doStep(j,LDD, LD,n_active_i );
             end
             
             %Solve first Step
-            disp('solve Step: 1' );
+            %             disp('solve Step: 1' );
             o.ricM.solveStep(1);
             
             %Calculate new controls to pass it to the engines imidiatley
@@ -306,7 +317,7 @@ classdef RealtimeSolver < TestEnv
             
             %Solve the remaining steps to obtain a new iterate
             for j = 2:o.horizon+1
-                disp(['solve Step: ',int2str(j)]);
+                %                 disp(['solve Step: ',int2str(j)]);
                 o.ricM.solveStep(j);
             end
         end
