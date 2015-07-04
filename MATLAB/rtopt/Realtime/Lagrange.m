@@ -158,9 +158,11 @@ classdef Lagrange < TestEnv
             end
         end
         
-         function [ H ] = getLDD_inv_approx(o,solverRT, t )
-            % GETLDD_INV_APPROX Approximates the Hessian, only with the costDD block.
-            % The hessian of the equalitiy constraints are omitted.
+         function [ H ] = getLDD_approx_costDDpAlphaI(o,solverRT, t, alpha)
+            % GETLDD_APPROX_COSTDDPALPHAI Approximates the Hessian, only with the costDD block.
+            % The hessian of the equalitiy constraints are omitted. The
+            % value alpha is small and ensures, that the matrix is not
+            % singular.
             
             % Initialize variables
             n_state = solverRT.cConst.dyn.robot.n_state;
@@ -172,25 +174,20 @@ classdef Lagrange < TestEnv
             else
                 AB = [];
             end
+            
             % Compute ineq_conD
             CD = solverRT.cConst.get_ineq_conD_block_t(t);
             ZERO = sparse(size(CD,1),size(CD,1)); %needed to fill matrix up
-            
-            % Active Set
             activeSet_t = solverRT.cConst.getActiveSet(t);
             CD = CD(activeSet_t,:);
             ZERO = ZERO(activeSet_t,activeSet_t);
             
-            % Would be the exact solution
-            %             costDall = solverRT.cCost.get_costDD{1} ; %brauchen nur den Teil an der Stelle t
-            %             costD = costDall( (t-1)*(n_state+n_contr) + 1: t*(n_state+n_contr), (t-1)*(n_state+n_contr) + 1: t*(n_state+n_contr));
-            
+            %Calculate the 
             costDD = solverRT.cCost.get_costDD();
             costDD = costDD{1};
             costDD = costDD( (t-1) * (n_state+n_contr) +1 : t * (n_state + n_contr),(t-1) * (n_state+n_contr) +1 : t * (n_state + n_contr));
-            % CostDD + Gewichtige Gradient der Equalty Constraints
-            % CostDD + alpha * I: alpha klein aber gro� genug das keine
-            % Singularitaet gibt
+            costDD = costDD + diag(alpha);
+            
             if (t ~= solverRT.cCost.dyn.environment.horizon +1 )
                 H = [costDD , CD' , AB' ;...
                     CD , ZERO, sparse(size(ZERO,1),n_state);...
