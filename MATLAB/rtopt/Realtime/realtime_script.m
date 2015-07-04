@@ -29,7 +29,7 @@ cQExt = QuadrocopterExt(cQ, env, cIntegrator);
 cQExt.hForceExt = @() rand(3, 1);
 cQExt.hMomentExt = @() rand(3, 1);
 %Neue Windfunktion
-%env.wind = @(s_t, t) s_t + 0.1 *cQExt.wind(t); %@(s_t ,t ) s_t ; % + 0.1 * [rand(3,1); zeros(10,1)];
+%env.wind = @(s_t, t)  cQExt.wind(t);
 env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
