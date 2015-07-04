@@ -7,14 +7,10 @@ close all
 horizon = 12;
 pointPerSecond = 1;
 
-
-
-
 env = Environment();
 env.horizon = horizon;
 %Die Dynamik wird nur auf dem Horizon betrachtet:
 n_intervals = env.setUniformMesh1(horizon+1,pointPerSecond); 
-
 
 cQ = Quadrocopter();
 
