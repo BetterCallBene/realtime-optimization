@@ -39,10 +39,10 @@ cConst = Constraints(cMultShoot);
 % Initialisierung Kostenfunktion
 cCost = CostsComplet(cBQD, 0.1, 2, 1, 1);
 
-n_timepoints = 50 ; %How many timepoints, do we want to calculate.
+n_timepoints = 20 ; %How many timepoints, do we want to calculate.
 
 %Define Cam Position function
-cCost.cam_pos = @(t) ((t-1) * [-20 ; 0 ;5]  + (n_timepoints - t ) * [20; 0; 5]) / (n_timepoints - 1);
+cCost.cam_pos = @(t) cCost.skierCamPos(t);
 
 %% Choose starting values
 
@@ -72,7 +72,7 @@ cRTSolver = RealtimeSolver(cCost, cConst,lambda, s, q, mu);
 %Choose how to calculate the LDD (approximation or not)?
 cLagrange = Lagrange();
 getLD = @(cRTSolver, t) cLagrange.getLD(cRTSolver,t);
-getLDD = @(cRTSolver,t) cLagrange.getLDD_inv_approx(cRTSolver, t) ;
+getLDD = @(cRTSolver,t) cLagrange.getLDD_approx_costDDpAlphaI(cRTSolver, t, 0.01 * ones(17,1) ) ;
 
 %% Calculate the solution with fminrt
 

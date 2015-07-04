@@ -8,7 +8,7 @@ classdef CostsComplet < Costs
         gamma; % weight of the cost function for the quadrions
         kappa; % weight of the cost function for the velocitys
         
-        cam_pos 
+        cam_pos
         
         timepoint;
     end
@@ -98,7 +98,7 @@ classdef CostsComplet < Costs
             
             i = n_tp;
             rindx((i-1)*n_state+1:i*n_state) = (i-1)*(n_state+n_contr) + 1:...
-                    (i-1)*(n_state+n_contr)+n_state;
+                (i-1)*(n_state+n_contr)+n_state;
             vindx((i-1)*n_state+1:(i-1)*n_state+3) = beta_ * (state(1:3,i) - obj.cam_pos(obj.timepoint));
             vindx((i-1)*n_state+4:(i-1)*n_state+7) = gamma_* state(4:7,i);
             vindx((i-1)*n_state+8:i*n_state)       = kappa_* state(8:end,i);
@@ -140,7 +140,7 @@ classdef CostsComplet < Costs
             
             i = n_tp;
             rindx((i-1)*n_state+1:i*n_state) = (i-1)*(n_state+n_contr) + 1:...
-                    (i-1)*(n_state+n_contr)+n_state;
+                (i-1)*(n_state+n_contr)+n_state;
             vindx((i-1)*n_state+1:(i-1)*n_state+3) = beta_ * ones(1,3);
             vindx((i-1)*n_state+4:(i-1)*n_state+7) = gamma_* ones(1,4);
             vindx((i-1)*n_state+8:i*n_state)       = kappa_* ones(1,6);
@@ -163,27 +163,62 @@ classdef CostsComplet < Costs
             
             if t >= n_tp
                 CostD_t = [beta_*ones(3,1); ...
-                           gamma_*ones(4,1); ...
-                           kappa_*ones(6,1); ...
-                           zeros(n_contr,1)];
+                    gamma_*ones(4,1); ...
+                    kappa_*ones(6,1); ...
+                    zeros(n_contr,1)];
             else
                 CostD_t = [beta_*ones(3,1); ...
-                           gamma_*ones(4,1); ...
-                           kappa_*ones(6,1); ...
-                           alpha_ * mesh(t)*ones(n_contr,1)];
-            end    
+                    gamma_*ones(4,1); ...
+                    kappa_*ones(6,1); ...
+                    alpha_ * mesh(t)*ones(n_contr,1)];
+            end
             cDD_val = CostD_t * CostD_t' ;
             
         end
         
-    end
-    
-    methods
+        function cam_pos =  skierCamPos(o, timepoint)
+            %SKIERCAMPOS Simulates a person skiing down a mountain
+            start_t = 1;
+            int1_t = 7.5*60+1;
+            int2_t = 10*60;
+            end_t = 20 * 60;
+            
+            start_z = 769;
+            int_z = 475;
+            end_z = 0;
+            
+            if( timepoint >= start_t  && timepoint < int1_t)
+                tmp = (timepoint - start_t) * 2* pi / 45;
+                x = sin(tmp) * 8;
+                y = timepoint;
+                z = start_z + (timepoint - start_t) * (int_z - start_z) / (int1_t -1 -start_t);
+                
+            elseif( timepoint >= int1_t && timepoint < int2_t)
+                x = 0;
+                y = int1_t;
+                z = int_z;
+            elseif( timepoint >= int2_t && timepoint < end_t )
+                tp = timepoint - (int2_t-int1_t);
+                
+                tmp = tp * 2 * pi / 60;
+                x = sin(-tmp) *5;
+                y = tp;
+                z = int_z + (timepoint - int2_t) * (end_z - int_z) / (end_t -1  - int2_t);
+            else
+                disp('timepoint not valid');
+                x = 0;
+                y = 1050;
+                z = 0;
+            end
+            
+            cam_pos = [x;y;z];
+            
+        end
         
         function setupTest(o,horizon)
             env = Environment();
             env.wind = @(s_t, t)  s_t + [rand(3,1); zeros(10,1)];
-%             env.setUniformMesh(uint16(horizon));
+            %             env.setUniformMesh(uint16(horizon));
             env.setUniformMesh1(horizon +1,1);
             cQ = Quadrocopter();
             
@@ -195,13 +230,13 @@ classdef CostsComplet < Costs
             cBQD = BasisQDyn(cQ, env,cFE);
             cBQD.vec = rand(cQ.n_var * (horizon +1),1);
             
-            % Parametrisieren     
+            % Parametrisieren
             o.dyn = cBQD;
             o.vec = o.dyn.vec;
             o.alpha = 2;
             o.beta = 3;
             o.gamma = 42;
-            o.kappa = 1337;            
+            o.kappa = 1337;
             o.timepoint = 23;
             o.cam_pos = @(timepoint) [ 2; 0; 5];
             
