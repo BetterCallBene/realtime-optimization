@@ -39,7 +39,7 @@ cConst = Constraints(cMultShoot);
 % Initialisierung Kostenfunktion
 cCost = CostsComplet(cBQD, 0.1, 2, 1, 1);
 
-n_timepoints = 600 ; %How many timepoints, do we want to calculate.
+n_timepoints = 20 ; %How many timepoints, do we want to calculate.
 
 %Define Cam Position function
 cCost.cam_pos = @(t) cCost.skierCamPos(t);
