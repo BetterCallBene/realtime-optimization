@@ -132,7 +132,7 @@ classdef MultiShooting < TestEnv
                 HDD = obj.cacheHDD;
             else
                 % compute the Hessian the equality constraints using forward euler
-                [n_int, n_state, n_contr, mesh] = getParams(obj);
+                [n_int, n_state, n_contr, mesh, n_var] = getParams(obj);
                 
                 disp('for testing only');
                 
@@ -145,13 +145,14 @@ classdef MultiShooting < TestEnv
                     for i=1:n_int
                         dotDD       = obj.dyn.dotDD(i);
                         
-                        for j=1:length(dotDD)
-                            [si,sj,sv]  = find(mesh(i)*dotDD{j});
+                        for j=1:size(dotDD, 1)
+                            dotDDM = reshape(dotDD(j, :, :), [n_var, n_var]);
+                            [si,sj,sv]  = find(mesh(i)*dotDDM);
                             si          = si + (i-1)*(n_state+n_contr);
                             sj          = sj + (i-1)*(n_state+n_contr);
                             
                             HDD{(i-1)*n_state+j} = sparse(si,sj,sv,...
-                                (n_int+1)*(n_state+n_contr),(n_int+1)*(n_state+n_contr));
+                                (n_int+1)*(n_var),(n_int+1)*(n_var));
                         end
                     end
                     

@@ -27,12 +27,12 @@ TEST = true;
 %suiteQuadrocopterExt.steadyPoint = []; % SteadyPoint initialisieren.
 %resultQuadrocopterExt = run(suiteQuadrocopterExt, 'testWind'); % Nur Windfunktion testen
 
-suiteMultiShooting = TestSuite.fromClass(?MultiShooting); 
-resultMultiShooting = run(suiteMultiShooting);
+%suiteMultiShooting = TestSuite.fromClass(?MultiShooting); 
+%resultMultiShooting = run(suiteMultiShooting);
 
 
-%suiteConstraints = TestSuite.fromClass(?Constraints);
-%resultConstraints = run(suiteConstraints);
+suiteConstraints = TestSuite.fromClass(?Constraints);
+resultConstraints = run(suiteConstraints);
 
 
 
