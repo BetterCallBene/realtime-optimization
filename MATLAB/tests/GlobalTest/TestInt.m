@@ -140,7 +140,7 @@ classdef TestInt < handle & TestEnv
             disp('Numerikvergleich von ForwEuler');
             [error, norm_error, rel_error2] =  testCase.NumAnaTest(n_intervals, solver2);
             testCase.verifyLessThan(max(error), opts1.RelTol * 90);
-            testCase.verifyLessThan(max(norm_error), 1e-7);
+            testCase.verifyLessThan(max(norm_error), 1e-3);
             
             disp('Numerikvergleich von ode15sM');
             [error, norm_error, rel_error3] = testCase.NumAnaTest(n_intervals, solver3);
@@ -164,15 +164,15 @@ classdef TestInt < handle & TestEnv
             
         end
         
-%         function testIntegratoren2(testCase)
-%             n_intervals = 3;
-%             
-%             %testCase.setupTest(n_intervals);
-%             
-%             testCase.setupTest2(n_intervals);
-%             disp('TestInt: TestSetup 2');
-%             testCase.stressTestIntegrator(n_intervals);
-%         end
+        function testIntegratoren2(testCase)
+            n_intervals = 50;
+            
+            %testCase.setupTest(n_intervals);
+            
+            testCase.setupTest2(n_intervals);
+            disp('TestInt: TestSetup 2');
+            testCase.stressTestIntegrator(n_intervals);
+        end
         
         %timepoint 5
     end

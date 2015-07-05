@@ -11,33 +11,30 @@ TEST = true;
 %Create Suite from SolverTest Class
 %The fromClass method creates a suite from all Test methods in the SolverTest class.
 
-%suiteBasisQDyn = BasisQDyn(); %Check
+%suiteBasisQDyn = BasisQDyn();  Check: BB: 05.07.2015
 %resultDyn = run(suiteBasisQDyn);
 
-%suiteForwEuler = ForwEuler(); %Check
-%resultForwEuler = run(suiteForwEuler);
 
-
-
-%suiteode15sM = ode15sM(); %Check
+%suiteode15sM = ode15sM();  Check: BB: 05.07.2015
 %resultsuiteode15sM = run(suiteode15sM);
 
-%suiteode45M = ode45M(); %Check
-%resultsuiteode45M = run(suiteode45M);
 
 
-%suiteInt = TestInt; %Check
+%suiteInt = TestInt;  Check: BB: 05.07.2015
 %resultInt = run(suiteInt);
 
-suiteQuadrocopterExt = QuadrocopterExt; 
-resultQuadrocopterExt = run(suiteQuadrocopterExt, 'testWind'); % Nur Windfunktion testen
+%suiteQuadrocopterExt = QuadrocopterExt; %Check: BB: 05.07.2015
+%suiteQuadrocopterExt.steadyPoint = []; % SteadyPoint initialisieren.
+%resultQuadrocopterExt = run(suiteQuadrocopterExt, 'testWind'); % Nur Windfunktion testen
+
+suiteMultiShooting = TestSuite.fromClass(?MultiShooting); 
+resultMultiShooting = run(suiteMultiShooting);
 
 
 %suiteConstraints = TestSuite.fromClass(?Constraints);
 %resultConstraints = run(suiteConstraints);
 
-%suiteMultiShooting = TestSuite.fromClass(?MultiShooting); %Check
-%resultMultiShooting = run(suiteMultiShooting);
+
 
 
 

@@ -55,9 +55,10 @@ classdef(Abstract) Dyn < handle  & TestEnv
                 numDiff = obj.numDiff_nxnD(timepoint,func);
                 
                 ana_dotDD = obj.dotDD(timepoint);
-                for j = 1:length(ana_dotDD)
+                for j = 1:size(ana_dotDD, 1)
                     num_dotDD = reshape(numDiff(j,:,:), [17 17] );
-                    obj.assertLessThan(max(abs(ana_dotDD(j, :, :) - num_dotDD)),obj.tol);
+                    anadotDDM = reshape(ana_dotDD(j, :, :), [17, 17]);
+                    obj.assertLessThan(max(abs(anadotDDM - num_dotDD)),obj.tol);
                 end
             end
         end

@@ -9,9 +9,12 @@ classdef MultiShooting < TestEnv
         flag_h;
         flag_hDD;
         
+        noCaching;
+        
         cacheH;
         cacheHD;
         cacheHDD;
+        
     end
     
     properties(Dependent)
@@ -30,6 +33,9 @@ classdef MultiShooting < TestEnv
     methods
         %constructor
         function mS = MultiShooting(varargin)
+            mS.flag_h = false;
+            mS.flag_hDD = false;
+            mS.noCaching = false;
             if(nargin == 0)
                 global TEST;
                 
@@ -51,8 +57,8 @@ classdef MultiShooting < TestEnv
         
         % other functions
         function [H, HD] = h(obj)
-            
-            if obj.flag_h
+            res = obj.flag_h && ~obj.noCaching;
+            if res
                 H = obj.cacheH;
                 HD = obj.cacheHD;
             else
@@ -122,7 +128,7 @@ classdef MultiShooting < TestEnv
         end
         
         function HDD = hDD(obj)
-            if obj.flag_hDD
+            if obj.flag_hDD && ~obj.noCaching
                 HDD = obj.cacheHDD;
             else
                 % compute the Hessian the equality constraints using forward euler
@@ -185,13 +191,14 @@ classdef MultiShooting < TestEnv
             env.setUniformMesh(uint8(n_intervals));
             
             model = Quadrocopter();
-            opts_ = odeset('RelTol',1e-4,'AbsTol',1e-5);
-            integrator = ode15sM(opts_);
+            opts_ = odeset('RelTol',1e-2,'AbsTol',1e-3);
+            integrator = ode15sM(opts_); %ForwEuler(); %ode15sM(opts_);
             
             %load('TestData', 'data');
             cBQD = BasisQDyn(model, env, integrator);
             cBQD.vec = rand(17 * (n_intervals+1), 1);
             obj.dyn = cBQD;
+            obj.noCaching = true;
         end
         
         function [vec_old, n, m, n_timepoints, dyn] = setup(obj, func)
@@ -243,7 +250,7 @@ classdef MultiShooting < TestEnv
         end
         
         function testhD(testCase)
-            n_intervals = 3;
+            n_intervals = 50;
             testCase.setupTest(n_intervals);
             [n_int, n_state, n_contr, mesh] = getParams(testCase);
             

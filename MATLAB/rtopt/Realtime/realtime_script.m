@@ -22,6 +22,7 @@ cIntegrator = ode15sM(opts);
 
 
 cQExt = QuadrocopterExt(cQ, env, cIntegrator);
+cQExt.steadyPoint = [];  %steadyPoint initialisieren: SteadyPoint ist eine globale Variable!!
 cQExt.hForceExt = @() rand(3, 1);
 cQExt.hMomentExt = @() rand(3, 1);
 %Neue Windfunktion

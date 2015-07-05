@@ -137,8 +137,6 @@ classdef ode15sM < Solver
             dy = obj.helperCreateVektor(F, kM, kN);
         end
         
-        
-        
         function dfdy = Jac(obj, t, y)
         % Jac Bestimmt die Jacobimatrix fuer das ode15s Verfahren    
             u0 = obj.u0;
@@ -162,12 +160,6 @@ classdef ode15sM < Solver
     methods
         
         function [vec_old, n, m, timepoints, dyn]  = setup(obj,func)
-            [n_state, n_contr, n_var] = getParams(obj);
-            
-            [old_interval] = obj.preToDo();
-            
-            %y0 = obj.helperCreateInitialConditions();
-            
             y0_ = obj.y0;
             
             old_timepoint = obj.timepoint;
@@ -209,13 +201,7 @@ classdef ode15sM < Solver
             model = Quadrocopter();
             
             obj.dyn = BasisQDyn(model, env, obj);
-            %val = [zeros(3, 1); 1; 0 ;0 ;0; zeros(6, 1)];
             obj.u0 = [10000; 10000; 10000; 10000];
-            %vec = [val;u];
-            %obj.dyn.vec = [vec; vec; vec];
-            
-            %obj.dyn.vec = rand(17 * (n_intervals + 1), 1);
-            
             obj.y0 = rand(234, 1);
             
         end
@@ -242,14 +228,18 @@ classdef ode15sM < Solver
     methods(Test)
         
         function testJac(testCase)
+        % testJac Test, ob die Jac Matrix zu der Funktion funcToIntegrate passt
             n_intervals = 4;
             timepoint = 1;
             testCase.timepoint = timepoint;
             testCase.setupTest(n_intervals, timepoint);
-            
+            [old_interval] = testCase.preToDo();
             [anaJ] =testCase.Jac([], testCase.y0);
+            testCase.postToDo(old_interval);
             
+            [old_interval] = testCase.preToDo();
             numDiffJ = testCase.numDiff_nD(timepoint, @testCase.funcToIntegrate);
+            testCase.postToDo(old_interval);
             testCase.assertLessThan(max(abs(anaJ - numDiffJ)),testCase.tol);
         end
         
