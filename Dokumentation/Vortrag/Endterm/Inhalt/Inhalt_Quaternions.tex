@@ -1,0 +1,43 @@
+\definecolor{green}{RGB}{0,190,0}
+\definecolor{red}{RGB}{190,0,0}
+\definecolor{gray}{RGB}{35,10,10}
+
+\begin{frame}
+\centering
+
+\begin{tikzpicture}[node distance=1.3cm, font=\Large,
+					neutral/.style ={
+					%shape
+					rectangle, minimum size=9mm, minimum width=3cm, rounded corners=2mm,
+					%rest
+					very thick, draw=gray!30,
+					top color=gray!5, bottom color=gray!20},
+					aktiv/.style ={
+					rectangle, minimum size=9mm, minimum width=3cm, rounded corners=2mm,
+					very thick, draw=red,
+					top color=red!20, bottom color=red!70},
+					fertig/.style ={
+					rectangle, minimum size=9mm, minimum width=3cm, rounded corners=2mm,
+					very thick, draw=green!70,
+					top color=green!20, bottom color=green!70}]
+
+%\draw (-1,0) rectangle (10,-5);
+\draw  
+	node[neutral, minimum width=10.5cm] (r) {Results}
+	node[neutral, above=of r.east, anchor=east] (f) {Realtime}
+	node[neutral, above=of f.east, anchor=east] (e) {Riccati}
+	node[fertig, above=of r.west, minimum width=7cm, anchor=west] (d) {Problemformulation}
+	node[fertig, above=of d.west, anchor=west] (b) {Modell} 
+	node[neutral, above=of d.east, anchor=east] (c) {Discretization}
+	node[aktiv, above=of b.west, anchor=west] (a) {Quaternions}
+	;
+	
+	\draw[very thick,->] (a) -- +(0,-0.8);
+	\draw[very thick,->] (b) -- +(0,-0.8);
+	\draw[very thick,->] (c) -- +(0,-0.8);
+	\draw[very thick,->] (d) -- +(0,-0.8);
+	\draw[very thick,->] (e) -- +(0,-0.8);
+	\draw[very thick,->] (f) -- +(0,-0.8);
+\end{tikzpicture}
+
+\end{frame}

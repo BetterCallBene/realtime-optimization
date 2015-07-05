@@ -1,0 +1,32 @@
+\begin{tikzpicture}[scale=4]
+
+	%Colors
+	\definecolor{red}{RGB}{190,0,0};
+  
+  % Styles
+  %\tikzstyle{axes}=[->]
+	\tikzstyle{every node}=[font=\normalsize]
+
+  % The graphic
+  \draw[style=help lines,step=1cm] (-1.2,0) (1.2,1.2);
+  \draw[thick] (0,0) (0:1cm) arc (0:98:1cm) ;
+    
+  \begin{scope}%[style=axes]
+    \draw[thick,->] (-.2,0) -- (1.2,0) node[anchor=west] {};
+    \draw[thick,->] (0,-.2) -- (0,1.5) node[anchor=west] {};
+
+    \foreach \x/\xtext in {1}
+      \draw[xshift=\x cm] (0pt,1pt) -- (0pt,-1pt) node[below,fill=white] {$\xtext$};
+		\foreach \y/\ytext in {1}
+      \draw[yshift=\y cm] (0pt,1pt) -- (0pt,-1pt) node[left=5pt,fill=white] {$\ytext$};
+  \end{scope}
+  
+  \node at (25:1cm) (q0) [circle, draw, fill=black, inner sep = 0.07cm]{};
+	\node[right=3pt] at (25:1cm) {$q_0$};
+	\node at (0.5cm,1.294cm) (q1) [circle, draw, fill=black, inner sep = 0.07cm]{};
+	\node[right=3pt] at (0.5cm,1.294cm) {$q_1$};
+	\draw[thick] (q0) to (q1);
+	\node at (68.87:1cm) (q1_normed) [circle, draw, fill=black, inner sep = 0.07cm]{};
+	\node[below=5pt] at (68.87:1cm) {$\mathlarger{\frac{q_1}{\|q_1\|}}$};
+	\draw[dashed,red,thick,->] (q1) -- (q1_normed) node[anchor=west] {};
+\end{tikzpicture}
