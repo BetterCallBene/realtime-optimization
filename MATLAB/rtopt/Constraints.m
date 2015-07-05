@@ -5,10 +5,16 @@ classdef Constraints < GenConstraints & TestEnv
         activeSet;
         n_addConstr = 8;
     end
-    
+    properties %
+        flagWind;
+        flagWindD;
+        Wind;
+        WindD;
+    end
     methods
         %constructor
         function cC = Constraints(varargin)
+            
             dode = [];
             if(nargin == 0)
                 global TEST;
@@ -25,7 +31,12 @@ classdef Constraints < GenConstraints & TestEnv
                 error('wrong number of inputs');
             end
             cC@GenConstraints(dode);
-        end %Check
+            cC.flagWind = true;
+            cC.flagWindD  = true;
+        end
+        
+        
+        %Check
         
 %         % other functions
 %         function [ineq_con,eq_con,ineq_conD,eq_conD] = constr(obj)
@@ -54,33 +65,31 @@ classdef Constraints < GenConstraints & TestEnv
             % the equality constraint of the ocp
             % combine the discretized ode with the boundary conditions
             
-            
-            
-            xbc         = obj.dyn.environment.xbc;
+            %xbc         = obj.dyn.environment.xbc;
             state_mat   = obj.dyn.state;
+            
             
             [H] = obj.dode.h();
             
+            
+            
             eq_con      = [H; 
-                                state_mat(:,1) - xbc(:,1); ...
-                                state_mat(:,end) - xbc(:,end); ...
-                                %obj.EqCon ...
+                           obj.getWind(state_mat);
                           ];
         end 
         
         function eq_conD = get_eq_conD(obj)
             % the Jacobian of the equality contraints of the ocp
             [r,q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
+            n_var = 17;
             
             
-            srow        = 1:2*n_state;
-            scol        = [1:n_state,...
-                n_int*(n_state+n_contr)+1:n_int*(n_state+n_contr)+n_state];
-            sval        = ones(1,2*n_state);
-            [h,hD]      = obj.dode.h();
             
-            eq_conD     = [hD; sparse(srow,scol,sval,...
-                2*n_state,(n_int+1)*(n_state+n_contr)); ...
+            
+           [H, hD] = obj.dode.h();
+            
+            eq_conD     = [hD;  ...
+                obj.spWindD();
                 %obj.EqConD ...
                 ]';
             
@@ -95,10 +104,10 @@ classdef Constraints < GenConstraints & TestEnv
                 obj         = varargin{1};
                 
                 [r, q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
+                n_timepoints = obj.dyn.environment.n_timepoints;
                 
-                
-                eq_conDD = [obj.dode.hDD(); cell(2*n_state,1)];
-                for i=0:2*n_state-1
+                eq_conDD = [obj.dode.hDD(); cell((n_timepoints-1)*n_state,1)];
+                for i=0:(n_timepoints-1)*n_state-1
                     eq_conDD{end-i} = sparse((n_int+1)*(n_state+n_contr),...
                         (n_int+1)*(n_state+n_contr));
                 end
@@ -267,6 +276,49 @@ classdef Constraints < GenConstraints & TestEnv
         
         
     end
+    methods %Helper
+        
+        function res = getWind(obj, states)
+            
+            n_state = 13;
+            n_timepoints = obj.dyn.environment.n_timepoints;
+            if obj.flagWind %Wind nur einmal ueberall Zeitraueme initialisieren
+                 
+                obj.Wind = zeros(n_state * (n_timepoints-1), 1);
+
+                for timepoint = 1:(n_timepoints-1)
+                    st_ = zeros(n_state, 1);
+                    obj.Wind( (timepoint-1) * n_state + 1: timepoint * n_state )= obj.dyn.environment.wind(st_, timepoint);
+                end
+                obj.flagWind = false;
+            end
+            res = zeros(n_state * (n_timepoints-1), 1);
+            for timepoint = 1:(n_timepoints-1)
+                res((timepoint-1) * n_state + 1: timepoint * n_state ) = states(:, timepoint ) + obj.Wind( (timepoint-1) * n_state + 1: timepoint * n_state );
+            end
+            
+        end
+        function res = spWindD(obj)
+            if obj.flagWindD
+                
+                [r,q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
+                n_timepoints = obj.dyn.environment.n_timepoints; 
+                n_var = 17;
+                sp = zeros((n_timepoints-1)*n_state, 3);
+
+                for timepoint = 1:(n_timepoints-1)
+                    sp((timepoint-1)*n_state +1:timepoint*n_state, 1) = (timepoint-1)*n_state +1:timepoint*n_state;
+                    sp((timepoint-1)*n_state +1:timepoint*n_state, 2) = (timepoint-1)*n_var +1:(timepoint-1) * n_var + n_state;
+                    sp((timepoint-1)*n_state +1:timepoint*n_state, 3) = ones(1, n_state);
+                end
+
+                obj.WindD = sparse(sp(:,1),sp(:,2),sp(:,3),...
+                    (n_timepoints-1)*n_state,(n_timepoints)*(n_var));
+                obj.flagWindD = false;
+            end
+            res = obj.WindD;
+        end
+    end
     methods %TestHelper
         
         %Some help functions (typically overwritten in subclasses)
@@ -292,8 +344,8 @@ classdef Constraints < GenConstraints & TestEnv
             func = @() obj.get_eq_con;
             
             numDiff = obj.numDiff_nD_AllT(func);
-            anaDiff = obj.get_eq_conD();
             
+            anaDiff = obj.get_eq_conD();
             anaDiff = anaDiff';
             
             obj.assertSize(anaDiff, size(numDiff) );
@@ -342,6 +394,7 @@ classdef Constraints < GenConstraints & TestEnv
             
             env = Environment();
             env.xbc = xbc;
+            env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
             env.setUniformMesh(n_int_);
             
             robot = Quadrocopter();

@@ -11,4 +11,6 @@ objectConstr.vec = v;
 ineq_con = [];
 ineq_conD = [];
 
-[eq_con, eq_conD]   = objectConstr.get_eq();
+objectConstr.dode.flag_h = false; % bei jedem Schritt auf neue Hessematrix berechnen
+[eq_con]   = objectConstr.get_eq_con();
+[eq_conD]  = objectConstr.get_eq_conD();

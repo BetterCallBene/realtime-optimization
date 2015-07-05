@@ -171,8 +171,38 @@ classdef MultiShooting < TestEnv
             mesh        = obj.dyn.environment.mesh;
             n_var     = obj.dyn.robot.n_var;
         end
+    end
+    methods
+        function setupTestEuler(obj,n_intervals)
+            % Quadrocopter soll 5 Meter hoch fliegen
+            xbc = [         ... Variablenname L�nge   Name
+                ... Anfangsbedingung
+                0, 0, 0,    ...     r           3      Ortsvektor
+                1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
+                0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
+                0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
+                ... Endbedingung
+                0, 0, 5,    ...
+                1, 0, 0, 0, ...
+                0, 0, 0,    ...
+                0, 0, 0     ...
+                ];
+            
+            env = Environment();
+            env.xbc = xbc;
+            env.setUniformMesh(uint8(n_intervals));
+            
+            model = Quadrocopter();
+            integrator = ForwEuler(); 
+            
+            %load('TestData', 'data');
+            cBQD = BasisQDyn(model, env, integrator);
+            cBQD.vec = rand(17 * (n_intervals+1), 1);
+            obj.dyn = cBQD;
+            obj.noCaching = true;
+        end
         
-        function setupTest(obj,n_intervals)
+        function setupTestode15s(obj,n_intervals)
             % Quadrocopter soll 5 Meter hoch fliegen
             xbc = [         ... Variablenname L�nge   Name
                 ... Anfangsbedingung
@@ -193,7 +223,7 @@ classdef MultiShooting < TestEnv
             
             model = Quadrocopter();
             opts_ = odeset('RelTol',1e-2,'AbsTol',1e-3);
-            integrator = ode15sM(opts_); %ForwEuler(); %ode15sM(opts_);
+            integrator = ode15sM(opts_); %  %ForwEuler(); %ode15sM(opts_);
             
             %load('TestData', 'data');
             cBQD = BasisQDyn(model, env, integrator);
@@ -211,30 +241,9 @@ classdef MultiShooting < TestEnv
             m = m(1);
         end
         
-        function numDiff = numDiff_nD_AllT(obj, func)
-            % NUMDIFF_NDALLT This method calculates numericalle the
-            % derivative of func, but for all timepoints
-            
-            [vec_old, n, m, n_timepoints, dyn] = obj.setup(func);
-            numDiff = zeros(m , n * n_timepoints);
-            
-            for timepoint = 1:n_timepoints
-                for i = 1:n
-                    func_p = obj.plusEpsShift(i,timepoint,vec_old, func, n, dyn);
-                    func_n = obj.minusEpsShift(i,timepoint,vec_old, func, n, dyn);
-                    
-                    %Central difference
-                    numDiff( : , ((timepoint-1) * n) + i) ...
-                        = (func_p - func_n)/2/obj.eps;
-                end
-            end
-        end
-        
         function hD =  gethD(obj)
             [h, hD] = obj.h();
         end
-        
-        
         
         
     end
@@ -243,8 +252,8 @@ classdef MultiShooting < TestEnv
         
         function testh(testCase)
             n_intervals = 20;
-            testCase.setupTest(n_intervals);
-            [n_int, n_state, n_contr, mesh] = getParams(testCase);
+            testCase.setupTestode15s(n_intervals);
+            
             tic
             [h, anaDiff] = testCase.h();
             toc
@@ -252,8 +261,8 @@ classdef MultiShooting < TestEnv
         
         function testhD(testCase)
             n_intervals = 50;
-            testCase.setupTest(n_intervals);
-            [n_int, n_state, n_contr, mesh] = getParams(testCase);
+            testCase.setupTestode15s(n_intervals);
+            
             
             [h, anaDiff] = testCase.h();
             
@@ -264,28 +273,28 @@ classdef MultiShooting < TestEnv
             numDiff = testCase.numDiff_nD_AllT(func);
             testCase.assertSize(anaDiff, size(numDiff));
             testCase.assertLessThan(max(abs(anaDiff - numDiff)), opts_.RelTol);
-        end
+       end
         
-        %% ToDo: Eulerabfrage
-        %         function testhDD(obj)
-        %
-        %             % TESTHDD This methods derives numerically obj.hd and compares
-        %             % it with obj.hDD
-        %             n_intervals = 3;
-        %             obj.setupTest(n_intervals);
-        %             [n_int, n_state, n_contr, mesh, n_var] = getParams(obj);
-        %
-        %             opts_ = obj.dyn.solver.opts;
-        %             func = @() obj.gethD;
-        %             numDiff = obj.numDiff_nxnD_AllT(func);
-        %             anaDiff = obj.hDD();
-        %
-        %             size_nDiff_i = (n_var) * (n_intervals +1 );
-        %             for i = 1:(n_int * n_state)
-        %                 numDiff_i = reshape(numDiff(i,:,:), [size_nDiff_i size_nDiff_i]);
-        %                 obj.assertSize(anaDiff{1}, size(numDiff_i));
-        %                 obj.assertLessThan(max(abs(anaDiff{i} - numDiff_i)), opts_.RelTol * 9);
-        %             end
-        %         end
+        
+       function testhDD(obj)
+           
+           % TESTHDD This methods derives numerically obj.hd and compares
+           % it with obj.hDD
+           n_intervals = 3;
+           obj.setupTestEuler(n_intervals);
+           [n_int, n_state, n_contr, mesh, n_var] = getParams(obj);
+           
+           opts_ = obj.dyn.solver.opts;
+           func = @() obj.gethD;
+           numDiff = obj.numDiff_nxnD_AllT(func);
+           anaDiff = obj.hDD();
+           
+           size_nDiff_i = (n_var) * (n_intervals +1 );
+           for i = 1:(n_int * n_state)
+               numDiff_i = reshape(numDiff(i,:,:), [size_nDiff_i size_nDiff_i]);
+               obj.assertSize(anaDiff{1}, size(numDiff_i));
+               obj.assertLessThan(max(abs(anaDiff{i} - numDiff_i)), opts_.RelTol * 9);
+           end
+       end
     end
 end

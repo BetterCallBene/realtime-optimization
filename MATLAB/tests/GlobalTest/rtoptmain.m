@@ -15,11 +15,11 @@ options.Algorithm       = 'interior-point';
 options.Display         = 'iter';
 options.GradObj         = 'on';
 options.GradConstr      = 'on';
-options.Hessian         = 'user-supplied';
-options.HessFcn         = @hessianAdapter;
-options.TolCon          = 1e-1;
-options.TolFun          = 1e-1;
-options.TolX            = 1e-1;
+%options.Hessian         = 'user-supplied';
+%options.HessFcn         = @hessianAdapter;
+options.TolCon          = 1e-5;
+options.TolFun          = 1e-6;
+options.TolX            = 1e-5;
 options.MaxFunEvals     = 1000000;
 options.MaxIter         = 1000000;
 
@@ -35,33 +35,20 @@ options.MaxIter         = 1000000;
 % * TolX: $$(options.TolX)$$
 
 
-n_int = 50;
+%Choose horizon
+horizon = 20;
+pointPerSecond = 1;
 
-%% Gitter und Intervallaenge
-% * Intervallaenge: $(n_int)$
-%
+env = Environment();
+env.horizon = horizon;
+env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
+%Die Dynamik wird nur auf dem Horizon betrachtet:
+n_intervals = env.setUniformMesh1(horizon+1,pointPerSecond); 
 
-xbc = [         ... Variablenname L�nge   Name
-                ... Anfangsbedingung
-    2, 0, 5,  ...     r           3      Ortsvektor
-    1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
-    0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
-    0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
-                ... Endbedingung
-    2, 0, 5,    ...
-    1, 0, 0, 0, ...
-    0, 0, 0,    ...
-    0, 0, 0     ...
-];   
 
 %% Environment
 % Anfangsbedingung:
 
-
-env = Environment();
-env.xbc = xbc;
-env.setUniformMesh(uint16(n_int));
-  
 cQ = Quadrocopter();
 
 %% Quadrocopter Eigenschaften    
@@ -76,8 +63,6 @@ cQ = Quadrocopter();
 % * motor_r: $$(cQ.motor_r)$$
 
 
-v0 = rand(cQ.n_var*(n_int+1),1);
-
 % Wahl des Integrators
 opts_ = odeset('RelTol',1e-2,'AbsTol',1e-3);
 cIntegrator =  ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %% %ForwEuler();%ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ode15sM(opts_);
@@ -85,17 +70,23 @@ cIntegrator =  ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ForwEuler(); %ode
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 cBQD.steadyPoint = [];
 point = cBQD.steadyPoint;
-cBQD.vec = repmat(point,(n_int+1), 1);  %rand(cQ.n_var * (n_int+1), 1);
+% Setup a initial estimation
+steadyPoint = cBQD.steadyPoint;
 
+% Initialisierung Kostenfunktion
+%cCost = CostsComplet(cBQD, 0.1, 2, 1, 1);
+cCost = CostsXU(cBQD, 0.1, 2);
+%Define Cam Position function
+%cCost.cam_pos = @(t) cCost.skierCamPos(t);
 
+steadyPoint(1:3) = cCost.cam_pos;
+v0 = repmat(steadyPoint,(n_intervals+1), 1);
+cBQD.vec =v0;   %rand(cQ.n_var * (n_int+1), 1);
 
 cMS = MultiShooting(cBQD);
 
 % Initialisierung der Nebenbedingungen
 cC = Constraints(cMS);
-
-% Initialisierung Kostenfunktion
-cCost = CostsXU(cBQD, 0.1, 50);
 
 %Variablen fuer fmincon verfuegbar machen
 global objectCost objectConstr;
@@ -105,7 +96,7 @@ objectConstr = cC;
 if PUBLISHABLE
     tic;
     [v, fval, exitflag, output] = fmincon(@costAdapter,v0,[],[],[],[],[],[],@constrAdapter, options);
-    intervals = linspace(0, 1, n_int + 1);
+    intervals = linspace(0, 1, n_intervals + 1);
     ProcessTime=toc;
     save('Data.mat', 'intervals', 'v', 'fval', 'exitflag', 'output', 'ProcessTime');
     %% Ergebnis

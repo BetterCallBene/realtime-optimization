@@ -15,12 +15,14 @@ classdef TestInt < handle & TestEnv
     end
     
     methods
+        
         function res = get.solver1(obj)
-            res = obj.dynOde45M.solver;
-        end
-        function res = get.solver2(obj)
             res = obj.dynForwEuler.solver;
         end
+        function res = get.solver2(obj)
+            res = obj.dynOde45M.solver;
+        end
+        
         
         function res = get.solver3(obj)
             res = obj.dynOde15sM.solver;
@@ -122,22 +124,22 @@ classdef TestInt < handle & TestEnv
             [spd] = testCase.speedTest(solver1, n_intervals);
             [spd] = testCase.speedTest(solver1, n_intervals);
             [spd] = testCase.speedTest(solver1, n_intervals);
-            disp('SpeedTest: ode45M');
+            disp('SpeedTest: ForEuler');
             [spd] = testCase.speedTest(solver1, n_intervals);
             disp(spd)
-            disp('SpeedTest: ForwEuler');
+            disp('SpeedTest: ode45M');
             [spd] = testCase.speedTest(solver2, n_intervals);
             disp(spd);
             disp('SpeedTest: ode15sM');
             [spd] = testCase.speedTest(solver3, n_intervals);
             disp(spd);
             pause(1)
-            disp('Numerikvergleich von ode45M');
+            disp('Numerikvergleich von ForwEuler');
             [error, norm_error, rel_error1] =  testCase.NumAnaTest(n_intervals, solver1);
             testCase.verifyLessThan(max(error), opts1.RelTol * 90);
             testCase.verifyLessThan(max(norm_error), 1e-7);
             
-            disp('Numerikvergleich von ForwEuler');
+            disp('Numerikvergleich von ode45');
             [error, norm_error, rel_error2] =  testCase.NumAnaTest(n_intervals, solver2);
             testCase.verifyLessThan(max(error), opts1.RelTol * 90);
             testCase.verifyLessThan(max(norm_error), 1e-3);
@@ -149,11 +151,13 @@ classdef TestInt < handle & TestEnv
             
         end
         
+        
+         
     end
     
     
     methods(Test)
-        function testIntegratoren1(testCase)
+        function testSetup1(testCase)
             n_intervals = 50;
             
             %testCase.setupTest(n_intervals);
@@ -164,7 +168,7 @@ classdef TestInt < handle & TestEnv
             
         end
         
-        function testIntegratoren2(testCase)
+        function testSetup2(testCase)
             n_intervals = 50;
             
             %testCase.setupTest(n_intervals);
@@ -172,6 +176,51 @@ classdef TestInt < handle & TestEnv
             testCase.setupTest2(n_intervals);
             disp('TestInt: TestSetup 2');
             testCase.stressTestIntegrator(n_intervals);
+        end
+        
+        function testExactness(testCase)
+            n_intervals = 50;
+            testCase.setupTest(n_intervals)
+            solver1 = testCase.solver1;
+            solver2 = testCase.solver2;
+            solver3 = testCase.solver3;
+            
+            solver1.preToDo();
+            solver2.preToDo();
+            [old_intervals] = solver3.preToDo();
+            
+            res = zeros(n_intervals, 3);
+            tic;
+            for timepoint = 1:n_intervals
+                [F1, J1] = solver1.ode(timepoint);
+                [F2, J2] = solver2.ode(timepoint);
+                [F3, J3] = solver3.ode(timepoint);
+                res(timepoint, 1) = max(abs(F1 - F2));
+                res(timepoint, 2) = max(abs(F2 - F3));
+                res(timepoint, 3) = max(abs(F3 - F1));
+            end
+            
+            mittelF1F2 = sum(res(:, 1))/n_intervals;
+            mittelF2F3 = sum(res(:, 2))/n_intervals;
+            mittelF3F1 = sum(res(:, 3))/n_intervals;
+            
+            maxF1F2 = max(res(:, 1));
+            maxF2F3 = max(res(:, 2));
+            maxF3F1 = max(res(:, 3));
+            
+            disp(['Vergleich im Mittel zwischen Euler und Ode45: ', num2str(mittelF1F2)]);
+            disp(['Vergleich im Mittel zwischen Euler und Ode45: ', num2str(mittelF2F3)]);
+            disp(['Vergleich im Mittel zwischen Euler und Ode45: ', num2str(mittelF3F1)]);
+            pause(5)
+            disp('');
+            disp(['Maximalerunterschied zwischen Euler und Ode45: ', num2str(maxF1F2)]);
+            disp(['Maximalerunterschied zwischen Euler und Ode45: ', num2str(maxF2F3)]);
+            disp(['Maximalerunterschied zwischen Euler und Ode45: ', num2str(maxF3F1)]);
+            spd = toc;
+            solver1.postToDo(old_intervals);
+            solver2.postToDo(old_intervals);
+            solver3.postToDo(old_intervals);
+            
         end
         
         %timepoint 5
@@ -209,19 +258,18 @@ classdef TestInt < handle & TestEnv
             %vec = [vec; vec; vec];
             vec =rand(17 * (n_intervals + 1), 1); 
             
-            opts_ = odeset('RelTol',1e-5,'AbsTol',1e-6);
+            opts_ = odeset('RelTol',1e-7,'AbsTol',1e-8);
             
-            solver1 = ode45M(opts_);
-            solver2 = ForwEuler();
+            solver1 = ForwEuler();
+            solver2 = ode45M(opts_);
             solver3 = ode15sM(opts_);
             
-            
-            obj.dynOde45M = BasisQDyn(model, env, solver1);
-            obj.dynOde45M.vec = vec;
-            
-            obj.dynForwEuler = BasisQDyn(model, env, solver2);
+            obj.dynForwEuler = BasisQDyn(model, env, solver1);
             obj.dynForwEuler.vec = vec;
             
+            obj.dynOde45M = BasisQDyn(model, env, solver2);
+            obj.dynOde45M.vec = vec;
+          
             obj.dynOde15sM = BasisQDyn(model, env, solver3);
             obj.dynOde15sM.vec = vec;
             
@@ -251,24 +299,25 @@ classdef TestInt < handle & TestEnv
             
             
             val = [zeros(3, 1); 1; 0 ;0 ;0; zeros(6, 1)];
-            u = [10000, 10000, 10000, 10000+500];
+            u = [5, 5, 5, 5];
             vec = [val; u'];
             
             vec = repmat(vec, (n_intervals + 1), 1);
             %vec =rand(17 * (n_intervals + 1), 1); 
             
-            opts_ = odeset('RelTol',1e-3,'AbsTol',1e-4);
+            opts_ = odeset('RelTol',1e-4,'AbsTol',1e-5);
             
-            solver1 = ode45M(opts_);
-            solver2 = ForwEuler();
+            solver1 = ForwEuler();
+            solver2 = ode45M(opts_);
             solver3 = ode15sM(opts_);
             
             
-            obj.dynOde45M = BasisQDyn(model, env, solver1);
-            obj.dynOde45M.vec = vec;
             
-            obj.dynForwEuler = BasisQDyn(model, env, solver2);
+            obj.dynForwEuler = BasisQDyn(model, env, solver1);
             obj.dynForwEuler.vec = vec;
+            
+            obj.dynOde45M = BasisQDyn(model, env, solver2);
+            obj.dynOde45M.vec = vec;
             
             obj.dynOde15sM = BasisQDyn(model, env, solver3);
             obj.dynOde15sM.vec = vec;
