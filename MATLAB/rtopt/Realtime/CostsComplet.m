@@ -10,8 +10,6 @@ classdef CostsComplet < Costs
         cam_pos
         
         timepoint;
-        
-        cam_pos;
     end
     
     methods
