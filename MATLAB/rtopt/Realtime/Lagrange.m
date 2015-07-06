@@ -9,8 +9,6 @@ classdef Lagrange < TestEnv
     methods
         
         function L = getL(o,solverRT)
-            %TODO: debug
-            
             n_state = solverRT.cCost.dyn.robot.n_state;
             
             %Costs
@@ -39,7 +37,7 @@ classdef Lagrange < TestEnv
             n_state = solverRT.cConst.dyn.robot.n_state;
             n_contr = solverRT.cConst.dyn.robot.n_contr;
             
-            %Calculate eq and ineq constraints
+            %Calculate eq and ineq constraints hold on 
             ineq_constr = solverRT.cConst.get_ineq_con_at_t(i);
             eq_constr = solverRT.cConst.get_eq_con_at_t(i);
             
@@ -84,7 +82,7 @@ classdef Lagrange < TestEnv
             
             % In the last block, there are no eq_conD considered
             if( t ~= solverRT.horizon +1 )
-                AB = solverRT.cConst.get_eq_conD_block_t(t);
+                AB = solverRT.cConst.get_eq_conD_block_t(t); hold on 
             else
                 AB = [];
             end
@@ -249,7 +247,7 @@ classdef Lagrange < TestEnv
         
         function testgetLD_Euler(o)
             horizon = 5;
-            tolerance = 1e-9;
+            tolerance = 1e-9; 
             o.setupTest(horizon);
             
             func = @() o.getL(o.cSolverRT);
@@ -257,15 +255,15 @@ classdef Lagrange < TestEnv
             
             for i = 1:horizon                
                 anaDiff = o.getLD(o.cSolverRT,i);
-                %Perform checks
-                o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30)), tolerance*10);
+                %Perform check
+                o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30))/ norm(anaDiff), 1e-5);
             end
             
             disp('Test testgetLD_Euler finished');
         end
         
         function testgetLD_ode15sM(o)
-            horizon = 5;
+            horizon = 10;
             tolerance = 1e-4;
             o.setupTest(horizon, tolerance, 1);
             
@@ -275,7 +273,7 @@ classdef Lagrange < TestEnv
             for i = 1:horizon                
                 anaDiff = o.getLD(o.cSolverRT,i);
                 %Perform checks
-                o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30)), tolerance*10);
+              o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30)) / norm(anaDiff), 1e-2);
             end
             
             disp('Test testgetLD_ode15sM finished');
@@ -283,7 +281,7 @@ classdef Lagrange < TestEnv
         
         function testgetLD_ode45M(o)
             horizon = 5;
-            tolerance = 1e-3;
+            tolerance = 1e-4;
             o.setupTest(horizon,tolerance, -1);
             
             func = @() o.getL(o.cSolverRT);
@@ -292,7 +290,7 @@ classdef Lagrange < TestEnv
             for i = 1:horizon                
                 anaDiff = o.getLD(o.cSolverRT,i);
                 %Perform checks
-                o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30)), tolerance*10);
+                o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30)) /  norm(anaDiff),e-2);
             end
             
             disp('Test testgetLD_ode45M finished');
@@ -429,8 +427,8 @@ classdef Lagrange < TestEnv
             
             % Setup a initial estimation
             for i = 1: horizon
-                s{i} = rand(13,1);
-                q{i} = rand(4,1);
+                s{i} = 0.99*rand(13,1)+0.01;
+                q{i} = 0.99*rand(4,1)+0.01;
                 lambda{i} = 10 * rand(cQ.n_state,1);
             end
             
