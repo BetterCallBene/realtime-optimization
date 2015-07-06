@@ -7,7 +7,7 @@ classdef CostsComplet < Costs
         gamma; % weight of the cost function for the quaternions
         kappa; % weight of the cost function for the velocitys
         
-        cam_poter
+        cam_pos
         
         timepoint;
     end
@@ -211,6 +211,43 @@ classdef CostsComplet < Costs
             end
             
             cam_pos = [x;y;z];
+            
+        end
+        
+        function  cam_pos =  skierCamPos_Short(o, timepoint)
+            %SKIERCAMPOS Simulates a person skiing down a mountain
+            start_t = 1;
+            int1_t = 60+1;
+            int2_t = 1.5*60;
+            end_t = 3 * 60;
+            
+            start_z = 225;
+            int_z = 95;
+            end_z = 0;
+            
+            
+            
+            if( timepoint >= start_t  && timepoint < int1_t)
+                tmp = (timepoint -1) * 2* pi / (int1_t-1) * 3;
+                x = sin(tmp) * (6+4 * cos(timepoint * 2 * pi / ( 0.5 * int1_t))) ; % +1.5*(2*timepoint/int1_t) ;
+                y = 2 * timepoint;
+                z = start_z + (timepoint - start_t) * (int_z - start_z) / (int1_t -1 -start_t);
+            elseif( timepoint >= int1_t && timepoint < int2_t)
+                x = 0;
+                y = 2 * int1_t;
+                z = int_z;
+            elseif( timepoint >= int2_t && timepoint < end_t )
+                tmp = (timepoint - int2_t) * 2 * pi / (end_t - 1 - int2_t) * 2;
+                x = sin(-tmp) * (6 - 3 * cos(timepoint * 2 * pi / 34)) ;%- 2.86*((timepoint-int2_t)/ end_t);
+                y = 2 * (timepoint - int2_t + int1_t);
+                z = int_z + (timepoint - int2_t) * (end_z - int_z) / (end_t -1  - int2_t);
+            else
+                x = 0;
+                y = 2 * (end_t - (int2_t-int1_t));
+                z = 0;
+            end
+            
+            cam_pos = [2*x;y;z];
             
         end
         
