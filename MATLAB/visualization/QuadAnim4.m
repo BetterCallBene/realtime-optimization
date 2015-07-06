@@ -286,7 +286,7 @@ scatter3(X,Y,Z,36,'blue')
 hold on
 fill3([minX-1 maxX+1 maxX+1 minX-1],...
     [minY-1 minY-1 maxY+1 maxY+1],...
-    [0 0 0 0],'g');
+    [0 0 0 0],grey);
 %alpha(0.7);
 xlabel('X')
 ylabel('Y')
@@ -667,10 +667,11 @@ if strcmp(mode,'Start')
         axes(handles.axes2)
         hold on
         scatter3(X,Y,Z,36,colors(j,:));
+        grey = [0.5 0.5 0.5];
         if (j == 1 || handles.skipFlag==1)
             fill3([minX-1 maxX+1 maxX+1 minX-1],...
                   [minY-1 minY-1 maxY+1 maxY+1],...
-                  [0 0 0 0],'g'); % make a plane to represent the ground (Z = 0)
+                  [0 0 0 0],grey); % make a plane to represent the ground (Z = 0)
             alpha(0.7); % Makes the ground "see-through"
             handles.skipFlag = 0;
             guidata(hObject,handles)
