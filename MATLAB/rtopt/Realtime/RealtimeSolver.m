@@ -61,7 +61,7 @@ classdef RealtimeSolver < TestEnv
             
             %Initialize variables
             o.est_y = cell(n_timepoints,4);
-            o.res = cell(n_timepoints,5);
+            o.res = cell(n_timepoints,6);
             
             for i = 1:n_timepoints
                 % Set estimated values
@@ -74,6 +74,7 @@ classdef RealtimeSolver < TestEnv
                 if( i ~= 1)
                     o.res{i-1, 5} = o.cCost.get_cost();
                     disp(['Cost function: ', num2str( o.res{i-1, 5} )]);
+                    o.res{i-1, 6} = o.cConst.get_eq_con_at_t(i-1);
                 end
                 
                 %Update active set
@@ -101,6 +102,7 @@ classdef RealtimeSolver < TestEnv
             o.cCost.timepoint = n_timepoints;
             
             o.res{i, 5} = o.cCost.get_cost();
+            o.res{i, 6} = o.cConst.get_eq_con_at_t(i);
             disp(['Cost function: ', num2str( o.res{i, 5} )]);
             
             res = o.res;

@@ -11,6 +11,7 @@ for i = 1:n_timepoints
 end
 
 % Plot cost function
+figure
 plot(costF)
 title('Cost function value');
 
@@ -29,7 +30,6 @@ norm_t = zeros(1,1200);
 for i=1:1200
 norm_t(i) = norm(cam_pos_t(:,i) - pos(:,i));
 end
-
 figure
 plot(norm_t);
 title('Distance between camPosition and computed position');
@@ -66,7 +66,7 @@ angle = zeros(1400, 3);
 global visualisation
 
 visualisation.yout = [ dot_ang' , angle , dot_pos' , pos'];
-visualisation.tout = {ones(1400,1);
+visualisation.tout = ones(1400,1);
 
 
 QuadAnim4;

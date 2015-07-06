@@ -1,11 +1,11 @@
-%clear all
+clear all
 close all
 %% Setup
 % Finds out how much time is between the moment the measurement is taken and
 % the moment, when the control is calculated for the Riccati method and the
 % MATLAB / operator.
 
-horizon = 25;
+horizon = 15;
 pointPerSecond = 1;
 
 
