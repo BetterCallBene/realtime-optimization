@@ -48,7 +48,7 @@ classdef CostsXU < Costs
             
             mesh    = obj.dyn.environment.mesh;
             c_val   = alpha_* 0.5*sum((control(:,1:end-1).^2)*mesh') + ...
-                beta_ * 0.5*sum(((state(1:3,1:end) - kron(one_vec,obj.cam_pos)).^2)*one_vec');
+                        beta_ * 0.5*sum(((state(1:3,1:end) - kron(one_vec,obj.cam_pos)).^2)*one_vec');
         end
         
         function cD_val = get_costD(obj)

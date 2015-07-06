@@ -3,7 +3,7 @@ classdef(Abstract) GenConstraints < handle
     %Berechnung der Ableitungen
     
     properties
-        dode;   % handle for the ForwEuler element providing the discretization of the ode
+        dode;   % handle for the MultShooting element providing the discretization of the ode
         dyn;    % Dynamik
     end
     

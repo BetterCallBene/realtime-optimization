@@ -1,0 +1,62 @@
+\documentclass{scrartcl}
+
+\usepackage{enumerate, amsmath, amssymb,amsthm, amstext}
+\usepackage[english,ngerman]{babel}
+\usepackage[latin1]{inputenc}   
+
+\begin{document}
+
+\parindent=0pt
+
+\section{Modellierung Wind}
+
+\subsection{Kraft:}
+
+\textbf{Winddruck:} 
+\[ P_{Wind} = c_P \cdot \frac{\rho_{Luft}}{2} \cdot v^2 \]
+
+\textbf{Windkraft:}
+\[ F_{Wind}= A \cdot P_{Wind} \]
+
+\begin{tabular}{ccc}
+	\(c_P\) & Druckbeiwert & z.B. \(c_P=0.7-2\) \\
+	\(\rho_{Luft}\) & Luftdichte in \(\frac{kg}{m^3}\) & abhängig von Höhe und Temperatur (ca.\(1.0 - 1.3 \frac{kg}{m^3})\)
+\end{tabular}
+
+\vspace{2em}
+
+\textbf{Windstärke:}
+
+\begin{tabular}{ccccl}
+	Beaufort & m/s & km/h & Bezeichnung & Wirkung \\
+	0  & 0.0-0.3 			& 0-1 					& Flaute &\\
+	1  & 0.3-1.6			& 1-5 					& leiser Zug &\\
+	2  & 1.6-3.4			& 6-11					& leichte Brise &\\
+	3  & 3.4-5.5			& 12-19					& schwache Brise &\\
+	4  & 5.5-8.0			& 20-28					& mäßige Brise & Zweige bewegt, Papier von Boden gehoben\\
+	5  & 8.0-10.8			& 29-38					&	frische Brise &\\
+	6  & 10.8-13.9		&	39-49					& starker Wind &\\
+	7  & 13.9-17.2		& 50-61					& steifer Wind & Bäume schwanken, Widerstand beim Gehen\\
+	8  & 17.2-20.8		& 62-74					& stürmischer Wind & große Bäume bewegt, Zweige abgebrochen\\
+	9  & 20.8-24.5		& 75-88					& Sturm \\
+	10 & 24.5-28.5		& 89-102				& schwerer Sturm \\
+	11 & 28.5-32.7		& 103-117				& orkanartiger Sturm \\
+	12 & \(\geq\)32.7	& \(\geq\) 117	& Orkan \\
+\end{tabular}
+
+\vspace{2em}
+
+Für uns könnte interessant sein:
+\begin{enumerate}
+	\item Windstärke 7-8 \(\rightarrow\) Gegenwind bei Skifahrer mit ca. \(60 \frac{km}{h}\)
+	\item höchste mögliche Windstärke?
+	\item Zeitverlust der Rechnung?
+\end{enumerate}
+
+\subsection{Drehmoment:}
+
+\textbf{Betrag:}
+\[ M=r\cdot F \]
+\[ M = \sum_i{r_i \cdot F_i} \]
+
+\end{document}

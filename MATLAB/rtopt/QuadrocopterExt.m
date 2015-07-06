@@ -98,7 +98,10 @@ classdef QuadrocopterExt < BasisQDyn
             testCase.setupTest(n_intervals);
             
             res = testCase.wind(timepoint);
+            steadyPoint1 = testCase.steadyPoint;
             abs(testCase.steadyPoint(1:13) - res)
+            
+            
         end
             
     end

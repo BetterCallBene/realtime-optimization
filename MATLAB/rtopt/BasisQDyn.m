@@ -3,7 +3,7 @@ classdef BasisQDyn < BasisGenQDyn
     properties
         backdoor_vec;
         
-        flagSteadyPoint;
+        steadyPoint;
         
         dotDpatternflag;
         dotDDpatternflag;
@@ -11,8 +11,10 @@ classdef BasisQDyn < BasisGenQDyn
         dotDCellpattern;
         dotDDCellpattern;
         
-        steadyPoint;
+        
     end
+    
+    
     
     properties(Dependent)
         state;
@@ -20,14 +22,33 @@ classdef BasisQDyn < BasisGenQDyn
         vec;
     end
     
+    methods(Static)
+        %Workaround fuer static Variablen %oh... Matlab
+        function res = getsetSteadyPoint(value, getsetflag)
+            persistent steadyPoint_;
+            
+            if getsetflag
+                res = steadyPoint_;
+            else
+                steadyPoint_ = value;
+            end
+        end
+    end
+    
+    methods %getter/setter
+        
+        function set.steadyPoint(obj, value)
+            BasisQDyn.getsetSteadyPoint(value, false);
+        end
+    end
     
     methods
+        
         function bQDyn = BasisQDyn(varargin)
             bQDyn@BasisGenQDyn();
             
             bQDyn.dotDpatternflag = true;
             bQDyn.dotDDpatternflag = true;
-            bQDyn.flagSteadyPoint = true;
             
             nargin_tmp = nargin;
             m = metaclass(bQDyn);
@@ -135,7 +156,8 @@ classdef BasisQDyn < BasisGenQDyn
         end
         
         function ret = get.steadyPoint(obj)
-            if obj.flagSteadyPoint
+            steadyPoint_ = BasisQDyn.getsetSteadyPoint([], true);
+            if isempty(steadyPoint_);
                 %[q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = obj.getParams();
                 m = obj.robot.m;
                 kT = obj.robot.kT;
@@ -145,11 +167,13 @@ classdef BasisQDyn < BasisGenQDyn
                 options = optimoptions('fsolve', 'Algorithm', 'levenberg-marquardt');
                 n_int_sav = obj.environment.n_intervals;
                 obj.environment.n_intervals = 0;
-                [obj.steadyPoint,fval,exitflag,output] = fsolve(@obj.helperF, estimator, options);
+                [steadyPoint_,fval,exitflag,output] = fsolve(@obj.helperF, estimator, options);
+                
+                BasisQDyn.getsetSteadyPoint(steadyPoint_, false);
                 obj.environment.n_intervals = n_int_sav ;
-                obj.flagSteadyPoint = false;
+                
             end
-            ret = obj.steadyPoint;
+            ret = steadyPoint_;
         end
         
         function res = helperF(obj, y)
