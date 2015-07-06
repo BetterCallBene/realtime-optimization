@@ -61,32 +61,37 @@ classdef Constraints < GenConstraints & TestEnv
         end
         
         % Equalties
-        function [eq_con] = get_eq_con(obj) 
+        function [eq_con] = get_eq_con(obj, varargin) 
             % the equality constraint of the ocp
             % combine the discretized ode with the boundary conditions
             
-            %xbc         = obj.dyn.environment.xbc;
+            n_timepoints = obj.dyn.environment.n_timepoints;
+            n_state = obj.dyn.robot.n_state;
             state_mat   = obj.dyn.state;
+            
+            if nargin == 2
+                tmpStates = varargin{1};
+            else
+                tmpStates = state_mat;
+            end
+            
             
             
             [H] = obj.dode.h();
             
-            
+            vec = reshape(state_mat(:, 1:(end-1)), (n_timepoints - 1) *n_state, 1);
             
             eq_con      = [H; 
-                           obj.getWind(state_mat);
+                           vec  - obj.getWind(tmpStates);
                           ];
         end 
         
         function eq_conD = get_eq_conD(obj)
             % the Jacobian of the equality contraints of the ocp
             [r,q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr] = getParams(obj);
-            n_var = 17;
             
             
-            
-            
-           [H, hD] = obj.dode.h();
+            [H, hD] = obj.dode.h();
             
             eq_conD     = [hD;  ...
                 obj.spWindD();
@@ -158,10 +163,12 @@ classdef Constraints < GenConstraints & TestEnv
             % optimization problem at time t.
             
             state_mat   = obj.dyn.state;
+            contr_mat   = obj.dyn.contr;
             s_t = state_mat(:,1);
+            ctr = contr_mat(:,1);
             multShoot = obj.dode.h();
             
-            eq_con      = [obj.dyn.environment.wind(s_t, t) - state_mat(:,1);
+            eq_con      = [obj.dyn.environment.wind(s_t, ctr) - state_mat(:,1);
                 multShoot();
                 ];
         end
@@ -292,9 +299,10 @@ classdef Constraints < GenConstraints & TestEnv
                 end
                 obj.flagWind = false;
             end
+            %ToDo: Wind
             res = zeros(n_state * (n_timepoints-1), 1);
             for timepoint = 1:(n_timepoints-1)
-                res((timepoint-1) * n_state + 1: timepoint * n_state ) = states(:, timepoint ) + obj.Wind( (timepoint-1) * n_state + 1: timepoint * n_state );
+                res((timepoint-1) * n_state + 1: timepoint * n_state ) = states(:, timepoint) + obj.Wind( (timepoint-1) * n_state + 1: timepoint * n_state );
             end
             
         end
@@ -333,6 +341,7 @@ classdef Constraints < GenConstraints & TestEnv
         
     end    
     methods(Test)
+
 %Check
         function test_get_eqjac(obj)
             %TEST_GET_EQJAC This method derives numerically get_eqfunc and compares it
@@ -340,8 +349,10 @@ classdef Constraints < GenConstraints & TestEnv
 
             n_intervals = uint16(10);
             obj.setupTest(n_intervals, ForwEuler());
+            
+            state_mat   = obj.dyn.state;
 
-            func = @() obj.get_eq_con;
+            func = @() obj.get_eq_con(state_mat);
             
             numDiff = obj.numDiff_nD_AllT(func);
             

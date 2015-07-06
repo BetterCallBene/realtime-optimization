@@ -20,12 +20,12 @@ TEST = true;
 
 
 
-suiteInt = TestInt;  %Check: BB: 05.07.2015
-resultInt = run(suiteInt);
+%suiteInt = TestInt;  %Check: BB: 05.07.2015
+%resultInt = run(suiteInt);
 
-%suiteQuadrocopterExt = QuadrocopterExt; %Check: BB: 05.07.2015
-%suiteQuadrocopterExt.steadyPoint = []; % SteadyPoint initialisieren.
-%resultQuadrocopterExt = run(suiteQuadrocopterExt, 'testWind'); % Nur Windfunktion testen
+suiteQuadrocopterExt = QuadrocopterExt; %Check: BB: 05.07.2015
+suiteQuadrocopterExt.steadyPoint = []; % SteadyPoint initialisieren.
+resultQuadrocopterExt = run(suiteQuadrocopterExt, 'testWind'); % Nur Windfunktion testen
 
 % suiteMultiShooting = TestSuite.fromClass(?MultiShooting); %Check: BB: 05.07.2015
 % resultMultiShooting = run(suiteMultiShooting);

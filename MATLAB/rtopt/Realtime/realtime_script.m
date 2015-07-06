@@ -18,16 +18,17 @@ cQ = Quadrocopter();
 tol = 1e-2;
 opts = odeset('RelTol',tol,'AbsTol',0.1*tol);
 cIntegrator = ode15sM(opts);
+cIntegratorExt = ode15sM(opts);
 %cIntegrator = ForwEuler();
 
 
-cQExt = QuadrocopterExt(cQ, env, cIntegrator);
+cQExt = QuadrocopterExt(cQ, env, cIntegratorExt);
 cQExt.steadyPoint = [];  %steadyPoint initialisieren: SteadyPoint ist eine globale Variable!!
-cQExt.hForceExt = @() rand(3, 1);
-cQExt.hMomentExt = @() rand(3, 1);
+cQExt.hForceExt = @(v) 0.1 * rand(3, 1) + 0.1 * 1/2 * v.^2;
+cQExt.hMomentExt = @() 0.1 * rand(3, 1);
 %Neue Windfunktion
-%env.wind = @(s_t, t)  cQExt.wind(t);
-env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
+env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
+%env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 

@@ -7,6 +7,6 @@ load('Data.mat')
 %     v((i -1) * 17 +4:(i-1)*17 + 7) = tmp;
 % end
 
-t = linspace(0, 1, size(v, 1) /17);
+t = 0:20;
 
 visualizeQuad(t, v);
