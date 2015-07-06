@@ -11,13 +11,16 @@ classdef Quadrocopter < Model
         % Tr�gheitsmoment gesamt in kg m^2
         m   = 1.022;                                % Gesamtgewicht des Quadrokopters in kg
         %I_M = 0.0001;     %ToDo                              % Tr�gheitsmoment der Motoren/Rotoren in kg m^2
-        kT  = 1.5e1;                              % N/(RPM^2)
-        kQ  = 3e-09;                                % N*m/(RPM)^2
+        kT  = 1.5e1;        %1.5e-7                      % N/(RPM^2)
+        kQ  = 3e-01;        %3e-9                        % N*m/(RPM)^2
         d   = 0.22;                                 % Abstand in m
+        c_w = 0.5;                                  % Luftwiderstand
+        A   = 0.04;                                 % Stroemungsrelevanteflaeche
         motor_m = 0.075;                            % Masse Motor
         motor_r = 0.015;                            % Motor R 1.5 cm
         u_min = 0.01;                                  % Minimale Umdrehungen pro Minute
         u_max = 1;                                % Maximale Umdrehungen pro Minute
+        rho = 1.2;                               % Luftdichte
     end
     
     %
@@ -30,7 +33,9 @@ classdef Quadrocopter < Model
     
     properties
         I_M;
+        F_w;                                      % Luftwiderstand
         flagI_M;
+        flagF_w;
     end
 
 	properties(Dependent)
@@ -41,6 +46,7 @@ classdef Quadrocopter < Model
     methods
         function QC = Quadrocopter(varargin)
             QC.flagI_M = true;
+            QC.flagF_w = true;
         end
         % Jm (Motor Rotation Inertia for Rotating Component only)
         % Mass of rotating component is 52.7% of the total mass of the motor + prop
@@ -66,7 +72,21 @@ classdef Quadrocopter < Model
 		function ret = get.n_var(obj)
 			%ret = obj.n_state + obj.n_contr;
             ret = 17; % Performance wgn
-		end
+        end
+        
+        function res = get.F_w(obj)
+            if obj.flagF_w 
+                obj.F_w = 1/2 * obj.rho * obj.A *  obj.c_w;
+                obj.flagF_w = false;
+            end
+            res = obj.F_w;
+        end
+        
+        function res = getF_w(obj, v)
+            res = obj.F_w * v.^2;
+        end
+        
+        
     end
     
 end
