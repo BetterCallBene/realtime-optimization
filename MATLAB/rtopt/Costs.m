@@ -164,8 +164,8 @@ methods(Test)
         numDiff = obj.numDiff_nD_AllT(func);
         
         obj.assertSize(anaDiff, size(numDiff));
-        obj.assertLessThan(max(abs(numDiff - anaDiff)),obj.tol);
-        obj.assertLessThan(norm(numDiff - anaDiff), 1e-8);
+        obj.assertLessThan(max(abs(numDiff - anaDiff)),1e-8);
+        obj.assertLessThan(norm(numDiff - anaDiff), 1e-7);
         
     end
     

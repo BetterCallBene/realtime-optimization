@@ -3,7 +3,7 @@ classdef(Abstract) GenConstraints < handle
     %Berechnung der Ableitungen
     
     properties
-        dode;   % handle for the ForwEuler element providing the discretization of the ode
+        dode;   % handle for the MultShooting element providing the discretization of the ode
         dyn;    % Dynamik
     end
     
@@ -24,6 +24,8 @@ classdef(Abstract) GenConstraints < handle
     methods
         function set.vec(obj, vec_)
             obj.dyn.backdoor_vec = vec_;
+            obj.dode.flag_h = false;
+            obj.dode.flag_hDD = false;
         end
     end
     

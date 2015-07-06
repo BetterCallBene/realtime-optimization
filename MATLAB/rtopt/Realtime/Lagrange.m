@@ -47,7 +47,7 @@ classdef Lagrange < TestEnv
             activeSet_i = solverRT.cConst.getActiveSet(i);
             n_active_i = sum(activeSet_i);
             ineq_constr = ineq_constr(activeSet_i);
-            
+             
             %Calculate the cost derivative at the right place
             costDall = solverRT.cCost.get_costD;
             costD = costDall( (i-1)*(n_state+n_contr) + 1: i*(n_state+n_contr));
@@ -71,7 +71,7 @@ classdef Lagrange < TestEnv
                 lambda = zeros(n_state + n_contr,1);
             end
             % Fill it up
-            J = -[ eq_constr( (i-1)*n_state +1 : i*n_state); costD + lambda + eqConD + ineqConD ; ineq_constr ];
+             J = -[ eq_constr( (i-1)*n_state +1 : i*n_state); costD + lambda + eqConD + ineqConD ; ineq_constr ];
             
             
         end
@@ -102,6 +102,7 @@ classdef Lagrange < TestEnv
             
             %eq_conDDAll = solverRT.cConst.get_eq_conDD(solverRT.lambda{t+1});
             %eq_conDDAll = eq_conDDAll{1};
+            if (t ~= solverRT.cCost.dyn.environment.horizon +1 )
             eq_conDDAll = solverRT.cConst.get_eq_conDD_at_t(solverRT.lambda{t+1}, t);
             eq_conDD = eq_conDDAll( (t-1)*(n_state+n_contr) + 1: t*(n_state+n_contr), (t-1)*(n_state+n_contr)+ 1: t*(n_state+n_contr));
             
@@ -109,21 +110,21 @@ classdef Lagrange < TestEnv
             % cost_approx_t = solverRT.cCost.get_costDD_approx(t);
             % costD = cost_approx_t;
             
-            
-            if (t ~= solverRT.cCost.dyn.environment.horizon +1 )
                 H = [costDD + eq_conDD, CD' , AB' ;...
                     CD , ZERO, sparse(size(ZERO,1),n_state);...
                     AB , sparse(n_state,size(ZERO,1)) , sparse(n_state,n_state) ];
             else
-                H = [costDD + eq_conDD, CD'; CD, ZERO ];
+                H = [costDD , CD'; CD, ZERO ];
             end
         end
         
         function [ H ] = getLDD_approx(o,solverRT, t )
-            % GETLDD
-            % Initialize
+            % GETLDD_APPROX Approximates the Lagrange hessian, with a approximaton of the
+            % cost function hessian. The hessian of the equality
+            % constraints are omitted.
+            
+            % Initialize variables
             n_state = solverRT.cConst.dyn.robot.n_state;
-            n_contr = solverRT.cConst.dyn.robot.n_contr;
             
             % In the last block, there are no eq_conD considered
             if( t ~= solverRT.horizon +1 )
@@ -148,15 +149,99 @@ classdef Lagrange < TestEnv
             costD = cost_approx_t;
             
             
-            if (t ~= cCost.dyn.environment.horizon +1 )
+            if (t ~= solverRT.cCost.dyn.environment.horizon +1 )
                 H = [costD , CD' , AB' ;...
-                    CD , ZERO, sparse(size(ZERO,1),cConst.dyn.robot.n_state);...
-                    AB , sparse(cConst.dyn.robot.n_state,size(ZERO,1)) , sparse(cConst.dyn.robot.n_state,cConst.dyn.robot.n_state) ];
+                    CD , ZERO, sparse(size(ZERO,1),n_state);...
+                    AB , sparse(n_state,size(ZERO,1)) , sparse(n_state,n_state) ];
             else
                 H = [costD, CD'; CD, ZERO ];
             end
         end
         
+         function [ H ] = getLDD_approx_costDDpAlphaI(o,solverRT, t, alpha)
+            % GETLDD_APPROX_COSTDDPALPHAI Approximates the Hessian, only with the costDD block.
+            % The hessian of the equalitiy constraints are omitted. The
+            % value alpha is small and ensures, that the matrix is not
+            % singular.
+            
+            % Initialize variables
+            n_state = solverRT.cConst.dyn.robot.n_state;
+            n_contr = solverRT.cConst.dyn.robot.n_contr;
+            
+            % In the last block, there are no eq_conD considered
+            if( t ~= solverRT.horizon +1 )
+                AB = solverRT.cConst.get_eq_conD_block_t(t);
+            else
+                AB = [];
+            end
+            
+            % Compute ineq_conD
+            CD = solverRT.cConst.get_ineq_conD_block_t(t);
+            ZERO = sparse(size(CD,1),size(CD,1)); %needed to fill matrix up
+            activeSet_t = solverRT.cConst.getActiveSet(t);
+            CD = CD(activeSet_t,:);
+            ZERO = ZERO(activeSet_t,activeSet_t);
+            
+            %Calculate the 
+            costDD = solverRT.cCost.get_costDD();
+            costDD = costDD{1};
+            costDD = costDD( (t-1) * (n_state+n_contr) +1 : t * (n_state + n_contr),(t-1) * (n_state+n_contr) +1 : t * (n_state + n_contr));
+            costDD = costDD + diag(alpha);
+            
+            if (t ~= solverRT.cCost.dyn.environment.horizon +1 )
+                H = [costDD , CD' , AB' ;...
+                    CD , ZERO, sparse(size(ZERO,1),n_state);...
+                    AB , sparse(n_state,size(ZERO,1)) , sparse(n_state,n_state) ];
+            else
+                H = [costDD, CD'; CD, ZERO ];
+            end
+         end
+        
+         function H = getLDD_approx_costDD_eqD(o,solverRT, t)
+             % GETLDD_APPROX_COSTDD_EQD Approximate the Lagrange hessian
+             % with the exact hessian of the cost function and an
+             % approximation of the equality constraint hessian, which is
+             % gradient times gradient'.
+             
+             % Initialize variables
+            n_state = solverRT.cConst.dyn.robot.n_state;
+            n_contr = solverRT.cConst.dyn.robot.n_contr;
+            
+            % In the last block, there are no eq_conD considered
+            if( t ~= solverRT.horizon +1 )
+                AB = solverRT.cConst.get_eq_conD_block_t(t);
+            else
+                AB = [];
+            end
+            % Compute ineq_conD
+            CD = solverRT.cConst.get_ineq_conD_block_t(t);
+            ZERO = sparse(size(CD,1),size(CD,1)); %needed to fill matrix up
+            
+            % Active Set
+            activeSet_t = solverRT.cConst.getActiveSet(t);
+            CD = CD(activeSet_t,:);
+            ZERO = ZERO(activeSet_t,activeSet_t);
+            
+            % Calculate hessian of cost function
+            costDD = solverRT.cCost.get_costDD();
+            costDD = costDD{1};
+            costDD = costDD( (t-1) * (n_state+n_contr) +1 : t * (n_state + n_contr),(t-1) * (n_state+n_contr) +1 : t * (n_state + n_contr));
+         
+            
+             if (t ~= solverRT.cCost.dyn.environment.horizon +1 )
+                % Calculate the approximation of eqConstrDD
+                eqConD = solverRT.cConst.get_eq_conD_block_t(t)' * solverRT.lambda{t+1};
+                eqConstDD_approx = eqConD * eqConD';
+                
+                 % Fill matrix
+                H = [costDD + eqConstDD_approx , CD' , AB' ;...
+                    CD , ZERO, sparse(size(ZERO,1),n_state);...
+                    AB , sparse(n_state,size(ZERO,1)) , sparse(n_state,n_state) ];
+             else
+                % Fill matrix
+                H = [costDD, CD'; CD, ZERO ];
+             end
+         end
     end
     
     

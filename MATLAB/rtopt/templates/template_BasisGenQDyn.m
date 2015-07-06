@@ -70,39 +70,6 @@ classdef(Abstract) BasisGenQDyn < Dyn
             res = obj.H;
         end
         
-        function res = FTilde(obj, y, u)
-            [q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = getParams(obj, y, u);
-            $3$
-            res = t1;
-        end
-        
-        function res = JTilde(obj, y, u)
-            [q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = getParams(obj, y, u);
-            $4$
-            res = t1;
-        end
-        
-        function res = getJTilde(obj, y, u)
-            J_ = obj.JTilde(y, u);
-            res = sparse(J_(:, 1), J_(:, 2), J_(:, 3), 13, 17);
-        end
-        
-        function res = HTilde(obj, y, u)
-            [q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = getParams(obj, y, u);
-            ones = 1;
-            $5$
-            res = t1;
-        end
-        
-        function res = getHTilde(obj, y, u)
-            
-            res = zeros(13, 17, 17);
-            H_ = obj.HTilde(y, u);
-            for i = 1:size(H_, 1)
-                res(H_(i, 1), H_(i, 2), H_(i, 3)) = H_(i, 4);
-            end
-        end
-        
         function [q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = getParams(obj, varargin)
             
             if nargin == 3            

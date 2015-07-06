@@ -5,6 +5,7 @@ classdef CostsXU < Costs
     properties
         alpha; % weight of the cost function for the control term
         beta;  % weight of the cost function for the state term
+         cam_pos = [ 2; 0; 5];
     end
     
     methods
@@ -39,7 +40,7 @@ classdef CostsXU < Costs
             % compute the cost value with penalty term
             control = obj.dyn.contr;
             state   = obj.dyn.state;
-            cam_pos = [ 2; 0; 5];
+           
             one_vec = ones(1,size(state,2));
             
             alpha_   = obj.alpha;
@@ -47,7 +48,7 @@ classdef CostsXU < Costs
             
             mesh    = obj.dyn.environment.mesh;
             c_val   = alpha_* 0.5*sum((control(:,1:end-1).^2)*mesh') + ...
-                beta_ * 0.5*sum(((state(1:3,1:end) - kron(one_vec,cam_pos)).^2)*one_vec');
+                        beta_ * 0.5*sum(((state(1:3,1:end) - kron(one_vec,obj.cam_pos)).^2)*one_vec');
         end
         
         function cD_val = get_costD(obj)
@@ -57,7 +58,6 @@ classdef CostsXU < Costs
             control     = obj.dyn.contr;
             mesh        = obj.dyn.environment.mesh;
             state   = obj.dyn.state;
-            cam_pos = [ 2; 0; 10];
             
             alpha_   = obj.alpha;
             beta_    = obj.beta;
@@ -76,13 +76,13 @@ classdef CostsXU < Costs
                 
                 rindx((i-1)*3+1:i*3) = (i-1)*(n_state+n_contr) + 1:...
                     (i-1)*(n_state+n_contr)+3;
-                vindx((i-1)*3+1:i*3) = beta_ * (state(1:3,i) - cam_pos);
+                vindx((i-1)*3+1:i*3) = beta_ * (state(1:3,i) - obj.cam_pos);
             end
             
             i = n_tp;
             rindx((i-1)*3+1:i*3) = (i-1)*(n_state+n_contr) + 1:...
                 (i-1)*(n_state+n_contr)+3;
-            vindx((i-1)*3+1:i*3) = beta_ * (state(1:3,i) - cam_pos);
+            vindx((i-1)*3+1:i*3) = beta_ * (state(1:3,i) - obj.cam_pos);
             
             cD_val        = sparse(rind,ones(1,(n_tp-1)*n_contr),vind,...
                 n_tp*(n_state+n_contr),1) + ...
@@ -149,10 +149,13 @@ classdef CostsXU < Costs
         function setupTest(o,horizon)
             env = Environment();
             env.wind = @(s_t, t)  s_t + [rand(3,1); zeros(10,1)];
-            env.setUniformMesh(uint16(horizon));
+%             env.setUniformMesh(uint16(horizon));
+            env.setUniformMesh1(horizon +1,1); 
             cQ = Quadrocopter();
             
-            cFE = ode15iM2();
+            tol = 1e-3;
+            opts = odeset('RelTol',tol,'AbsTol',0.1*tol);
+            cFE = ode15sM(opts);
             
             % Initialisierung der Dynamik
             cBQD = BasisQDyn(cQ, env,cFE);

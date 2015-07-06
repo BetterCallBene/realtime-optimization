@@ -19,4 +19,3 @@ visualization.tout = t;
 QuadAnim4;
 
 end
-
