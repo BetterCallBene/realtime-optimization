@@ -2,34 +2,24 @@
 
 \usepackage{pgfpages} %This is needed for notes presentation!
 %\setbeameroption{}
-
-\usepackage{enumerate, amsmath, amssymb,amsthm, amstext,color}
 \usepackage[ngerman, english]{babel}
-\usepackage[latin1]{inputenc}   
-\usepackage{dsfont}
-\usepackage{geometry}
-\usepackage{fancyhdr}
+\usepackage[latin1]{inputenc} 
+\usepackage{amsmath,amssymb,amsthm,amstext}  
+\usepackage{enumerate}
 \usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
 \usetikzlibrary{plotmarks}
 \usetikzlibrary{arrows, positioning}
 \usepackage{lmodern}
-\usepackage{textcomp}
 \usepackage{textpos}
 \usepackage{relsize}
-
-
-\usepackage{float}
 \usepackage{color}
 \usepackage{hyperref}
-% \usepackage{algorithmicx}
-% \usepackage{algpseudocode}
 \usepackage{fancybox}
 \usepackage{float}
 \usepackage{sidecap}
-
-
-%\setbeamertamplate[circle]
-
+% \usepackage{algorithmicx}
+% \usepackage{algpseudocode}
 
 
 \newcommand{\lk}{\left}
@@ -38,47 +28,10 @@
 \newcommand{\rhn}{\mathds{R}^n}
  
 \usetheme{Madrid} % Antibes, Berlin, darmstadt, default, Frankfurt; JuanLesPins
-%\usetheme{
-%	AnnArbor | Antibes | Bergen |
-%	Berkeley | Berlin | Boadilla |
-%	boxes | CambridgeUS | Copenhagen |
-%	Darmstadt | default | Dresden |
-%	Frankfurt | Goettingen |Hannover |
-%	Ilmenau | JuanLesPins | Luebeck |
-%	Madrid | Malmoe | Marburg |
-%	Montpellier | PaloAlto | Pittsburgh |
-%	Rochester | Singapore | Szeged |
-%	Warsaw
-%}
 \usecolortheme{beaver}
-% \usecolortheme{
-% 	albatross | beaver | beetle |
-% 	crane | default | dolphin |
-% 	dove | fly | lily | orchid |
-% 	rose |seagull | seahorse |
-% 	sidebartab | structure |
-% 	whale | wolverine
-% }
-
 \useinnertheme{rounded}
-% \useinnertheme{
-% 	circles | default | inmargin |
-% 	rectangles | rounded
-% }
-
 \useoutertheme{infolines}
-% \useoutertheme{
-% 	default | infolines | miniframes |
-% 	shadow | sidebar | smoothbars |
-% 	smoothtree | split | tree
-% }
-
 \usefonttheme{default}
-% \usefonttheme{
-% 	default | professionalfonts | serif |
-% 	structurebold | structureitalicserif |
-% 	structuresmallcapsserif
-% }
 
 % Seitenzahlen
 \setbeamertemplate{footline}[frame number]
@@ -87,21 +40,11 @@
 \author{Simon Kick, Philipp Fr\"ohlich, Benedikt K\"onig, Annika Stegie}
 \institute{Technische Universit\"at M\"unchen}
 \date{11 July 2015}
-% \titlegraphic{\pgfimage[width=1cm,height=1cm]{MA_Web}}
-%\logo{\pgfimage[width=1.2cm,height=1.2cm]{MA_Web}}
 
 \beamertemplatenavigationsymbolsempty
 % kleine Symbole zur Nvigation wegmachen
 
 \setcounter{MaxMatrixCols}{20}
-
-%\AtBeginSection[]
-%{
-%	\begin{frame}
-%	\frametitle{Overview}
-%	\tableofcontents[currentsection]
-%	\end{frame}
-%}
 
 
 \begin{document}
@@ -112,10 +55,6 @@
 \thispagestyle{empty}
 \end{frame}
 
-%\begin{frame}{Overview}
-%\tableofcontents
-%\end{frame}
-%
 % 1.  Folie mit Poster-Bild zur Erklärung was wir überhaupt machen - ok
 % 2.  Mindmap mit den Bausteinen unseres Projekts
 % 3.  Formulierung unseres Optimierungsproblems -> kurz warum SQP
@@ -128,11 +67,15 @@
 % 9.  Mindmap Realtime ok
 % 10. Ergebnisse: Wind, verschiedene Flugbahnen, mit und ohne stabilisierung, ...
 
-
-\input{Motivation_End}
-\input{SQP-Formulierung_End}
-\input{Model_End}
-\input{Quaternions_End}
+\input{Sections/Motivation_End}
+\input{Inhalt/Inhalt_alles_grau}
+\input{Inhalt/Inhalt_Model_Probform}
+\input{Sections/SQP-Formulierung_End}
+\input{Sections/Model_End}
+\input{Inhalt/Inhalt_Quaternions}
+\input{Sections/Quaternions_End}
+\input{Inhalt/Inhalt_Discretization}
+\input{Sections/rtSQP}
 
 %TODO:
 %  1. Zitate, Quellen (welche Auswahl?) - ok
@@ -140,7 +83,7 @@
 %  3. Mindmap
 %  4. passt alles zusammen?
 %  5. Quaternionen-Bild - ok
-%  6. PS Settin???? andere Überschrift?
+%  6. PS Setting???? andere Überschrift?
 % 
 
 \nocite{Boyd2009}
