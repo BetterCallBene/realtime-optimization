@@ -66,6 +66,9 @@ timeRicTotal = zeros(n_rep,1);
 timeBslTotal = zeros(n_rep,1);
 
 timeRic_fromXtoQ = zeros(n_rep,1);
+timeRic_phase2 = zeros(n_rep,1);
+timeRic_phase1 = zeros(n_rep,1);
+
 timeBsl_fromxtoQ = zeros(n_rep,1);
 
 
@@ -92,6 +95,7 @@ solverRT = RealtimeSolver(cCost, cConst, lambda, s, q, mu);
 
 for i = 1:n_rep
     tot = tic;
+    phase1 = tic;
     %Perform solution for one timepoint
     
     for j = horizon+1:-1:2
@@ -101,7 +105,8 @@ for i = 1:n_rep
     end
     
     j = 1;
-    
+    timeRic_phase1(i) = toc(phase1);
+    phase2 = tic;
     fromXtoQ = tic;
     [LD, n_active] = getLD(solverRT, j);
     LDD = getLDD(solverRT, j ) ;
@@ -112,8 +117,11 @@ for i = 1:n_rep
     
     for j = 2:horizon + 1
         ricM.solveStep(j);
+        act_q = q{1} + ricM.delta_q{1};
+        act_s = s{j} + ricM.delta_s{j};
+        act_lambda = lambda{j} + ricM.delta_lambda{j};
     end
-    
+    timeRic_phase2(i) = toc(phase2);
     timeRicTotal(i) = toc(tot);
 end
 
