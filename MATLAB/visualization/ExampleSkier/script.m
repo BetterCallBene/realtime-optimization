@@ -44,3 +44,30 @@ title('Distance between camPosition and computed position');
 % view(-116,16);
 % pause(0.1);
 % end
+
+%Show animation in nice framework
+
+pos = zeros(3,1400);
+ang = zeros(4,1400);
+dot_pos = zeros(3,1400);
+dot_ang = zeros(3,1400);
+
+for i = 1:1400
+   tmp  = res{i,1};
+    pos(:, i ) = tmp(1:3);
+    ang(:,i) = tmp(4:7);
+    dot_pos(:,i) = tmp(8:10);
+    dot_ang(:,i) = tmp(11:13);
+end
+
+angle = zeros(1400, 3);
+[angle(:, 1), angle(:, 2), angle(:, 3)] = quat2angle((ang'));
+% Prepare variables
+global visualisation
+
+visualisation.yout = [ dot_ang' , angle , dot_pos' , pos'];
+visualisation.tout = {ones(1400,1);
+
+
+QuadAnim4;
+
