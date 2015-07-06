@@ -18,8 +18,8 @@ options.GradConstr      = 'on';
 %options.Hessian         = 'user-supplied';
 %options.HessFcn         = @hessianAdapter;
 options.TolCon          = 1e-5;
-options.TolFun          = 1e-6;
-options.TolX            = 1e-5;
+options.TolFun          = 1e-5;
+options.TolX            = 1e-10;
 options.MaxFunEvals     = 1000000;
 options.MaxIter         = 1000000;
 
@@ -41,7 +41,7 @@ pointPerSecond = 1;
 
 env = Environment();
 env.horizon = horizon;
-env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
+env.wind = @(s_t ,t ) s_t + 0.5 * [rand(3,1); zeros(4,1); rand(6, 1)];
 %Die Dynamik wird nur auf dem Horizon betrachtet:
 n_intervals = env.setUniformMesh1(horizon+1,pointPerSecond); 
 
@@ -64,8 +64,8 @@ cQ = Quadrocopter();
 
 
 % Wahl des Integrators
-opts_ = odeset('RelTol',1e-2,'AbsTol',1e-3);
-cIntegrator =  ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %% %ForwEuler();%ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ode15sM(opts_);
+opts_ = odeset('RelTol',1e-3,'AbsTol',1e-4);
+cIntegrator = ode15sM(opts_); % %ode45M(opts_); %ForwEuler(); %ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %% %ForwEuler();%ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ode15sM(opts_);
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 cBQD.steadyPoint = [];

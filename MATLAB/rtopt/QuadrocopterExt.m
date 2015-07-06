@@ -13,13 +13,20 @@ classdef QuadrocopterExt < BasisQDyn
         function QExt = QuadrocopterExt(varargin)
             QExt@BasisQDyn(varargin);
         end
-        function F = wind(obj, timepoint)
+        function F = wind(obj, st, ctr)
             solver_ = obj.solver;
-            [old_intervals] = solver_.preToDo();
+            %old_intervals = solver_.dyn.environment.n_intervals;
+            %solver_.dyn.environment.n_intervals = 0;
+            %vec_sav = solver_.vec;
             
+            solver_.vec = [st; ctr];
+            [old_intervals1] = solver_.preToDo();
             
-            obj.ForceExt = obj.hForceExt();
+            v = zeros(3, 1);%st(8:10);
+            
+            obj.ForceExt = obj.hForceExt(v);
             obj.MomentExt = obj.hMomentExt();
+            
             
             % Matlab Bug.. Ahh
             n1 = logical(size(obj.ForceExt, 1) ~=3);
@@ -28,8 +35,10 @@ classdef QuadrocopterExt < BasisQDyn
                 error('Force and Moment vector should by 3 x 1');
             end
             
-            [F] =solver_.ode(timepoint);
-            solver_.postToDo(old_intervals);
+            [F] =solver_.ode(1);
+            solver_.postToDo(old_intervals1);
+            %solver_.vec = vec_sav;
+            %solver_.dyn.environment.n_intervals = old_intervals;
         end
         
         function res = dot(obj,ind) 
