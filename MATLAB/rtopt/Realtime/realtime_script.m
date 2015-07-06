@@ -22,13 +22,13 @@ cIntegratorExt = ode15sM(opts);
 %cIntegrator = ForwEuler();
 
 
-cQExt = QuadrocopterExt(cQ, env, cIntegratorExt);
-cQExt.steadyPoint = [];  %steadyPoint initialisieren: SteadyPoint ist eine globale Variable!!
-cQExt.hForceExt = @(v) 0.1 * rand(3, 1) + 0.1 * 1/2 * v.^2;
-cQExt.hMomentExt = @() 0.1 * rand(3, 1);
+%cQExt = QuadrocopterExt(cQ, env, cIntegratorExt);
+%cQExt.steadyPoint = [];  %steadyPoint initialisieren: SteadyPoint ist eine globale Variable!!
+%cQExt.hForceExt = @(v) 0.1 * rand(3, 1) + cQ.getF_w(v);
+%cQExt.hMomentExt = @() 0.1 * rand(3, 1);
 %Neue Windfunktion
-env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
-%env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
+%env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
+env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 
@@ -44,7 +44,7 @@ cCost = CostsComplet(cBQD, 0.1, 2, 1, 1);
 n_timepoints = 20 ; %How many timepoints, do we want to calculate.
 
 %Define Cam Position function
-cCost.cam_pos = @(t) cCost.skierCamPos(t);
+%cCost.cam_pos = @(t) cCost.skierCamPos(t);
 
 %% Choose starting values
 
@@ -81,4 +81,4 @@ getLDD = @(cRTSolver,t) cLagrange.getLDD_approx_costDDpAlphaI(cRTSolver, t, 0.01
 tic;
 %Use realtime solver
 [res, est_y  ] = cRTSolver.fminrt(getLD, getLDD, n_timepoints);
-toc;
+ProcessTime = toc;
