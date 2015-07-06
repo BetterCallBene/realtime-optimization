@@ -20,8 +20,8 @@ TEST = true;
 
 
 
-suiteInt = TestInt;  %Check: BB: 05.07.2015
-resultInt = run(suiteInt);
+% suiteInt = TestInt;  %Check: BB: 05.07.2015
+% resultInt = run(suiteInt);
 
 %suiteQuadrocopterExt = QuadrocopterExt; %Check: BB: 05.07.2015
 %suiteQuadrocopterExt.steadyPoint = []; % SteadyPoint initialisieren.
@@ -50,8 +50,8 @@ resultInt = run(suiteInt);
 % suiteRTSolver = TestSuite.fromClass(?RealtimeSolver); %Check: BB: 05.07.2015
 % resultRTSolver = run(suiteRTSolver);                        %Check
 
-% suiteLagrange = TestSuite.fromClass(?Lagrange); % Failed: testgetLD_Euler mit 3.080005295425193e-04  und testgetLD_ode15sM mit 1.489192913595154 kann aber auch sein, das die Zeitintervalle zu kurz sind
-% resultLagrange = run(suiteLagrange);
+suiteLagrange = TestSuite.fromClass(?Lagrange); % Failed: testgetLD_Euler mit 3.080005295425193e-04  und testgetLD_ode15sM mit 1.489192913595154 kann aber auch sein, das die Zeitintervalle zu kurz sind
+resultLagrange = run(suiteLagrange);
 
 
 % If every test ran successfully, notify user

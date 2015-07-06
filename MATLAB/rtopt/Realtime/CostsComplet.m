@@ -1,14 +1,13 @@
 classdef CostsComplet < Costs
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    % COSTSCOMPLET A cost function for our realtime approach.
     
     properties
         alpha; % weight of the cost function for the control term
         beta;  % weight of the cost function for the state term
-        gamma; % weight of the cost function for the quadrions
+        gamma; % weight of the cost function for the quaternions
         kappa; % weight of the cost function for the velocitys
         
-        cam_pos
+        cam_poter
         
         timepoint;
     end
