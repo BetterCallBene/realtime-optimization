@@ -144,7 +144,7 @@
 \begin{frame}{Discrete Problem}
 \begin{block}{}
 %\begin{align*}
-\[  \min_{x, u} \sum_{i=t}^{N} J_{i}(x_{i},u_{i}) \quad  
+\[  \min_{x, u} \sum_{i=t}^{N} J_{i}(x_{i},u_{i}) \qquad  
   \text{s.t.} \quad 
   h_i (x_i ,u_i ) = 0 \quad  i = t, ... , N  \]
 %\end{align*}
@@ -155,24 +155,28 @@
 %  \vspace{1ex} \\
 %$x_t - s_t = 0$ & expected state $=$ real state
   \vspace{1ex} \\
-$h_i (x_i ,u_i )$ & equality condition at time $i$ 
+$h_i (x_i ,u_i )$ & equality constraints at time $i$ 
 \end{tabular}
 \end{frame}
+
+\input{Inhalt/Inhalt_Riccati}
 
 \begin{frame}{The Lagrangian}
 \begin{block}{ }
 %\begin{align*}
 %\begin{array}{c}
-\[  L^{t}(y) =   \sum\limits_{i=t}^{N} J_{i}(x_{i},u_{i})
+\[  L(y) =   \sum\limits_{i=t}^{N} J_{i}(x_{i},u_{i})
 %  + \lambda_{t}^{T}(x_{t} - s_{t}) 
   + \sum\limits_{i=t}^{N} \lambda_{i}^{T} h_i (x_i ,u_i ) \]
 %  \end{array}
 %\end{align*}
 %\vspace{.1ex}
 \end{block}
-$$ y := (\lambda,x,u) $$
-\vspace{1em}
-\[ y^* \text{ optimal} \Leftrightarrow \nabla_{y} L^{t}(y^*)  = 0 \]
+\begin{gather*}
+	y := (\lambda,x,u) \\
+	\vspace{1ex}
+	y^* \text{ optimal} \quad \Leftrightarrow \quad \nabla_{y} L(y^*)  = 0
+\end{gather*}
 
 \end{frame}
 
@@ -206,7 +210,7 @@ $$ y := (\lambda,x,u) $$
 Find $y^*$:
 \begin{block}{ }
 %\begin{gather*}
-\[ y_{k+1} = y_{k} + s_{k} \] \\ 
+\[ y_{k+1} = y_{k} + s_{k} \]
 \[\min_{s_k}  \frac{1}{2} s_k^T \nabla^2 L(y_k) s_k + \nabla L(y_k)^T s_k \]
 %\end{gather*} \vspace{.1ex}
 \end{block}
@@ -218,6 +222,9 @@ Find $y^*$:
 %$ A_{k} = H(y_k)$ & approximated Hessian $\nabla^{2}_{y_k} L(y_k)$ \vspace{1ex} \\
 %$\alpha_k = 1$ & 
 %\end{tabular}
+
+Bild!!!
+
 \end{frame}
 
 \begin{frame}{Quasi Newton-Method}
