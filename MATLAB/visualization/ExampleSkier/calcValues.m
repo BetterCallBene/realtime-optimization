@@ -24,11 +24,11 @@ cIntegratorExt = ode15sM(opts);
 
 cQExt = QuadrocopterExt(cQ, env, cIntegratorExt);
 cQExt.steadyPoint = [];  %steadyPoint initialisieren: SteadyPoint ist eine globale Variable!!
-cQExt.hForceExt = @(v) 0.1 * rand(3, 1) + 0.1 * 1/2 * v.^2;
+cQExt.hForceExt = @(v) 0.1 * rand(3, 1) + cQ.getF_w(v);
 cQExt.hMomentExt = @() 0.1 * rand(3, 1);
 %Neue Windfunktion
-%env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
-env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
+env.wind = @(t, s_t, ctr)  cQExt.wind(s_t, ctr);
+%env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 
@@ -39,9 +39,9 @@ cMultShoot = MultiShooting(cBQD);
 cConst = Constraints(cMultShoot);
 
 % Initialisierung Kostenfunktion
-cCost = CostsComplet(cBQD, 0.1, 3, 1, 1);
+cCost = CostsComplet(cBQD, 2.5, 2, 1, 1);
 
-n_timepoints = 4*60 ; %How many timepoints, do we want to calculate.
+n_timepoints = 50 ; %How many timepoints, do we want to calculate.
 
 %Define Cam Position function
 cCost.cam_pos = @(t) cCost.skierCamPos_Short(t);
