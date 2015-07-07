@@ -14,12 +14,12 @@ classdef Quadrocopter < Model
         kT  = 1.5e1;        %1.5e-7                      % N/(RPM^2)
         kQ  = 3e-01;        %3e-9                        % N*m/(RPM)^2
         d   = 0.22;                                 % Abstand in m
-        c_w = 0.5;                                  % Luftwiderstand
-        A   = 0.04;                                 % Stroemungsrelevanteflaeche
+        c_w = 0.2;                                  % Luftwiderstand
+        A   = 0.01;                                 % Stroemungsrelevanteflaeche
         motor_m = 0.075;                            % Masse Motor
         motor_r = 0.015;                            % Motor R 1.5 cm
         u_min = 0.01;                                  % Minimale Umdrehungen pro Minute
-        u_max = 1.5;                                % Maximale Umdrehungen pro Minute
+        u_max = 2;                                % Maximale Umdrehungen pro Minute
         rho = 1.2;                               % Luftdichte
     end
     
