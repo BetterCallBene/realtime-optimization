@@ -7,15 +7,15 @@
 	\end{figure}
 \end{frame}
 
-\begin{frame}
-	\frametitle{Quaternions}
-	\begin{block}{}
-		\centering
-		\vspace{1ex}
-		\( q = a + \textup{i}b+\textup{j}c+\textup{k}d \qquad a, b, c, d \in \mathbb{R} \)
-		\vspace{1ex}
-	 \end{block}
-	\end{frame}
+%\begin{frame}
+	%\frametitle{Quaternions}
+	%\begin{block}{}
+		%\centering
+		%\vspace{1ex}
+		%\( q = a + \textup{i}b+\textup{j}c+\textup{k}d \qquad a, b, c, d \in \mathbb{R} \)
+		%\vspace{1ex}
+	 %\end{block}
+	%\end{frame}
 
 \begin{frame}
 	\frametitle{Quaternions}
@@ -36,18 +36,18 @@
 \begin{frame}
 	\frametitle{Drift Correction}
 		\begin{columns}[T] % align columns
-			\begin{column}{.6\textwidth}
+			\begin{column}{.55\textwidth}
 			\centering
 				\begin{textblock}{0}(-4.4,-5)
 					\input{Sections/q0_to_q1_halb.tex}
 				\end{textblock}
 			\end{column}
 			\hfill
-			\begin{column}{0.4\textwidth}
+			\begin{column}{0.45\textwidth}
 				\begin{textblock}{.9\columnwidth}(0,0)
 					\begin{block}{}
 					\centering
-						\( \dot{q} = \tilde{f}(q) \)
+						\( \dot{q}(t) = \tilde{f}(q(t)) \)
 					\end{block}
 				\end{textblock}
 				\end{column}
@@ -57,17 +57,17 @@
 \begin{frame}
 	\frametitle{Drift Correction}
 		\begin{columns}[T] % align columns
-			\begin{column}{.6\textwidth}
+			\begin{column}{.55\textwidth}
 				\begin{textblock}{0}(-4.4,-5)
 					\input{Sections/norm_q1_halb.tex}
 				\end{textblock}
 			\end{column}
 			\hfill
-			\begin{column}{0.4\textwidth}
+			\begin{column}{0.45\textwidth}
 				\begin{textblock}{.9\columnwidth}(0,0)
 					\begin{block}{}
 					\centering
-					\( \dot{q} = \tilde{f}(q)-\lambda(q) \)
+					\( \dot{q}(t) = \tilde{f}(q(t))-\lambda(q(t)) \)
 					\end{block}
 				\end{textblock}
 				\end{column}

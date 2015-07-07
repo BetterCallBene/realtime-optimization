@@ -1,0 +1,33 @@
+\documentclass[12pt]{beamer}
+\usepackage[ngerman, english]{babel}
+\usepackage[latin1]{inputenc} 
+\usepackage{amsmath,amssymb,amsthm,amstext}  
+\usepackage{enumerate}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{plotmarks}
+\usetikzlibrary{arrows, positioning}
+
+\begin{document}
+
+\begin{frame}
+	
+	\begin{tikzpicture}[domain=-1:1.5] % Zeichenbereich
+% Gitter zeichnen
+%\draw[very thin,color=gray] (-0.1,-1.1) grid (3.9,3.9);
+% Achsen zeichnen
+\draw[->] (-2.7,0) -- (2.7,0) node[right] {$x$};
+\draw[->] (0,-2.7) -- (0,2.7) node[above] {$f(x)$};
+% Funktionen zeichnen
+%\draw[color=red,samples at={0,1,2,2.5,4},mark=pentagon*,mark options={fill=white,draw=red},
+%mark size=4pt] plot[only marks] (\x,\x) node[right] at (4.2,4) {$f(x) =x$};
+%\draw[color=blue] plot (\x,{sin(\x r)}) node[right] {$f(x) = \sin x$};
+\draw[color=blue, thick] plot (\x,{(\x)^3-2*(\x)^2+1}) node[right] {$f(x) = x^2$};
+\draw[color=red, thick, domain=-0.5:0.5] plot (\x,{2*(\x)^2+\x}) node[right] {$f(x) = x^2$};
+%\draw[color=orange] plot (\x,{0.05*exp(\x)}) node[right] {$f(x) = \frac{1}{20} \mathrm e^x$};
+\end{tikzpicture}
+	
+\end{frame}
+
+
+\end{document}

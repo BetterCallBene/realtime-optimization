@@ -1,9 +1,17 @@
 \begin{frame}
 	\frametitle{Optimal Control Formulation}
 	\begin{block}{}
+		%\begin{center}
+		 %\parbox{9.5cm}{\( \min \limits_{x,u} J(x,u) \qquad  \) s.t. \parbox{\textwidth}{
+				%\( \qquad \left. \begin{array}{c} \tilde{h}(x,u)=0 \\  \dot{x} = f(x,u) \end{array} \right.\)	}}
+				%\begin{align*}
+					%x: & \quad \text{state} \\
+					%u: & \quad \text{control}
+				%\end{align*}
+		%\end{center}
 		\begin{center}
-		 \parbox{9.5cm}{\( \min \limits_{x,u} J(x,u) \qquad  \) s.t. \parbox{\textwidth}{
-				\( \qquad \left. \begin{array}{c} \tilde{h}(x,u)=0 \\  \dot{x} = f(x,u) \end{array} \right.\)	}}
+		 \parbox{9.5cm}{\( \min \limits_{x,u} J(x,u) \quad  \) s.t. \parbox{\textwidth}{
+				\( \quad \left. \begin{array}{c} \tilde{h}(x,u)=0 \\  \dot{x}(t) = f(x(t),u(t)) \end{array} \right.\)	}}
 				\begin{align*}
 					x: & \quad \text{state} \\
 					u: & \quad \text{control}
@@ -15,9 +23,17 @@
 \begin{frame}
 	\frametitle{Optimal Control Formulation}
 	\begin{block}{}
+		%\begin{center}
+		 %\parbox{9.5cm}{\( \min \limits_{x,u} J(x,u) \qquad  \) s.t. \parbox{\textwidth}{
+				%\( \qquad \left. \begin{array}{c} \tilde{h}(x,u)=0 \\  \dot{x} = f(x,u) \end{array} \right\} \Rightarrow h(x,u) = 0 \)	}}
+				%\begin{align*}
+					%x: & \quad \text{state} \\
+					%u: & \quad \text{control}
+				%\end{align*}
+		%\end{center}
 		\begin{center}
-		 \parbox{9.5cm}{\( \min \limits_{x,u} J(x,u) \qquad  \) s.t. \parbox{\textwidth}{
-				\( \qquad \left. \begin{array}{c} \tilde{h}(x,u)=0 \\  \dot{x} = f(x,u) \end{array} \right\} \Rightarrow h(x,u) = 0 \)	}}
+		 \parbox{9.5cm}{\( \min \limits_{x,u} J(x,u) \quad  \) s.t. \parbox{\textwidth}{
+				\( \quad \left. \begin{array}{c} \tilde{h}(x,u)=0 \\  \dot{x}(t) = f(x(t),u(t)) \end{array} \right\} \Rightarrow h(x,u) = 0 \)	}}
 				\begin{align*}
 					x: & \quad \text{state} \\
 					u: & \quad \text{control}
