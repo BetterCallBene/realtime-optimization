@@ -222,7 +222,7 @@ Find $y^*$:
 %$ A_{k} = H(y_k)$ & approximated Hessian $\nabla^{2}_{y_k} L(y_k)$ \vspace{1ex} \\
 %$\alpha_k = 1$ & 
 %\end{tabular}
-\hfill
+%\hfill
 \centering
 \input{images/Formeltest}
 
@@ -258,9 +258,8 @@ Approximate $\nabla^2 L(y_0)$ and solve:
 \draw[black] (-1.5,-4.5) rectangle (3.5,0.5);
 \draw[white,fill=white] (-1.4,0.6) rectangle (3.4,-4.6);
 %Schrift einfügen
-\draw (1,-5.2) node {\large $H(y_0)$}
-		(4.2,-5.2) node {\large $s$}
-		(5.7,-5.2) node {\large $-\nabla L(y_{0})$};
+\draw (1,-4.5) node[below] {\Large $H(y_0)$}
+		(;
 
 \draw[black] (3.9,0.5) rectangle (4.5,-4.5);
 \draw[white,fill=white] (4,0.6) rectangle (4.4,-4.6);

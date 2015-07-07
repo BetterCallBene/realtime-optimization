@@ -1,10 +1,11 @@
 close all
+
 %% Define setting
 
 % Quadrocopter soll einen halben Meter nach unten fliegen
 
 %Choose horizon
-horizon = 15;
+horizon = 12;
 pointPerSecond = 1;
 
 env = Environment();
@@ -24,11 +25,11 @@ cIntegratorExt = ode15sM(opts);
 
 cQExt = QuadrocopterExt(cQ, env, cIntegratorExt);
 cQExt.steadyPoint = [];  %steadyPoint initialisieren: SteadyPoint ist eine globale Variable!!
-cQExt.hForceExt = @(v) 0.1 * rand(3, 1) + 0.1 * 1/2 * v.^2;
+cQExt.hForceExt = @(v) 0.1 * rand(3, 1) + cQ.getF_w(v);
 cQExt.hMomentExt = @() 0.1 * rand(3, 1);
 %Neue Windfunktion
-%env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
-env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
+env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
+%env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 
@@ -39,9 +40,9 @@ cMultShoot = MultiShooting(cBQD);
 cConst = Constraints(cMultShoot);
 
 % Initialisierung Kostenfunktion
-cCost = CostsComplet(cBQD, 0.1, 3, 1, 1);
+cCost = CostsComplet(cBQD, 1, 0.1, 1, 1);
 
-n_timepoints = 4*60 ; %How many timepoints, do we want to calculate.
+n_timepoints = 70 ; %How many timepoints, do we want to calculate.
 
 %Define Cam Position function
 cCost.cam_pos = @(t) cCost.skierCamPos_Short(t);
@@ -89,7 +90,7 @@ for i = 1:n_timepoints
 end
 
 
-costF = 0;
+costF = zeros(n_timepoints,1);
 pos = zeros(3,n_timepoints);
 for i = 1:n_timepoints
     costF(i) = res{i,5};
@@ -97,7 +98,7 @@ for i = 1:n_timepoints
     pos(:,i) = tmp(1:3);
 end
 
-norm_t = zeros(1,1200);
+norm_t = zeros(1,n_timepoints);
 for i=1:n_timepoints
 norm_t(i) = norm(cam_pos(:,i) - pos(:,i));
 end
@@ -117,7 +118,6 @@ figure
 plot3(cam_pos(1,:), cam_pos(2,:), cam_pos(3,:),'r')
 hold on
 plot3(pos(1,:), pos(2,:), pos(3,:),'b')
-axis([-30 30  0 500 0 500])
 view(-116,16);
 title(' CamPosition (red) and computed position (blue)');
 
@@ -148,7 +148,7 @@ for i = 1:n_timepoints
     plot3(pos(1,1:i), pos(2,1:i), pos(3,1:i),'r');
     plot3(cam_pos(1,i), cam_pos(2,i), cam_pos(3,i),'b.', 'markersize', 7)
     plot3(pos(1,i), pos(2,i), pos(3,i),'r.', 'markersize', 15);
-    axis([-20 20  0 400 0 400]);
+    axis([-20 20  0 275 0 275]);
     view(-116,16);
     title( 'Position of the drone(red) and the camera position(blue) in R^3');
     hold off
@@ -157,7 +157,7 @@ for i = 1:n_timepoints
     plot(norm_t(1:i),'r');
     hold on 
     plot( i, norm_t(i), 'r.', 'markersize', 30);
-    axis( [0 n_timepoints 0 16] );
+    axis( [0 n_timepoints 0 18] );
     title( 'Distance between actual position and cam position');
     hold off
     
@@ -166,7 +166,7 @@ for i = 1:n_timepoints
     plot(costF(1:i),'r');
     hold on 
     plot(i,costF(i), 'r.', 'markersize', 30);
-    axis( [0 n_timepoints 0 1500])
+    axis( [0 n_timepoints 0 180])
     title( 'Cost function');
     hold off
     
