@@ -1,8 +1,8 @@
-close all
-
 %% Define setting
+close all
+clear all
 
-% Quadrocopter soll einen halben Meter nach unten fliegen
+% Quadrocopter soll einem Skifahrer folgen
 
 %Choose horizon
 horizon = 12;
@@ -104,11 +104,11 @@ norm_t(i) = norm(cam_pos(:,i) - pos(:,i));
 end
 save('visualization/ExampleSkier/skierCamPos_Short.mat');
 
+%% Plot functions
+% Plot cost function
 load('skierCamPos_Short.mat');
 
 
-%% Plot functions
-% Plot cost function
 figure
 plot(costF)
 title('Cost function value');

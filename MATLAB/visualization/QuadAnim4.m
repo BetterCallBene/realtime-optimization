@@ -272,17 +272,18 @@ hold off
 %      'Ang. Vel. Track','I-Frame Vel. Track','Location','SouthOutside')
 % hold off
 
-minX = min(A(:,10))*3.28;
-minY = min(A(:,11))*3.28;
-% minZ = min(A(:,12))*3.28;
-maxX = max(A(:,10))*3.28;
-maxY = max(A(:,11))*3.28;
-maxZ = max(A(:,12))*3.28;
+minX = min(A(:,10));
+minY = min(A(:,11));
+minZ = min(A(:,12));
+maxX = max(A(:,10));
+maxY = max(A(:,11));
+maxZ = max(A(:,12));
 
 % Plot the three dimensional trajectory of the box
 axes(handles.axes2)
-X = A(1:1,10)*3.28; Y = A(1:1,11)*3.28; Z = A(1:1,12)*3.28;
-scatter3(X,Y,Z,36,'blue')
+X = A(1:1,10); Y = A(1:1,11); Z = A(1:1,12);
+%scatter3(X,Y,Z,36,'blue')
+scatter3(0,0,0,36,'blue')
 hold on
 fill3([minX-1 maxX+1 maxX+1 minX-1],...
     [minY-1 minY-1 maxY+1 maxY+1],...
@@ -293,7 +294,7 @@ ylabel('Y')
 zlabel('Z')
 xlim([minX-1 maxX+1])
 ylim([minY-1 maxY+1])
-zlim([-0.1 maxZ+1])
+zlim([minZ-1 maxZ+1])
 view(handles.AZval,handles.ELval)
 axis square
 grid on
@@ -561,13 +562,13 @@ if strcmp(mode,'Start')
 
     % Next we run through the points in the vector A as an
     % animation until we get a command to stop
-    minX = min(A(:,10))*3.28; % meters to feet
-    minY = min(A(:,11))*3.28;
-    %minZ = min(A(:,12))*3.28;
-    maxX = max(A(:,10))*3.28;
-    maxY = max(A(:,11))*3.28;
-    maxZ = max(A(:,12))*3.28;
-    colors = jet(length(A(:,10))); % color the path for time info
+    minX = min(A(:,10)); 
+    minY = min(A(:,11));
+    minZ = min(A(:,12));
+    maxX = max(A(:,10));
+    maxY = max(A(:,11));
+    maxZ = max(A(:,12));
+    colors = winter(length(A(:,10))); % color the path for time info
     
     % Precompute R
     % ROTATION MATRIX BELOW --- ZYX ROTATION
@@ -653,9 +654,9 @@ if strcmp(mode,'Start')
             cla(handles.axes2)
         else if (handles.skipFlag==1)
                 cla(handles.axes2)
-                X = A(1:frameSkipVal:j,10)*3.28; 
-                Y = A(1:frameSkipVal:j,11)*3.28; 
-                Z = A(1:frameSkipVal:j,12)*3.28;
+                X = A(1:frameSkipVal:j,10); 
+                Y = A(1:frameSkipVal:j,11); 
+                Z = A(1:frameSkipVal:j,12);
                 axes(handles.axes2)
                 hold on
                 scatter3(X,Y,Z,36,colors(1:frameSkipVal:j,:)); 
@@ -663,7 +664,7 @@ if strcmp(mode,'Start')
         end
         % Ordinary plotting sequence (one frame at a time using hold on to
         % create persistance
-        X = A(j,10)*3.28; Y = A(j,11)*3.28; Z = A(j,12)*3.28;
+        X = A(j,10); Y = A(j,11); Z = A(j,12);
         axes(handles.axes2)
         hold on
         scatter3(X,Y,Z,36,colors(j,:));
@@ -681,7 +682,7 @@ if strcmp(mode,'Start')
         zlabel('Z')
         xlim([minX-1 maxX+1])
         ylim([minY-1 maxY+1])
-        zlim([-0.1 maxZ+1]) % Keep ground within view
+        zlim([ minZ-1 maxZ+1]) % Keep ground within view
         % These calls are necessarry to avoid stutter in the frames if adjusting slider while animation is running
         handles.AZval = get(handles.AZslider,'Value')*360; 
         handles.ELval = get(handles.ELslider,'Value')*90;
