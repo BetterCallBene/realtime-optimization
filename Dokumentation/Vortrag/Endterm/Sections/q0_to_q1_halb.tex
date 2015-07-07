@@ -24,6 +24,12 @@
   \node at (25:1cm) (q0) [circle, draw, fill=black, inner sep = 0.07cm]{};
 	\node[right=3pt] at (25:1cm) {$q_0$};
 	\node at (0.5cm,1.294cm) (q1) [circle, draw, fill=black, inner sep = 0.07cm]{};
-	\node[right=3pt] at (0.5cm,1.294cm) {$q_1=q_0+\Delta h\cdot \dot{q}_0$};
-	\draw[red, thick,->] (q0) to (q1);
+	\node<1>[right=3pt] at (q1) {$q_1=q_0+\Delta h\cdot \dot{q}_0$};
+	\draw<1>[red, thick,->] (q0) to (q1);
+	
+	\node<2>[right=3pt] at (0.5cm,1.281cm) {$q_1$};
+	\draw<2>[thick] (q0) to (q1);
+	\node<2> at (68.87:1cm) (q1_normed) [circle, draw, fill=black, inner sep = 0.07cm]{};
+	\node<2>[below=5pt] at (68.87:1cm) {$\mathlarger{\frac{q_1}{\|q_1\|}}$};
+		\draw<2>[dashed,red,thick,->] (q1) -- (q1_normed) node[anchor=west] {};
 \end{tikzpicture}
