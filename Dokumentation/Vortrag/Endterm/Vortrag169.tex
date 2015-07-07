@@ -1,4 +1,4 @@
-\documentclass[12pt]{beamer} %[aspectratio=169]
+\documentclass[aspectratio=169,12pt]{beamer} %[aspectratio=169]
 
 \usepackage{pgfpages} %This is needed for notes presentation!
 %\setbeameroption{}
@@ -56,31 +56,37 @@
 \thispagestyle{empty}
 \end{frame}
 
-%TODO:
-% 1.  Pfeile in Setting anderes grün?? -> DONE
-% 2.  Mail wegen Videos
-% 3.  Formulierung Fragenkatalog
-% 4.  Copter Bilder höher -> DONE
-% 5.  Plots (Zahlen größer, linien dicker, Pnkte größer)
-% 6.a) Plot (fertiger, copter) Linie statt Punkte
-% 6.b) besserer Kontrast/dunktere Fraben
-% 7.  Inhaltverzeichnis -> DONE
-% 8.  Horizon N->N+t
-% 9.  Kräfte- Drehmomentgleichung neu -> DONE
-% 10. Horizon Tabelle mit Werten füllen
-
+% 1.  Folie mit Poster-Bild zur Erklärung was wir überhaupt machen - ok
+% 2.  Mindmap mit den Bausteinen unseres Projekts
+% 3.  Formulierung unseres Optimierungsproblems -> kurz warum SQP
+%     Erklärung wann dikretisierung??? in Folien???
+% 4.  Mindmap mit Haken bei Problem-Formulierung?
+% 5.  Modell -> Bilder schön einzeln und Formeln immer mit passenden Bildern
+% 6.  ?????? Lösung der ODEs mit multiple shooting Ansatz????
+% 7.  Mindmap Modell abgehakt
+% 8.  Realtime, Riccati, ... Zeitenvergleich mit und ohne Riccati
+% 9.  Mindmap Realtime ok
+% 10. Ergebnisse: Wind, verschiedene Flugbahnen, mit und ohne stabilisierung, ...
 
 \input{Sections/Motivation_End}
-\input{Inhalt/Inhalt_alles_grau2}
+\input{Inhalt/Inhalt_alles_grau}
 \input{Sections/SQP-Formulierung_End}
 \input{Sections/Model_End}
-\input{Inhalt/Inhalt_Quaternions2}
+\input{Inhalt/Inhalt_Quaternions}
 \input{Sections/Quaternions_End}
-\input{Inhalt/Inhalt_Discretization2}
+\input{Inhalt/Inhalt_Discretization}
 \input{Sections/rtSQP}
-\input{Inhalt/Inhalt_Results2}
+\input{Inhalt/Inhalt_Results}
 
 
+%TODO:
+%  1. Zitate, Quellen (welche Auswahl?) - ok
+%  2. Quellen vor oder nach "`Frage"' Seite 
+%  3. Mindmap
+%  4. passt alles zusammen?
+%  5. Quaternionen-Bild - ok
+%  6. PS Setting???? andere Überschrift?
+% 
 
 \nocite{Boyd2009}
 \nocite{Diehl2001}

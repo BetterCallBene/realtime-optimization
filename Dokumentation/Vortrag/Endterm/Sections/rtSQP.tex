@@ -124,9 +124,9 @@
 
 %draw known controls
 \draw<2-> (2,1) node[anchor=west] {control};
-\draw<2->[->,green] (-2.5, 0.8) -- (-2,0.8) ;
-\draw<2->[->,green] (-2, 1.2) -- (-1,1.2) ;
-\draw<2->[->,green] (-1, 0.9) -- (0,0.9) ;
+\draw<2->[->,green2] (-2.5, 0.8) -- (-2,0.8) ;
+\draw<2->[->,green2] (-2, 1.2) -- (-1,1.2) ;
+\draw<2->[->,green2] (-1, 0.9) -- (0,0.9) ;
 \draw<4->[->,red,thick] (0, 1.1) -- (1,1.1) ;
 
 %Draw actual time
@@ -134,8 +134,8 @@
 
 %Draw exact states
 \draw<2-> (2,2) node[anchor=west] {state};
-\draw<2->[green, fill=green] (-2, 2.2) circle (1pt) node[anchor=north]{\footnotesize $x_{t-2}$};
-\draw<2->[green, fill=green] (-1, 1.9) circle (1pt) node[anchor=north]{\footnotesize $x_{t-1}$};
+\draw<2->[green2, fill=green2] (-2, 2.2) circle (1pt) node[anchor=north]{\footnotesize $x_{t-2}$};
+\draw<2->[green2, fill=green2] (-1, 1.9) circle (1pt) node[anchor=north]{\footnotesize $x_{t-1}$};
 \draw<3->[red, fill=red] (0,2.1) circle (1pt) node[anchor=north]{\footnotesize $x_{t}$};
 \end{tikzpicture}
 \end{figure}
@@ -159,7 +159,7 @@ $h_i (x_i ,u_i )$ & equality constraints at time $i$
 \end{tabular}
 \end{frame}
 
-\input{Inhalt/Inhalt_Riccati}
+\input{Inhalt/Inhalt_Riccati2}
 
 \begin{frame}{The Lagrangian}
 \begin{block}{ }
@@ -354,9 +354,9 @@ What happens in interval $ [ t-1 , t ] $ ?
 %Solve for control in t_k-1
 \draw<2->[red,fill=red] (0,0) rectangle (0.1, 1);
 % Calculcate start value for t_k
-\draw<3->[blue,fill=blue] (0.1,0) rectangle (1, 1);
+\draw<3->[blue,fill=blue] (0.1,0) rectangle (0.2, 1);
 %Prepare for t_k
-\draw<4->[green, fill=green] (1,0) rectangle (5,1);
+\draw<4->[green, fill=green] (0.2,0) rectangle (5,1);
 \end{tikzpicture}
 \end{figure}
 
