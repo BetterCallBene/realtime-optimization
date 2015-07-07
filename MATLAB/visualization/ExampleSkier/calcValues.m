@@ -40,6 +40,7 @@ cMultShoot = MultiShooting(cBQD);
 cConst = Constraints(cMultShoot);
 
 % Initialisierung Kostenfunktion
+
 cCost = CostsComplet(cBQD, 1, 0.1, 1, 1);
 
 n_timepoints = 70 ; %How many timepoints, do we want to calculate.
