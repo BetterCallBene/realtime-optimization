@@ -221,8 +221,8 @@ classdef CostsComplet < Costs
             int2_t = 1.5*60;
             end_t = 3 * 60;
             
-            start_z = 225;
-            int_z = 95;
+            start_z = 250;
+            int_z = 120;
             end_z = 0;
             
             

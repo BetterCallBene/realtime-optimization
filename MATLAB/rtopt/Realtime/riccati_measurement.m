@@ -5,7 +5,7 @@ close all
 % the moment, when the control is calculated for the Riccati method and the
 % MATLAB / operator.
 
-horizon = 15;
+horizon = 30;
 pointPerSecond = 1;
 
 
