@@ -1,0 +1,25 @@
+Fragen:
+
+Kostenfunktion 
+	dazu gesagt: viele Einstellungsmöglichkeiten
+	Fragen:	was einstellen?
+		
+Quaternionen
+	dazu gesagt: Korrekturterm
+	Fragen: was genau sind Quaternionen?
+		Wie sieht der Korrekturterm aus?
+
+Aktives Set/Ungleichungsbedingungen
+	dazu gesagt: vernachlässigen die inaktiven Ungleichungen...
+	Fragen: warum vernachlässigbar?
+		wie arbeiten mit aktivem Set?
+
+Startpunkten
+	dazu gesagt: ??
+	Fragen: Woher kommen die Startpunkte?
+		wie wichtig sind sie?
+
+Dae/DGL-Löser:
+	dazu gesagt: lösen DGL numerisch
+	Fragen:	Welchen Löser?
+		multiple shooting?
