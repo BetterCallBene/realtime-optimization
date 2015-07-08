@@ -8,6 +8,8 @@ Quaternionen
 	dazu gesagt: Korrekturterm
 	Fragen: was genau sind Quaternionen?
 		Wie sieht der Korrekturterm aus?
+	Antwort: Verweis auf Geometriekalküle/ Form (1 0; 0 1), i=(i 0; 0 -i), j=(0 1; -1 0), k=(0 i; i 0)
+		 Korrekturterm: (1-norm(q))*q
 
 Aktives Set/Ungleichungsbedingungen
 	dazu gesagt: vernachlässigen die inaktiven Ungleichungen...
@@ -31,3 +33,8 @@ Dae/DGL-Löser:
 	dazu gesagt: lösen DGL numerisch
 	Fragen:	Welchen Löser?
 		multiple shooting?
+
+	Antwort: benutzen Multiple shooting, dabei kommen Sensitivitäten rein... -> durch Ableitungen wegen SQP-Formulierung (M,N)
+		 Lösungsversuch mit DAE (ODEs mit Nebenbedningungen) -> damit Norm(q)=1 zu allen Zeitpunken erfüllt
+		 nicht gut in MATLAB (nur Probleme mit ein- Und Ausgabevektor gleich groß könne gelöst werden)
+		 deswegen Korrekturterm ond lösung mi od15s wegen steifemm Problem
