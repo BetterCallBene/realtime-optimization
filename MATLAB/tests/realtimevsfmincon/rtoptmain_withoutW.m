@@ -8,20 +8,22 @@ PUBLISHABLE = true;
 global TEST;
 TEST = false;
 
+load('WindRand.mat', 'Wind');
+
 %parpool(8);
 
 options                 = optimoptions('fmincon');
-options.Algorithm       = 'interior-point';
+options.Algorithm       = 'sqp';
 options.Display         = 'iter';
 options.GradObj         = 'on';
 options.GradConstr      = 'on';
 %options.Hessian         = 'user-supplied';
 %options.HessFcn         = @hessianAdapter;
-options.TolCon          = 1e-9;
-options.TolFun          = 1e-9;
-options.TolX            = 1e-10;
-options.MaxFunEvals     = 1000000;
-options.MaxIter         = 1000000;
+options.TolCon          = 1e-5;
+options.TolFun          = 1e-5;
+options.TolX            = 1e-6;
+options.MaxFunEvals     = 60;
+options.MaxIter         = 60;
 
 %% fmincon options    
 % * Algorithm: $(options.Algorithm)$
@@ -34,20 +36,30 @@ options.MaxIter         = 1000000;
 % * TolFun: $$(options.TolFun)$$
 % * TolX: $$(options.TolX)$$
 
+xbc = [         ... Variablenname L�nge   Name
+                ... Anfangsbedingung
+                2, 0, 5,  ...     r           3      Ortsvektor
+                1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
+                0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
+                0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
+                ... Endbedingung
+                2, 0, 7,    ...
+                1, 0, 0, 0, ...
+                0, 0, 0,    ...
+                0, 0, 0     ...
+                ];
+
 
 %Choose horizon
-horizon = 50;
+horizon = 49;
 pointPerSecond = 1;
 
 env = Environment();
 env.horizon = horizon;
-env.wind = @(s_t ,t ) s_t + [rand(3,1); zeros(4,1); rand(6, 1)];
+env.xbc = xbc;
+env.wind = @(t, s_t , ctr) s_t;
 %Die Dynamik wird nur auf dem Horizon betrachtet:
 n_intervals = env.setUniformMesh1(horizon+1,pointPerSecond); 
-
-
-%% Environment
-% Anfangsbedingung:
 
 cQ = Quadrocopter();
 
@@ -64,27 +76,33 @@ cQ = Quadrocopter();
 
 
 % Wahl des Integrators
-opts_ = odeset('RelTol',1e-3,'AbsTol',1e-4);
-cIntegrator = ode15sM(opts_); % %ode45M(opts_); %ForwEuler(); %ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %% %ForwEuler();%ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ode15sM(opts_);
+tol = 1e-2;
+opts = odeset('RelTol',tol,'AbsTol',0.1*tol);
+cIntegrator = ode15sM(opts); 
+cIntegratorExt = ode15sM(opts);
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 cBQD.steadyPoint = [];
-point = cBQD.steadyPoint;
+
 % Setup a initial estimation
 steadyPoint = cBQD.steadyPoint;
 
+% Initialisierung des Multiple Shootings
+cMS = MultiShooting(cBQD);
+
 % Initialisierung Kostenfunktion
-cCost = CostsComplet(cBQD, 0.1, 2, 1, 1);
+%cCost = CostsComplet(cBQD, 1, 3, 0, 0);
+cCost = CostsComplet(cBQD, 2.5, 75, 1, 1);
 
 %Define Cam Position function
-%cCost.cam_pos = @(t) cCost.skierCamPos(t); %Standardwert verwenden [2, 0,
+cCost.cam_pos = @(t) xbc(2, 1:3)'; %Standardwert verwenden [2, 0,
 %5]
 
-steadyPoint(1:3) = cCost.cam_pos(1);
+steadyPoint(1:3) = xbc(1, 1:3);
 v0 = repmat(steadyPoint,(n_intervals+1), 1);
-cBQD.vec =v0;   %rand(cQ.n_var * (n_int+1), 1);
+cBQD.vec =v0;  
 
-cMS = MultiShooting(cBQD);
+
 
 % Initialisierung der Nebenbedingungen
 cC = Constraints(cMS);
@@ -94,12 +112,21 @@ global objectCost objectConstr;
 objectCost = cCost;
 objectConstr = cC;
 
+%u_min = cQ.u_min;
+%u_max = cQ.u_max;
+%A = zeros(21, 17);
+%A(14:17, 14:17) = -eye(4);
+%A(18:end, 14:17) = eye(4);
+%b = [zeros(13, 1);u_min *ones(4, 1); u_max *ones(4, 1)];
+
+%repmat(A, 1, (n_intervals+1)); 
+
 if PUBLISHABLE
     tic;
     [v, fval, exitflag, output] = fmincon(@costAdapter,v0,[],[],[],[],[],[],@constrAdapter, options);
-    intervals = 0:50;%linspace(0, 1, n_intervals + 1);
+    intervals = 1:(horizon +1);
     ProcessTime=toc;
-    save('Data.mat', 'intervals', 'v', 'fval', 'exitflag', 'output', 'ProcessTime');
+    save('FData.mat', 'intervals', 'v', 'fval', 'exitflag', 'output', 'ProcessTime');
     %% Ergebnis
     %
     % <latex>
@@ -118,7 +145,7 @@ if PUBLISHABLE
     % \end{itemize}
     % </latex>
 else
-    load('Data.mat');
+    load('FData.mat');
     Q = zeros(length(intervals), 12);
     array = reshape(v, [length(v)/length(intervals), length(intervals)])';
 

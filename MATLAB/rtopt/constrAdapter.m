@@ -7,9 +7,10 @@ global objectConstr;
 objectConstr.vec = v;
 
 
-%[ineq_con, ineq_conD]     = objectConstr.get_ineq();
-ineq_con = [];
-ineq_conD = [];
+[ineq_con]     = objectConstr.get_ineq_con();
+[ineq_conD]    = objectConstr.get_ineq_conD();
+%ineq_con = [];
+%ineq_conD = [];
 
 objectConstr.dode.flag_h = false; % bei jedem Schritt auf neue Hessematrix berechnen
 [eq_con]   = objectConstr.get_eq_con();
