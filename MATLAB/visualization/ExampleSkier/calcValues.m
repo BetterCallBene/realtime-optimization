@@ -27,8 +27,8 @@ cQExt.steadyPoint = [];  %steadyPoint initialisieren: SteadyPoint ist eine globa
 cQExt.hForceExt = @(v) 0.1 * rand(3, 1) + cQ.getF_w(v);
 cQExt.hMomentExt = @() 0.1 * rand(3, 1);
 %Neue Windfunktion
-%env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
-env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
+env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
+%env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 
@@ -40,7 +40,7 @@ cConst = Constraints(cMultShoot);
 
 % Initialisierung Kostenfunktion
 
-cCost = CostsComplet(cBQD, 1, 0.1, 1, 1);
+cCost = CostsComplet(cBQD, 1, 0.25, 1, 1);
 
 n_timepoints = 4*60 ; %How many timepoints, do we want to calculate.
 
@@ -156,7 +156,7 @@ title('Norm of lambdas');
 print([relpath, 'norm_lambda'], '-dsvg');
 
 %% For Screencast of downhill setting
-
+close all;
 pause(1);
 
 hLarge = figure('name', 'Quadrocopter following a skier');
@@ -164,7 +164,7 @@ hLarge = figure('name', 'Quadrocopter following a skier');
 set(hLarge , 'Position', [0 0, 1920 , 1080 ]);
 
 
-pause(3);
+pause(4);
 
 for i = 1:n_timepoints
     r3plot = subplot(2,3,[1,2,4,5]);
@@ -174,7 +174,7 @@ for i = 1:n_timepoints
     plot3(pos(1,1:i), pos(2,1:i), pos(3,1:i),'r');
     plot3(cam_pos(1,i), cam_pos(2,i), cam_pos(3,i),'b.', 'markersize', 19);
     plot3(pos(1,i), pos(2,i), pos(3,i),'r.', 'markersize', 24);
-    axis([-20 20  -1 275 -1 275]);
+    axis([-20 20  -5 305 -5 275]);
     legend(r3plot, {'Given camera position' , 'Drone'}, 'Location', 'northwest', 'FontSize', 14);
     set(gca, 'FontSize', 12);
     view(-116,16);
@@ -185,7 +185,7 @@ for i = 1:n_timepoints
     plot(norm_t(1:i),'r');
     hold on 
     plot( i, norm_t(i), 'r.', 'markersize', 30);
-    axis( [0 n_timepoints 0 25] );
+    axis( [0 n_timepoints 0 15] );
     set(gca, 'FontSize', 12);
     title( 'Distance between actual position and given camera position','FontSize', 12);
     hold off
@@ -195,7 +195,7 @@ for i = 1:n_timepoints
     plot(costF(1:i),'r');
     hold on 
     plot(i,costF(i), 'r.', 'markersize', 30);
-    axis( [0 n_timepoints 0 180])
+    axis( [0 n_timepoints 0 220])
     set(gca, 'FontSize', 12);
     title( 'Cost function','FontSize', 12);
     hold off
