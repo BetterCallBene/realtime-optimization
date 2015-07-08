@@ -1,7 +1,7 @@
 clear all
 
 horizons = [4, 15, 40];
-n_rep = 1;
+n_rep = 7;
 
 time = zeros(length(horizons), n_rep);
 costF = cell(length(horizons), n_rep);
@@ -246,5 +246,7 @@ set(gca,'XTickLabel',names, 'XTick', 1:3 );
 b(1).FaceColor = 'red';
 b(2).FaceColor = 'blue';
              
-relpath = 'rtopt/Realtime/';
-print([relpath, 'horizonPlot'], '-dpdf');
+relpath = 'visualization/Horizon_Measurement/';
+print([relpath, 'horizonPlot'], '-dsvg');
+legend('Time in s', 'Error in m');
+set(gca, 'FontSize', 12);
