@@ -4,6 +4,7 @@
 
 \begin{frame}
 \centering
+
 \begin{tikzpicture}[node distance=1.3cm, font=\Large,
 					neutral/.style ={
 					%shape
@@ -21,13 +22,15 @@
 					top color=green!20, bottom color=green!70}]
 
 %\draw (-1,0) rectangle (10,-5);
+%\draw (-1,0) rectangle (10,-5);
 \draw  
-	node[neutral, minimum width=10.5cm] (r) {Results}
-	node[neutral, above=of r.east, anchor=east] (f) {Realtime}
-	node[neutral, above=of f.east, anchor=east] (e) {Riccati}
-	node[aktiv, above=of r.west, minimum width=7cm, anchor=west] (d) {Problemformulation}
-		node[neutral, above=of d.west, anchor=west] (b) {Quaternions} 
-	node[fer, above=of d.east, anchor=east] (c) {Discretization}
+	node[aktiv, minimum width=10.5cm] (r) {Results}
+	node[fertig, above=of r.east, anchor=east] (f) {Realtime}
+	node[fertig, above=of f.east, anchor=east] (e) {Riccati}
+	node[fertig, above=of e.east, anchor=east] (g) {SQP}
+	node[fertig, above=of r.west, minimum width=7cm, anchor=west] (d) {Problemformulation}
+		node[fertig, above=of d.west, anchor=west] (b) {Quaternions} 
+	node[fertig, above=of d.east, anchor=east] (c) {Discretization}
 	node[fertig, minimum width=3.145cm, above=of b.west, anchor=west] (a) {Model}
 	;
 	
@@ -39,4 +42,5 @@
 	\draw[very thick,->] (f) -- +(0,-0.8);
 	\draw[very thick,->] (g) -- +(0,-0.8);
 \end{tikzpicture}
+
 \end{frame}

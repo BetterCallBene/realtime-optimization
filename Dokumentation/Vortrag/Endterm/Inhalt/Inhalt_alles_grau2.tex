@@ -25,11 +25,13 @@
 	node[neutral, minimum width=10.5cm] (r) {Results}
 	node[neutral, above=of r.east, anchor=east] (f) {Realtime}
 	node[neutral, above=of f.east, anchor=east] (e) {Riccati}
-	node[aktiv, above=of r.west, minimum width=7cm, anchor=west] (d) {Problemformulation}
-		node[neutral, above=of d.west, anchor=west] (b) {Quaternions} 
-	node[fer, above=of d.east, anchor=east] (c) {Discretization}
-	node[fertig, minimum width=3.145cm, above=of b.west, anchor=west] (a) {Model}
+	node[neutral, above=of e.east, anchor=east] (g) {SQP}
+	node[neutral, above=of r.west, minimum width=7cm, anchor=west] (d) {Problemformulation}
+	node[neutral, above=of d.west, anchor=west] (b) {Quaternions} 
+	node[neutral, above=of d.east, anchor=east] (c) {Discretization}
+	node[neutral, minimum width=3.145cm, above=of b.west, anchor=west] (a) {Model}
 	;
+	
 	
 	\draw[very thick,->] (a) -- +(0,-0.8);
 	\draw[very thick,->] (b) -- +(0,-0.8);
@@ -38,5 +40,11 @@
 	\draw[very thick,->] (e) -- +(0,-0.8);
 	\draw[very thick,->] (f) -- +(0,-0.8);
 	\draw[very thick,->] (g) -- +(0,-0.8);
+	
+	\draw<2->
+	node[aktiv, above=of r.west, minimum width=7cm, anchor=west] (d) {Problemformulation}
+	node[aktiv, minimum width=3.145cm, above=of b.west, anchor=west] (a) {Model} 
+	;
 \end{tikzpicture}
+
 \end{frame}
