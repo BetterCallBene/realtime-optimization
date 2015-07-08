@@ -1,6 +1,4 @@
 close all
-
-load('WindRand.mat', 'Wind');
 %% Define setting
 
 % Quadrocopter soll einen halben Meter nach unten fliegen
@@ -12,7 +10,7 @@ pointPerSecond = 1;
 env = Environment();
 env.horizon = horizon;
 
-env.wind = @(s_t , t) s_t ;%+ 0.3*Wind(:, t);
+
 
 %Die Dynamik wird nur auf dem Horizon betrachtet:
 n_intervals = env.setUniformMesh1(horizon+1,pointPerSecond); 
@@ -25,6 +23,11 @@ opts = odeset('RelTol',tol,'AbsTol',0.1*tol);
 cIntegrator = ode15sM(opts);
 cIntegratorExt = ode15sM(opts);
 
+cQExt = QuadrocopterExt(cQ, env, cIntegratorExt);
+cQExt.hForceExt = @(v) 0.3 * rand(3, 1) + cQ.getF_w(v);
+cQExt.hMomentExt = @(v) 0.3 * rand(3, 1);
+env.wind = @(s_t, ctr) cQExt.wind(s_t, ctr);
+
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 cBQD.steadyPoint = [];
@@ -36,17 +39,13 @@ steadyPoint = cBQD.steadyPoint;
 cMultShoot = MultiShooting(cBQD);
 
 % Initialisierung Kostenfunktion
-cCost = CostsComplet(cBQD, 2.5, 75, 1, 3);
-%cCost = CostsComplet(cBQD, 0.7, 105, 1, 0.7); % good
-
-%Define Cam Position function
-cCost.cam_pos = @(t) [2; 0; 10];%cCost.skierCamPos(t);
-
+%cCost = CostsComplet(cBQD, 2.5, 75, 1, 3);
+cCost = CostsComplet(cBQD, 1, 0.25, 1, 1); % good
 
 % Initialisierung der Nebenbedingungen
 cConst = Constraints(cMultShoot);
 
-n_timepoints = 30 ; %How many timepoints, do we want to calculate.
+n_timepoints = 200 ; %How many timepoints, do we want to calculate.
 
 
 %% Choose starting values
@@ -57,7 +56,7 @@ lambda = cell(n_intervals +1 ,1);
 mu = ones( cConst.n_addConstr * (n_intervals+1),1);
 
 % Place Quadrocopter at the desired camera position 
-steadyPoint(1:3) = [2, 0, 5]; %cCost.cam_pos(1); % [2, 0, 5]
+steadyPoint(1:3) = cCost.cam_pos(1); % % [2, 0, 5]
 
 for i = 1: n_intervals 
 s{i} = steadyPoint(1:cQ.n_state);

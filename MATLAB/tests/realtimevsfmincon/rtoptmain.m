@@ -19,11 +19,11 @@ options.GradObj         = 'on';
 options.GradConstr      = 'on';
 %options.Hessian         = 'user-supplied';
 %options.HessFcn         = @hessianAdapter;
-options.TolCon          = 1e-9;
-options.TolFun          = 1e-9;
+options.TolCon          = 1e-7;
+options.TolFun          = 1e-7;
 options.TolX            = 1e-10;
-options.MaxFunEvals     = 1000000;
-options.MaxIter         = 1000000;
+options.MaxFunEvals     = 60;
+options.MaxIter         = 60;
 
 %% fmincon options    
 % * Algorithm: $(options.Algorithm)$
@@ -36,20 +36,30 @@ options.MaxIter         = 1000000;
 % * TolFun: $$(options.TolFun)$$
 % * TolX: $$(options.TolX)$$
 
+xbc = [         ... Variablenname L�nge   Name
+                ... Anfangsbedingung
+                2, 0, 5,  ...     r           3      Ortsvektor
+                1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
+                0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
+                0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
+                ... Endbedingung
+                2, 0, 10,    ...
+                1, 0, 0, 0, ...
+                0, 0, 0,    ...
+                0, 0, 0     ...
+                ];
+
 
 %Choose horizon
-horizon = 199;
+horizon = 29;
 pointPerSecond = 1;
 
 env = Environment();
 env.horizon = horizon;
-env.wind = @(t, s_t , ctr) s_t + 0.3*Wind(:, t);
+env.xbc = xbc;
+env.wind = @(t, s_t , ctr) s_t;
 %Die Dynamik wird nur auf dem Horizon betrachtet:
 n_intervals = env.setUniformMesh1(horizon+1,pointPerSecond); 
-
-
-%% Environment
-% Anfangsbedingung:
 
 cQ = Quadrocopter();
 
@@ -66,28 +76,36 @@ cQ = Quadrocopter();
 
 
 % Wahl des Integrators
-tol = 1e-3;
+tol = 1e-2;
 opts = odeset('RelTol',tol,'AbsTol',0.1*tol);
-cIntegrator = ode15sM(opts); % %ode45M(opts_); %ForwEuler(); %ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %% %ForwEuler();%ode15sM(opts_); %ForwEuler(); %ode15sM(opts_); %ode15sM(opts_);
+cIntegrator = ode15sM(opts); 
+cIntegratorExt = ode15sM(opts);
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 cBQD.steadyPoint = [];
-point = cBQD.steadyPoint;
+
 % Setup a initial estimation
 steadyPoint = cBQD.steadyPoint;
 
+% Initialisierung des Multiple Shootings
+cMS = MultiShooting(cBQD);
+
 % Initialisierung Kostenfunktion
-cCost = CostsComplet(cBQD, 2.5, 75, 1, 1);
+%cCost = CostsComplet(cBQD, 1, 3, 0, 0);
+cCost = CostsComplet(cBQD, 2.5, 10, 1, 3);
 
 %Define Cam Position function
-%cCost.cam_pos = @(t) cCost.skierCamPos(t); %Standardwert verwenden [2, 0,
+cCost.cam_pos = @(t) xbc(2, 1:3)'; %Standardwert verwenden [2, 0,
 %5]
 
-steadyPoint(1:3) = cCost.cam_pos(1);
-v0 = repmat(steadyPoint,(n_intervals+1), 1);
-cBQD.vec =v0;   %rand(cQ.n_var * (n_int+1), 1);
+steadyPoint(1:3) = xbc(1, 1:3);
+steadyPoint1 = steadyPoint;
+steadyPoint(1:3) = xbc(2, 1:3);
 
-cMS = MultiShooting(cBQD);
+v0 = [steadyPoint1; repmat(steadyPoint,(n_intervals), 1)];
+cBQD.vec =v0;  
+
+
 
 % Initialisierung der Nebenbedingungen
 cC = Constraints(cMS);
@@ -96,6 +114,15 @@ cC = Constraints(cMS);
 global objectCost objectConstr;
 objectCost = cCost;
 objectConstr = cC;
+
+%u_min = cQ.u_min;
+%u_max = cQ.u_max;
+%A = zeros(21, 17);
+%A(14:17, 14:17) = -eye(4);
+%A(18:end, 14:17) = eye(4);
+%b = [zeros(13, 1);u_min *ones(4, 1); u_max *ones(4, 1)];
+
+%repmat(A, 1, (n_intervals+1)); 
 
 if PUBLISHABLE
     tic;

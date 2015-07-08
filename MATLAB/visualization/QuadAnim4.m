@@ -108,6 +108,8 @@ handles.j     = 1; % Initialize animation frame counting variable
 handles.skipFlag = 0;
 % Move GUI to center of screen
 movegui('center')
+% BB: Set Backgroundcolor
+set(hObject,'Color',[.9 .9 .9])
 % This sets up the initial plot - only do when we are invisible
 % so window can get raised using QuadAnim4.
 
@@ -342,6 +344,7 @@ function ELslider_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+set(hObject,'Color',[.9 .9 .9])
 handles.ELval = get(hObject,'Value')*90; % Set elevation view in degrees
 handles.AZval = get(handles.AZslider,'Value')*360; % Set aximuth view in degrees
 view(handles.axes1,handles.AZval,handles.ELval);
@@ -664,10 +667,12 @@ if strcmp(mode,'Start')
         end
         % Ordinary plotting sequence (one frame at a time using hold on to
         % create persistance
-        X = A(j,10); Y = A(j,11); Z = A(j,12);
+        %X = A(j,10); Y = A(j,11); Z = A(j,12);
+        X = A(1:j,10); Y = A(1:j,11); Z = A(1:j,12);
         axes(handles.axes2)
         hold on
-        scatter3(X,Y,Z,36,colors(j,:));
+        scatter3(X(j),Y(j),Z(j),36,colors(j,:));
+        %plot3(X, Y, Z, 'r');
         grey = [0.5 0.5 0.5];
         if (j == 1 || handles.skipFlag==1)
             fill3([minX-1 maxX+1 maxX+1 minX-1],...
