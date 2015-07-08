@@ -13,6 +13,14 @@ Aktives Set/Ungleichungsbedingungen
 	dazu gesagt: vernachlässigen die inaktiven Ungleichungen...
 	Fragen: warum vernachlässigbar?
 		wie arbeiten mit aktivem Set?
+	Antwort: When we start the iteration sufficiently close to a KKT point that satisfies the
+		 second order sufficient conditions
+		 (x* regular point iff there exist multipier vectors lambda* and mu*, such that (lambda*, mu*,x*) is KKT point
+		 and the Hessian is possitive definite), so that we can assume that the active set is known and we can
+		 restrict our attention to equality constrained problems.
+		
+		We check in every step, the inequality conditions, if they are equal or violated we consider it as activ
+		and set it as a new equality constraint
 
 Startpunkten
 	dazu gesagt: ??
