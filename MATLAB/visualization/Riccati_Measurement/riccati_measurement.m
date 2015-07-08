@@ -5,7 +5,9 @@ close all
 % the moment, when the control is calculated for the Riccati method and the
 % MATLAB / operator.
 
-horizon = 30;
+horizon = 18;
+
+
 pointPerSecond = 1;
 
 
@@ -61,7 +63,7 @@ cLagrange = Lagrange();
 getLD = @(cRTSolver, t) cLagrange.getLD(cRTSolver,t);
 getLDD = @(cRTSolver,t) cLagrange.getLDD_approx_costDDpAlphaI(cRTSolver, t, zeros(17,1) ) ;
 
-n_rep = 5;
+n_rep = 15;
 timeRicTotal = zeros(n_rep,1);
 timeBslTotal = zeros(n_rep,1);
 
@@ -178,4 +180,14 @@ for i = 1:n_rep
     
     timeBslTotal(i) = toc(tot);
 end
+
+disp(['Horizon: ', int2str(horizon)]);
+
+disp('Total time for \ Operator: ');
+disp(num2str( timeBslTotal));
+
+disp('Total time for Riccati: ');
+disp(num2str(timeRicTotal));
+
+disp(['Time saved in %: ', num2str( (1 - min(timeRic_fromXtoQ) / min(timeBsl_fromxtoQ))* 100)]);
 
