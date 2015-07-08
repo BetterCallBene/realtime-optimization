@@ -3,7 +3,7 @@ with(LinearAlgebra);
 with(VectorCalculus);
 with(CodeGeneration);
 with(FileTools);
-TEST := true;
+TEST := false;
 DEB := false;
 
 # State und Control Vektor
@@ -29,24 +29,17 @@ T := proc (omega, u) local res, M; res := Vector(6); M := Matrix(3, 4, {(1, 1) =
 # 
 
 # dot(x):= [[[R(q)*v,],[1/(2)*q*[[[0,],[omega,]]],],[M^(-1)*(T(omega, u) - Theta(q, v, omega)),]]];
-getDot := proc (x) local vx, res, tmpQ, tmpV, tmpOmega, tmpU; vx := Vector(x); res := Vector(13); tmpQ := vx[4 .. 7]; tmpV := vx[8 .. 10]; tmpOmega := vx[11 .. 13]; tmpU := vx[14 .. 17]; res[1 .. 3] := Multiply(R(tmpQ), tmpV); res[4 .. 7] := (1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega)); res[8 .. 13] := Multiply(Minv, T(tmpOmega, tmpU)-Theta(tmpQ, tmpV, tmpOmega)); return res end proc;
-getDotTilde := proc (x) local correctTerm, res, lambda; correctTerm := Vector(13); res := getDot(x); lambda := 1-q[1]^2-q[2]^2-q[3]^2-q[4]^2; correctTerm[4] := lambda*q[1]; correctTerm[5] := lambda*q[2]; correctTerm[6] := lambda*q[3]; correctTerm[7] := lambda*q[4]; res := res+correctTerm; return res end proc;
+getDotBasis := proc (x) local vx, res, tmpQ, tmpV, tmpOmega, tmpU; vx := Vector(x); res := Vector(13); tmpQ := vx[4 .. 7]; tmpV := vx[8 .. 10]; tmpOmega := vx[11 .. 13]; tmpU := vx[14 .. 17]; res[1 .. 3] := Multiply(R(tmpQ), tmpV); res[4 .. 7] := (1/2)*quatmultiply(tmpQ, `<,>`(0, tmpOmega)); res[8 .. 13] := Multiply(Minv, T(tmpOmega, tmpU)-Theta(tmpQ, tmpV, tmpOmega)); return res end proc;
+
+getDot := proc (x) local correctTerm, res, lambda; correctTerm := Vector(13); res := getDotBasis(x); lambda := VectorCalculus:-`+`(1, VectorCalculus:-`-`(VectorCalculus:-`+`(VectorCalculus:-`+`(VectorCalculus:-`+`(q[1]^2, q[2]^2), q[3]^2), q[4]^2))); correctTerm[4] := lambda*q[1]; correctTerm[5] := lambda*q[2]; correctTerm[6] := lambda*q[3]; correctTerm[7] := lambda*q[4]; res := res+correctTerm; return res end proc;
 
 #  Ausführen von getDot(x)
 dot := getDot(x);
-dotTilde := getDotTilde(x);
 dot := simplify(dot, 'symbolic');
-dotTilde := simplify(dotTilde, 'symbolic');
 # Für den Matlabexport in eine Matrix umwandeln
 
 dotMatrix := convert(dot, Matrix);
-dotMatrixTilde := convert(dotTilde, Matrix);
-if DEB = true then dotMatrix[1 .. 3]; dotMatrix[4 .. 7]; dotMatrix[8 .. 13] end if;
 
-
-
-
-if DEB = true then print(TestJ[11 .. 13, 14 .. 17]) end if;
 # Berechnung der nicht Nulleinträge von Matrizen
 
 getNZeros := proc (M) local res, i, j, m, n; res := 0; i := 1; j := 1; m := 0; n := 0; m, n := Dimension(M); for i to m do for j to n do if M[i][j] <> 0 then res := res+1 end if end do end do; return res end proc;
@@ -64,9 +57,6 @@ getArray := proc (F, x) local m, n, JBtmp, CountJacobi, CountHesse, J, H, i, j, 
 # Ausgabe Hesse und Jacobi in Array
 J, H := getArray(dot, x);
 
-
-# 
-JTilde, HTilde := getArray(dotTilde, x);
 # Temporary Ordner finden
 tmpDir := TemporaryDirectory();
 # Temporary Ordner als aktuellen Ordner setzen.
@@ -74,11 +64,7 @@ currentdir(tmpDir);
 currentdir();
 # Optimieren in MATLAB und exportieren.
 
-if TEST = false then Matlab(eval(([codegen:-optimize])(dotMatrix, tryhard)), defaulttype = integer, output = tmpRTOptFunction); Matlab(eval(([codegen:-optimize])(J, tryhard)), defaulttype = integer, output = tmpRTOptJacobi)*Matlab(eval(([codegen:-optimize])(H, tryhard)), defaulttype = integer, output = tmpRTOptHesse)*Matlab(eval(([codegen:-optimize])(dotMatrixTilde, tryhard)), defaulttype = integer, output = tmpRTOptFTilde)*Matlab(eval(([codegen:-optimize])(JTilde, tryhard)), defaulttype = integer, output = tmpRTOptJTilde)*Matlab(eval(([codegen:-optimize])(HTilde, tryhard)), defaulttype = integer, output = tmpRTOptHTilde) else if DEB = false then  else  end if end if;
-;
-;
-;
-;
-;
-NULL;
+if TEST = false then Matlab(eval(([codegen:-optimize])(dotMatrix, tryhard)), defaulttype = integer, output = tmpRTOptFunction); VectorCalculus:-`*`(Matlab(eval(([codegen:-optimize])(J, tryhard)), defaulttype = integer, output = tmpRTOptJacobi), Matlab(eval(([codegen:-optimize])(H, tryhard)), defaulttype = integer, output = tmpRTOptHesse)) else if DEB = false then  else  end if end if;
+dotMatrix;
+dotMatrix[1 .. 3];
 

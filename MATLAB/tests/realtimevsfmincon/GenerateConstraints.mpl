@@ -11,7 +11,7 @@ eps := .1;
 x := [r[1], r[2], r[3], q[1], q[2], q[3], q[4], v[1], v[2], v[3], omega[1], omega[2], omega[3], u[1], u[2], u[3], u[4]];
 
 eqConstraints := Vector([q[1]^2+q[2]^2+q[3]^2+q[4]^2-1]);
-inEqConstraints := Vector(Vector(8, {(1) = -u[1]+umin, (2) = -u[2]+umin, (3) = -u[3]+umin, (4) = -u[4]+umin, (5) = u[1]+umax, (6) = u[2]+umax, (7) = u[3]+umax, (8) = u[4]+umax}));
+inEqConstraints := Vector(Vector(8, {(1) = -u[1]+umin, (2) = -u[2]+umin, (3) = -u[3]+umin, (4) = -u[4]+umin, (5) = u[1]-umax, (6) = u[2]-umax, (7) = u[3]-umax, (8) = u[4]-umax}));
 eqMatrix := convert(eqConstraints, Matrix);
 
 inEqMatrix := convert(inEqConstraints, Matrix);
