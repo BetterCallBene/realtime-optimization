@@ -1,11 +1,10 @@
 %% Define setting
 close all
-clear all
 
 % Quadrocopter soll einem Skifahrer folgen
 
 %Choose horizon
-horizon = 12;
+horizon = 18;
 pointPerSecond = 1;
 
 env = Environment();
@@ -28,8 +27,8 @@ cQExt.steadyPoint = [];  %steadyPoint initialisieren: SteadyPoint ist eine globa
 cQExt.hForceExt = @(v) 0.1 * rand(3, 1) + cQ.getF_w(v);
 cQExt.hMomentExt = @() 0.1 * rand(3, 1);
 %Neue Windfunktion
-env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
-%env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
+%env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
+env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 
@@ -43,7 +42,7 @@ cConst = Constraints(cMultShoot);
 
 cCost = CostsComplet(cBQD, 1, 0.1, 1, 1);
 
-n_timepoints = 70 ; %How many timepoints, do we want to calculate.
+n_timepoints = 4*60 ; %How many timepoints, do we want to calculate.
 
 %Define Cam Position function
 cCost.cam_pos = @(t) cCost.skierCamPos_Short(t);
@@ -93,10 +92,14 @@ end
 
 costF = zeros(n_timepoints,1);
 pos = zeros(3,n_timepoints);
+contr = zeros(4,n_timepoints);
+norm_lambda = zeros(1,n_timepoints);
 for i = 1:n_timepoints
     costF(i) = res{i,5};
     tmp = res{i,1};
     pos(:,i) = tmp(1:3);
+    contr(:,i) = res{i,3};
+    norm_lambda(i) = norm(res{i,2});
 end
 
 norm_t = zeros(1,n_timepoints);
@@ -109,26 +112,48 @@ save('visualization/ExampleSkier/skierCamPos_Short.mat');
 % Plot cost function
 load('skierCamPos_Short.mat');
 
+relpath = 'visualization/ExampleSkier/';
 
-figure
-plot(costF)
+figure;
+plot(costF,'r')
 title('Cost function value');
+print([relpath, 'costF'], '-dsvg');
 
 % Plot CamPos and Pos
-figure
-plot3(cam_pos(1,:), cam_pos(2,:), cam_pos(3,:),'r')
+figure;
+plot3(cam_pos(1,:), cam_pos(2,:), cam_pos(3,:),'b')
 hold on
-plot3(pos(1,:), pos(2,:), pos(3,:),'b')
+plot3(pos(1,:), pos(2,:), pos(3,:),'r')
 view(-116,16);
-title(' CamPosition (red) and computed position (blue)');
-
+title('Flight in R^3');
+legend({'Given camera position' , 'Drone'}, 'Location', 'northwest');
+print([relpath, 'r3Plot'], '-dsvg');
 
 %Plot
-
 figure
-plot(norm_t);
+plot(norm_t,'r');
 title('Distance between camPosition and computed position');
+print([relpath, 'norm_t'], '-dsvg');
 
+% Plot controls
+figure
+subplot(2,1,1);
+title('Controls');
+hold on
+for k = 1:2
+    contrPlot = subplot(2,1,k);
+    hold on
+    plot(contr(k,:)', 'b');
+    plot(contr(k+2,:)', 'r');
+    legend(contrPlot, {['Engine ' , int2str(k)] ,['Engine ' , int2str(k+2)]}, 'Location', 'north','FontSize', 12);
+end
+print([relpath, 'controls'], '-dsvg');
+
+%Plot norm lambdas
+figure
+plot(norm_lambda', 'r');
+title('Norm of lambdas');
+print([relpath, 'norm_lambda'], '-dsvg');
 
 %% For Screencast of downhill setting
 
@@ -139,27 +164,30 @@ hLarge = figure('name', 'Quadrocopter following a skier');
 set(hLarge , 'Position', [0 0, 1920 , 1080 ]);
 
 
-pause(5);
+pause(3);
 
 for i = 1:n_timepoints
-    subplot(2,3,[1,2,4,5]);
+    r3plot = subplot(2,3,[1,2,4,5]);
    
     plot3(cam_pos(1,1:i), cam_pos(2,1:i), cam_pos(3,1:i),'b')
     hold on
     plot3(pos(1,1:i), pos(2,1:i), pos(3,1:i),'r');
-    plot3(cam_pos(1,i), cam_pos(2,i), cam_pos(3,i),'b.', 'markersize', 7)
-    plot3(pos(1,i), pos(2,i), pos(3,i),'r.', 'markersize', 15);
-    axis([-20 20  0 275 0 275]);
+    plot3(cam_pos(1,i), cam_pos(2,i), cam_pos(3,i),'b.', 'markersize', 19);
+    plot3(pos(1,i), pos(2,i), pos(3,i),'r.', 'markersize', 24);
+    axis([-20 20  -1 275 -1 275]);
+    legend(r3plot, {'Given camera position' , 'Drone'}, 'Location', 'northwest', 'FontSize', 14);
+    set(gca, 'FontSize', 12);
     view(-116,16);
-    title( 'Position of the drone(red) and the camera position(blue) in R^3');
+    title( 'Flight in R^3','FontSize', 14);
     hold off
     
     subplot(2,3,3);
     plot(norm_t(1:i),'r');
     hold on 
     plot( i, norm_t(i), 'r.', 'markersize', 30);
-    axis( [0 n_timepoints 0 18] );
-    title( 'Distance between actual position and cam position');
+    axis( [0 n_timepoints 0 25] );
+    set(gca, 'FontSize', 12);
+    title( 'Distance between actual position and given camera position','FontSize', 12);
     hold off
     
     
@@ -168,23 +196,26 @@ for i = 1:n_timepoints
     hold on 
     plot(i,costF(i), 'r.', 'markersize', 30);
     axis( [0 n_timepoints 0 180])
-    title( 'Cost function');
+    set(gca, 'FontSize', 12);
+    title( 'Cost function','FontSize', 12);
     hold off
     
     
-    pause(0.1);
+    pause(0.01);
 end
+
+print([relpath, 'Animation'], '-dsvg');
 
 %% Show animation in nice framework
 
-pos = zeros(n_timepoints,3);
+posi = zeros(n_timepoints,3);
 ang = zeros(n_timepoints,4);
 dot_pos = zeros(n_timepoints,3);
 dot_ang = zeros(n_timepoints,3);
 
 for i = 1:n_timepoints
    tmp  = res{i,1};
-    pos(i,:) = tmp(1:3)';
+    posi(i,:) = tmp(1:3)';
     ang(i,:) = tmp(4:7)';
     dot_pos(i,:) = tmp(8:10)';
     dot_ang(i,:) = tmp(11:13)';
@@ -195,7 +226,7 @@ angle = zeros(n_timepoints, 3);
 % Prepare variables
 global visualization
 
-visualization.yout = [ dot_ang , angle , dot_pos , pos];
+visualization.yout = [ dot_ang , angle , dot_pos , posi];
 visualization.tout = ones(n_timepoints,1);
 
 QuadAnim4;
