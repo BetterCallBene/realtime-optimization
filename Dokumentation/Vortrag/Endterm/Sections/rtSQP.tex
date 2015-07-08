@@ -144,9 +144,9 @@
 \begin{frame}{Discrete Problem}
 \begin{block}{}
 %\begin{align*}
-\[  \min_{x, u} \sum_{i=t}^{N} J_{i}(x_{i},u_{i}) \qquad  
+\[  \min_{x, u} \sum_{i=t}^{t+N} J_{i}(x_{i},u_{i}) \qquad  
   \text{s.t.} \quad 
-  h_i (x_i ,u_i ) = 0 \quad  i = t, ... , N  \]
+  h_i (x_i ,u_i ) = 0 \quad  i = t, ... , t+N  \]
 %\end{align*}
 \end{block}
 \vspace{2em}
@@ -165,9 +165,9 @@ $h_i (x_i ,u_i )$ & equality constraints at time $i$
 \begin{block}{ }
 %\begin{align*}
 %\begin{array}{c}
-\[  L(y) =   \sum\limits_{i=t}^{N} J_{i}(x_{i},u_{i})
+\[  L(y) =   \sum\limits_{i=t}^{t+N} J_{i}(x_{i},u_{i})
 %  + \lambda_{t}^{T}(x_{t} - s_{t}) 
-  + \sum\limits_{i=t}^{N} \lambda_{i}^{T} h_i (x_i ,u_i ) \]
+  + \sum\limits_{i=t}^{t+N} \lambda_{i}^{T} h_i (x_i ,u_i ) \]
 %  \end{array}
 %\end{align*}
 %\vspace{.1ex}
