@@ -14,7 +14,9 @@ classdef QuadrocopterExt < BasisQDyn
     methods
         function QExt = QuadrocopterExt(varargin)
             QExt@BasisQDyn(varargin);
-            QExt.WindSav = zeros(13, QExt.environment.n_timepoints);
+            if nargin >= 2
+                QExt.WindSav = zeros(13, QExt.environment.n_timepoints);
+            end
         end
         function F = wind(obj, t, st, ctr)
             solver_ = obj.solver;
@@ -39,10 +41,10 @@ classdef QuadrocopterExt < BasisQDyn
             end
             
             [F] =solver_.ode(1);
-            obj.WindSav(:, t) = F - st;
+            if ~isempty(obj.WindSav)
+                obj.WindSav(:, t) = F - st;
+            end
             solver_.postToDo(old_intervals1);
-            %solver_.vec = vec_sav;
-            %solver_.dyn.environment.n_intervals = old_intervals;
         end
         
         function res = dot(obj,ind) 
@@ -90,11 +92,12 @@ classdef QuadrocopterExt < BasisQDyn
             steadyPoint = obj.steadyPoint;
             obj.vec = repmat(steadyPoint, (n_intervals +1), 1); % Setup a initial estimation
             
-            obj.hMomentExt = @() obj.testMoment();
-            obj.hForceExt = @() obj.testForce();
+            obj.hMomentExt = @obj.testMoment;
+            obj.hForceExt = @obj.testForce;
+            obj.WindSav = zeros(13, env.n_timepoints);
         end
         
-        function res =  testForce(obj)
+        function res =  testForce(obj, v)
             res = rand(3, 1);
         end
         
@@ -110,7 +113,9 @@ classdef QuadrocopterExt < BasisQDyn
             timepoint = 5;
             testCase.setupTest(n_intervals);
             
-            res = testCase.wind(timepoint);
+            st = rand(13, 1);
+            ctr = rand(4, 1);
+            res = testCase.wind(timepoint, st, ctr);
             steadyPoint1 = testCase.steadyPoint;
             abs(testCase.steadyPoint(1:13) - res)
             
