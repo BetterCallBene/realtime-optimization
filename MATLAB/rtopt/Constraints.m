@@ -225,20 +225,7 @@ classdef Constraints < GenConstraints & TestEnv
                 end
                 
             else
-                % derive numerically, as implementation is too time
-                % consuming
-                H = cell(n_state, 1);
-                for i = 1:n_state
-                    func = @() o.numDerivHelper(i,t);
-                    H{i} = o.numDiff_nxnD(t,func);
-                    disp(['State No. :', int2str(i)]);
-                end
-                
-                eq_conDD = 0;
-                for  i = 1:n_state
-                    eq_conDD = eq_conDD + lambda(i) * reshape(H{i}, size(H{i},2),size(H{i},3));
-                end
-                
+                error(' ODE15sM does not provide a Hessian');
             end
         end
         
@@ -282,18 +269,8 @@ classdef Constraints < GenConstraints & TestEnv
             % and which isn't.
             activeSet_k = o.activeSet( (k-1) * o.n_addConstr +1 : k * o.n_addConstr);
         end
-        
-        function hD =  numDerivHelper(obj,i,t)
-            n_state = obj.dode.dyn.robot.n_state;
-            
-            [h , hDhelp ] = obj.dode.h();
-            hD = hDhelp( (t-1) * n_state + i, : )';
-        end
-        
-        
-        
-        
     end
+    
     methods %Helper
         
         function res = getWind(obj, states)

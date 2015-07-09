@@ -11,46 +11,45 @@ TEST = true;
 %Create Suite from SolverTest Class
 %The fromClass method creates a suite from all Test methods in the SolverTest class.
 
-%suiteBasisQDyn = BasisQDyn();  %Check: BB: 05.07.2015
-%resultDyn = run(suiteBasisQDyn);
+suiteBasisQDyn = BasisQDyn();  %Check: BB: 05.07.2015
+resultDyn = run(suiteBasisQDyn);
 
 
-%suiteode15sM = ode15sM();  Check: BB: 05.07.2015
-%resultsuiteode15sM = run(suiteode15sM);
+suiteode15sM = ode15sM();  %Check: BB: 05.07.2015
+resultsuiteode15sM = run(suiteode15sM);
 
 
-%suiteInt = TestInt;  %Check: BB: 05.07.2015
-%resultInt = run(suiteInt);
+suiteInt = TestInt;  %Check: BB: 05.07.2015
+resultInt = run(suiteInt);
 
 
-suiteQuadrocopterExt = QuadrocopterExt; %Check: BB: 05.07.2015
+suiteQuadrocopterExt = QuadrocopterExt(); %Check: BB: 05.07.2015
 suiteQuadrocopterExt.steadyPoint = []; % SteadyPoint initialisieren.
 resultQuadrocopterExt = run(suiteQuadrocopterExt, 'testWind'); % Nur Windfunktion testen
 
-% suiteMultiShooting = TestSuite.fromClass(?MultiShooting); %Check: BB: 05.07.2015
-% resultMultiShooting = run(suiteMultiShooting);
+suiteMultiShooting = TestSuite.fromClass(?MultiShooting); %Check: BB: 05.07.2015
+resultMultiShooting = run(suiteMultiShooting);
 
+suiteConstraints = TestSuite.fromClass(?Constraints); %Check: BB: 05.07.2015
+resultConstraints = run(suiteConstraints);
 
-% suiteConstraints = TestSuite.fromClass(?Constraints); %Check: BB: 05.07.2015
-% resultConstraints = run(suiteConstraints);
-% 
-% suiteCosts = TestSuite.fromClass(?Costs);  %Check: BB: 05.07.2015
-% resultCosts = run(suiteCosts);                           
-%  
-% suiteCostsXU = TestSuite.fromClass(?CostsXU); %Check: BB: 05.07.2015
-% resultCostsXU = run(suiteCostsXU);                        
-% 
-% suiteCostsComplete = TestSuite.fromClass(?CostsComplet); %Check: BB: 05.07.2015
-% resultCostsComplete = run(suiteCostsComplete);     
-% 
-% suiteRiccati = TestSuite.fromClass(?RiccatiManager); %Check: BB: 05.07.2015
-% resultRiccati = run(suiteRiccati); 
-% 
-% suiteRTSolver = TestSuite.fromClass(?RealtimeSolver); %Check: BB: 05.07.2015
-% resultRTSolver = run(suiteRTSolver);                        %Check
-% 
-% suiteLagrange = TestSuite.fromClass(?Lagrange); % Failed: testgetLD_Euler mit 3.080005295425193e-04  und testgetLD_ode15sM mit 1.489192913595154 kann aber auch sein, das die Zeitintervalle zu kurz sind
-% resultLagrange = run(suiteLagrange);
+suiteCosts = TestSuite.fromClass(?Costs);  %Check: BB: 05.07.2015
+resultCosts = run(suiteCosts);                           
+ 
+suiteCostsXU = TestSuite.fromClass(?CostsXU); %Check: BB: 05.07.2015
+resultCostsXU = run(suiteCostsXU);                        
+
+suiteCostsComplete = TestSuite.fromClass(?CostsComplet); %Check: BB: 05.07.2015
+resultCostsComplete = run(suiteCostsComplete);     
+
+suiteRiccati = TestSuite.fromClass(?RiccatiManager); %Check: BB: 05.07.2015
+resultRiccati = run(suiteRiccati); 
+
+suiteRTSolver = TestSuite.fromClass(?RealtimeSolver); %Check: BB: 05.07.2015
+resultRTSolver = run(suiteRTSolver);                        %Check
+
+suiteLagrange = TestSuite.fromClass(?Lagrange); % Failed: testgetLD_Euler mit 3.080005295425193e-04  und testgetLD_ode15sM mit 1.489192913595154 kann aber auch sein, das die Zeitintervalle zu kurz sind
+resultLagrange = run(suiteLagrange);
 
 
 % If every test ran successfully, notify user
