@@ -153,14 +153,14 @@ end
 
 
 %plot(timeMin);
-
-figure;
-
-plot(errMin);
-figure;
-
-plot(coFMin);
-
+% 
+% figure;
+% 
+% plot(errMin);
+% figure;
+% 
+% plot(coFMin);
+% 
 
 figure
 val = [timeMin' , errMin , coFMin];
@@ -176,20 +176,23 @@ subplot(1,3,1)
 bar(val(:,1)-6.5,'red')
 title('Time');
 set(gca,'XTickLabel',names, 'XTick', 1:4); 
+% set(gca, 'FontSize', 10);
+
 
 subplot(1,3,2)
-bar(val(:,2)-0.035,'blue')
+bar(val(:,2)-0.027,'blue')
 title('Distance');
 set(gca,'XTickLabel',names, 'XTick', 1:4); 
+% set(gca, 'FontSize', 10);
 
 
 subplot(1,3,3)
 bar(val(:,3)-13,'red')
 title('Cost function');
 set(gca,'XTickLabel',names, 'XTick', 1:4); 
+% set(gca, 'FontSize', 10);
 
 
 relpath = 'visualization/Approx_Measurement/';
 print([relpath, 'approxPlot'], '-dsvg');
 
-set(gca, 'FontSize', 12);
