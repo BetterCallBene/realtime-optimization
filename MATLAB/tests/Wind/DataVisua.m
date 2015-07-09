@@ -32,13 +32,6 @@ QR(:, 16) = sqrt(sum((array(:, 1:3) - steadyPoints).^2, 2));
 
 
 
-
-
-
-
-
-
-
 visualization.yout = QR;
 visualization.tout = intervals;
 % 

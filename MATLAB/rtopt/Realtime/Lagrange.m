@@ -398,7 +398,7 @@ classdef Lagrange < TestEnv
             
             cEnv = Environment();
             cEnv.horizon = horizon;
-            cEnv.wind = @(s_t ,t ) s_t + [1;1;1; zeros(10,1)];
+            cEnv.wind = @(t, s_t, ctr) s_t + [1;1;1; zeros(10,1)];
             cEnv.setUniformMesh(uint16(horizon));
             cQ = Quadrocopter();
             

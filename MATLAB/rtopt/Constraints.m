@@ -299,6 +299,7 @@ classdef Constraints < GenConstraints & TestEnv
         function res = getWind(obj, states)
             
             n_state = 13;
+            n_contr = 4;
             n_timepoints = obj.dyn.environment.n_timepoints;
             if obj.flagWind %Wind nur einmal ueberall Zeitraueme initialisieren
                  
@@ -306,7 +307,8 @@ classdef Constraints < GenConstraints & TestEnv
 
                 for timepoint = 1:(n_timepoints-1)
                     st_ = zeros(n_state, 1);
-                    obj.Wind( (timepoint-1) * n_state + 1: timepoint * n_state )= obj.dyn.environment.wind(timepoint, st_);
+                    ctr_ = zeros(n_contr);
+                    obj.Wind( (timepoint-1) * n_state + 1: timepoint * n_state )= obj.dyn.environment.wind(timepoint, st_, ctr_);
                 end
                 obj.flagWind = false;
             end
@@ -416,7 +418,7 @@ classdef Constraints < GenConstraints & TestEnv
             
             env = Environment();
             env.xbc = xbc;
-            env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
+            env.wind = @(t, s_t, ctr ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
             env.setUniformMesh(n_int_);
             
             robot = Quadrocopter();

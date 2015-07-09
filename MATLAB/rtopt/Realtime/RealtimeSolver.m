@@ -393,7 +393,7 @@ classdef RealtimeSolver < TestEnv
             
             env = Environment();
             
-            env.wind = @(s_t, t) s_t + 0.5 * [ones(3,1); zeros(10,1)];
+            env.wind = @(t, s_t, ctr) s_t + 0.5 * [ones(3,1); zeros(10,1)];
             env.horizon = hori;
             env.setUniformMesh1(hori+1 ,1);
             cQ = Quadrocopter();
