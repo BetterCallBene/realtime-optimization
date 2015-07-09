@@ -63,7 +63,7 @@ for h = 1:length(LDDcell)
         %cQExt.hMomentExt = @() 0.5 * rand_hM;
         %Neue Windfunktion
         %env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
-         env.wind = @(s_t ,t ) s_t + 0.01 * [rand_hF; zeros(10,1)];
+         env.wind = @(t, s_t ,ctr) s_t + 0.01 * [rand_hF; zeros(10,1)];
 %        env.wind = @(s_t ,t ) s_t ;
         % Initialisierung der Dynamik
         cBQD = BasisQDyn(cQ, env, cIntegratorExt);
@@ -173,14 +173,14 @@ bar(val);
 
 
 subplot(1,3,1)
-bar(val(:,1)-6.5,'red')
+bar(val(:,1)-7.5,'red')
 title('Time');
 set(gca,'XTickLabel',names, 'XTick', 1:4); 
 % set(gca, 'FontSize', 10);
 
 
 subplot(1,3,2)
-bar(val(:,2)-0.027,'blue')
+bar(val(:,2)-0.008,'blue')
 title('Distance');
 set(gca,'XTickLabel',names, 'XTick', 1:4); 
 % set(gca, 'FontSize', 10);
