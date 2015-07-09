@@ -224,13 +224,13 @@ end
 
 figure;
 
-endError = zeros(length(horizons),1);
+endError = -ones(length(horizons),1);
 endT = endError;
 names = { };
 for k = 0:length(horizons)-1
     for l = 1:n_rep
         actError  = error{k+1,l};
-        if( endError(k+1) < actError(end))
+        if( endError(k+1) > actError(end) || endError(k+1) < 0 )
             endError(k+1) = actError(end);
         end
     end
