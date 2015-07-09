@@ -726,6 +726,10 @@ if strcmp(mode,'Start')
         zlim(wind_lim);
         view(handles.axes5,handles.AZval,handles.ELval)
         
+         xlabel('X')
+        ylabel('Y')
+        zlabel('Z')
+        
         hold off
         
         
@@ -739,6 +743,8 @@ if strcmp(mode,'Start')
         axis( [0 size(A,1) 0 (max(A(:,16))+1)] );
         hold on 
         plot(j,X(j), 'r.', 'markersize', 30);
+        xlabel('Time')
+        
         
 %%%%%
 
