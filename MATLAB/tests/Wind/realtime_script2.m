@@ -26,7 +26,7 @@ cIntegratorExt = ode15sM(opts);
 cQExt = QuadrocopterExt(cQ, env, cIntegratorExt);
 cQExt.hForceExt = @(v) 0.3 * rand(3, 1) + cQ.getF_w(v);
 cQExt.hMomentExt = @(v) 0.3 * rand(3, 1);
-env.wind = @(s_t, ctr) cQExt.wind(s_t, ctr);
+env.wind = @(t, s_t, ctr) cQExt.wind(t, s_t, ctr);
 
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
@@ -93,4 +93,5 @@ end
 
 intervals = 1:n_timepoints;
 
-save('RData.mat', 'v', 'ProcessTime', 'intervals');
+Wind =  cQExt.WindSav;
+save('RData.mat', 'v', 'ProcessTime', 'intervals', 'Wind' );

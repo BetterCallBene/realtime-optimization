@@ -17,7 +17,7 @@ cQ = Quadrocopter();
 % Initialize Environment with a little wind
 env = Environment();
 env.horizon = horizon;
-env.wind = @(s_t ,t ) s_t + 0.1 * [ones(3,1); zeros(10,1)];
+env.wind = @(t, s_t, ctr) s_t + 0.1 * [ones(3,1); zeros(10,1)];
 n_intervals = env.setUniformMesh1(horizon+1,pointPerSecond);
 
 % Init Integrator

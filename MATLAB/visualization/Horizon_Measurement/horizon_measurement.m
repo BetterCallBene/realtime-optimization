@@ -48,8 +48,8 @@ for h = 1:length(horizons)
         %cQExt.hForceExt = @(v) 0.5 * rand_hF + cQ.getF_w(v);
         %cQExt.hMomentExt = @() 0.5 * rand_hM;
         %Neue Windfunktion
-        %env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
-        env.wind = @(s_t ,t ) s_t + 0.5 * [rand_hF; zeros(10,1)];
+%         env.wind = @(t, s_t, ctr)  cQExt.wind(t,s_t, ctr);
+        env.wind = @(t, s_t, ctr) s_t + 0.5 * [rand_hF; zeros(10,1)];
         % Initialisierung der Dynamik
         cBQD = BasisQDyn(cQ, env, cIntegrator);
         
@@ -138,8 +138,8 @@ for h = 1:length(horizons)
         cQExt.hForceExt = @(v) 0.5 * rand_hF + cQ.getF_w(v);
         cQExt.hMomentExt = @() 0.5 * rand_hM;
         %Neue Windfunktion
-        env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
-        %env.wind = @(s_t ,t ) s_t + 0.5 * [rand(3,1); zeros(10,1)];
+%         env.wind = @(t, s_t, ctr)  cQExt.wind(t, s_t, ctr);
+        env.wind = @(t, s_t ,ctr ) s_t + 0.5 * [rand(3,1); zeros(10,1)];
         % Initialisierung der Dynamik
         cBQD = BasisQDyn(cQ, env, cIntegrator);
         
@@ -224,13 +224,13 @@ end
 
 figure;
 
-endError = zeros(length(horizons),1);
+endError = -ones(length(horizons),1);
 endT = endError;
 names = { };
 for k = 0:length(horizons)-1
     for l = 1:n_rep
         actError  = error{k+1,l};
-        if( endError(k+1) < actError(end))
+        if( endError(k+1) > actError(end) || endError(k+1) < 0 )
             endError(k+1) = actError(end);
         end
     end

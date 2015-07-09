@@ -15,21 +15,20 @@ suiteBasisQDyn = BasisQDyn();  %Check: BB: 05.07.2015
 resultDyn = run(suiteBasisQDyn);
 
 
-%suiteode15sM = ode15sM();  Check: BB: 05.07.2015
-%resultsuiteode15sM = run(suiteode15sM);
+suiteode15sM = ode15sM();  %Check: BB: 05.07.2015
+resultsuiteode15sM = run(suiteode15sM);
 
 
-%suiteInt = TestInt;  %Check: BB: 05.07.2015
-%resultInt = run(suiteInt);
+suiteInt = TestInt;  %Check: BB: 05.07.2015
+resultInt = run(suiteInt);
 
 
-% suiteQuadrocopterExt = QuadrocopterExt; %Check: BB: 05.07.2015
-% suiteQuadrocopterExt.steadyPoint = []; % SteadyPoint initialisieren.
-% resultQuadrocopterExt = run(suiteQuadrocopterExt, 'testWind'); % Nur Windfunktion testen
+suiteQuadrocopterExt = QuadrocopterExt(); %Check: BB: 05.07.2015
+suiteQuadrocopterExt.steadyPoint = []; % SteadyPoint initialisieren.
+resultQuadrocopterExt = run(suiteQuadrocopterExt, 'testWind'); % Nur Windfunktion testen
 
-% suiteMultiShooting = TestSuite.fromClass(?MultiShooting); %Check: BB: 05.07.2015
-% resultMultiShooting = run(suiteMultiShooting);
-
+suiteMultiShooting = TestSuite.fromClass(?MultiShooting); %Check: BB: 05.07.2015
+resultMultiShooting = run(suiteMultiShooting);
 
 suiteConstraints = TestSuite.fromClass(?Constraints); %Check: BB: 05.07.2015
 resultConstraints = run(suiteConstraints);

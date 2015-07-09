@@ -179,7 +179,7 @@ classdef Constraints < GenConstraints & TestEnv
             ctr = contr_mat(:,1);
             multShoot = obj.dode.h();
             
-            eq_con      = [obj.dyn.environment.wind(s_t, ctr) - state_mat(:,1);
+            eq_con      = [obj.dyn.environment.wind(t, s_t, ctr) - state_mat(:,1);
                 multShoot();
                 ];
         end
@@ -225,20 +225,7 @@ classdef Constraints < GenConstraints & TestEnv
                 end
                 
             else
-                % derive numerically, as implementation is too time
-                % consuming
-                H = cell(n_state, 1);
-                for i = 1:n_state
-                    func = @() o.numDerivHelper(i,t);
-                    H{i} = o.numDiff_nxnD(t,func);
-                    disp(['State No. :', int2str(i)]);
-                end
-                
-                eq_conDD = 0;
-                for  i = 1:n_state
-                    eq_conDD = eq_conDD + lambda(i) * reshape(H{i}, size(H{i},2),size(H{i},3));
-                end
-                
+                error(' ODE15sM does not provide a Hessian');
             end
         end
         
@@ -282,23 +269,14 @@ classdef Constraints < GenConstraints & TestEnv
             % and which isn't.
             activeSet_k = o.activeSet( (k-1) * o.n_addConstr +1 : k * o.n_addConstr);
         end
-        
-        function hD =  numDerivHelper(obj,i,t)
-            n_state = obj.dode.dyn.robot.n_state;
-            
-            [h , hDhelp ] = obj.dode.h();
-            hD = hDhelp( (t-1) * n_state + i, : )';
-        end
-        
-        
-        
-        
     end
+    
     methods %Helper
         
         function res = getWind(obj, states)
             
             n_state = 13;
+            n_contr = 4;
             n_timepoints = obj.dyn.environment.n_timepoints;
             if obj.flagWind %Wind nur einmal ueberall Zeitraueme initialisieren
                  
@@ -306,7 +284,8 @@ classdef Constraints < GenConstraints & TestEnv
 
                 for timepoint = 1:(n_timepoints-1)
                     st_ = zeros(n_state, 1);
-                    obj.Wind( (timepoint-1) * n_state + 1: timepoint * n_state )= obj.dyn.environment.wind(timepoint, st_);
+                    ctr_ = zeros(n_contr);
+                    obj.Wind( (timepoint-1) * n_state + 1: timepoint * n_state )= obj.dyn.environment.wind(timepoint, st_, ctr_);
                 end
                 obj.flagWind = false;
             end
@@ -416,7 +395,7 @@ classdef Constraints < GenConstraints & TestEnv
             
             env = Environment();
             env.xbc = xbc;
-            env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
+            env.wind = @(t, s_t, ctr ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
             env.setUniformMesh(n_int_);
             
             robot = Quadrocopter();

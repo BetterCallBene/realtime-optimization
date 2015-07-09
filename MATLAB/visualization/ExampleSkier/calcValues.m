@@ -27,8 +27,8 @@ cQExt.steadyPoint = [];  %steadyPoint initialisieren: SteadyPoint ist eine globa
 cQExt.hForceExt = @(v) 0.1 * rand(3, 1) + cQ.getF_w(v);
 cQExt.hMomentExt = @() 0.1 * rand(3, 1);
 %Neue Windfunktion
-env.wind = @(s_t, ctr)  cQExt.wind(s_t, ctr);
-%env.wind = @(s_t ,t ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
+env.wind = @(t, s_t, ctr)  cQExt.wind(s_t, ctr);
+%env.wind = @(t, s_t, ctr ) s_t + 0.1 * [rand(3,1); zeros(10,1)];
 % Initialisierung der Dynamik
 cBQD = BasisQDyn(cQ, env, cIntegrator);
 

@@ -136,17 +136,17 @@ classdef TestInt < handle & TestEnv
             pause(1)
             disp('Numerikvergleich von ForwEuler');
             [error, norm_error, rel_error1] =  testCase.NumAnaTest(n_intervals, solver1);
-            testCase.verifyLessThan(max(error), opts1.RelTol * 90);
+            testCase.verifyLessThan(max(error), opts1.RelTol * 150);
             testCase.verifyLessThan(max(norm_error), 1e-3);
             
             disp('Numerikvergleich von ode45');
             [error, norm_error, rel_error2] =  testCase.NumAnaTest(n_intervals, solver2);
-            testCase.verifyLessThan(max(error), opts1.RelTol * 90);
+            testCase.verifyLessThan(max(error), opts1.RelTol * 150);
             testCase.verifyLessThan(max(norm_error), 1e-3);
             
             disp('Numerikvergleich von ode15sM');
             [error, norm_error, rel_error3] = testCase.NumAnaTest(n_intervals, solver3);
-            testCase.verifyLessThan(max(error), opts3.RelTol * 90);
+            testCase.verifyLessThan(max(error), opts3.RelTol * 150);
             testCase.verifyLessThan(max(norm_error), opts3.RelTol);
             
         end

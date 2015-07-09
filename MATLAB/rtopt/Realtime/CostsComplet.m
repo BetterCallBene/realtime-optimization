@@ -253,7 +253,7 @@ classdef CostsComplet < Costs
         
         function setupTest(o,horizon)
             env = Environment();
-            env.wind = @(s_t, t)  s_t + [rand(3,1); zeros(10,1)];
+            env.wind = @(t, s_t, ctr)  s_t + [rand(3,1); zeros(10,1)];
             %             env.setUniformMesh(uint16(horizon));
             env.setUniformMesh1(horizon +1,1);
             cQ = Quadrocopter();

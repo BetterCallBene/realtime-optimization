@@ -12,7 +12,7 @@ pointPerSecond = 1;
 env = Environment();
 env.horizon = horizon;
 
-env.wind = @(s_t , t) s_t ;%+ 0.3*Wind(:, t);
+env.wind = @(t, s_t, ctr) s_t ;%+ 0.3*Wind(:, t);
 
 %Die Dynamik wird nur auf dem Horizon betrachtet:
 n_intervals = env.setUniformMesh1(horizon+1,pointPerSecond); 
