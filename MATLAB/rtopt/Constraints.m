@@ -179,7 +179,7 @@ classdef Constraints < GenConstraints & TestEnv
             ctr = contr_mat(:,1);
             multShoot = obj.dode.h();
             
-            eq_con      = [obj.dyn.environment.wind(s_t, ctr) - state_mat(:,1);
+            eq_con      = [obj.dyn.environment.wind(t, s_t, ctr) - state_mat(:,1);
                 multShoot();
                 ];
         end

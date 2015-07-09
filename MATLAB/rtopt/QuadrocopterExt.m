@@ -7,13 +7,16 @@ classdef QuadrocopterExt < BasisQDyn
         ForceExt;
         MomentExt;
         
+        WindSav;
+        
     end
     
     methods
         function QExt = QuadrocopterExt(varargin)
             QExt@BasisQDyn(varargin);
+            QExt.WindSav = zeros(13, QExt.environment.n_timepoints);
         end
-        function F = wind(obj, st, ctr)
+        function F = wind(obj, t, st, ctr)
             solver_ = obj.solver;
             %old_intervals = solver_.dyn.environment.n_intervals;
             %solver_.dyn.environment.n_intervals = 0;
@@ -36,6 +39,7 @@ classdef QuadrocopterExt < BasisQDyn
             end
             
             [F] =solver_.ode(1);
+            obj.WindSav(:, t) = F - st;
             solver_.postToDo(old_intervals1);
             %solver_.vec = vec_sav;
             %solver_.dyn.environment.n_intervals = old_intervals;

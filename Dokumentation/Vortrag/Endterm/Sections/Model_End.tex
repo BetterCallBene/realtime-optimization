@@ -35,11 +35,11 @@
 					\centering
 					\includegraphics<1>[width=11cm]{images/Copter_axis.pdf}
 				
-					\includegraphics<2>[width=11cm]{images/Copter_phi.pdf}
+					\includegraphics<2>[width=11cm]{images/Copter_psi.pdf}
 
-					\includegraphics<3>[width=11cm]{images/Copter_theta.pdf}
+					\includegraphics<3>[width=11cm]{images/Copter_phi.pdf}
 
-					\includegraphics<4>[width=11cm]{images/Copter_psi.pdf}
+					\includegraphics<4>[width=11cm]{images/Copter_theta.pdf}
 				\end{figure}
 		
 \end{frame}
@@ -65,6 +65,15 @@
 	\begin{block}{}
 		\centering
 		\[\left. \begin{array}{rl} F_{res} \hspace{-1.25ex} &= F_{ext} + F_{g} + \sum_{i=1}^{4}{F_{i}} \\ \tau_{res} \hspace{-1.25ex} &= \tau_{ext} + \tau_{\psi} + \tau_{\varphi} + \tau_{\theta}  \end{array} \right\} \quad \Rightarrow \quad \dot{x}(t)=f(x(t),u(t)) \]
+		\vspace{1ex}
+	\end{block}
+	
+	\vspace{2em}
+	
+	\begin{block}{}
+		\begin{center}
+		 	\[ \quad \left. \begin{array}{c} \tilde{h}(x,u)=0 \\  \dot{x}(t) = f(x(t),u(t)) \end{array} \right\} \Rightarrow h(x,u) = 0	\]
+		\end{center}
 		\vspace{1ex}
 	\end{block}
 	
