@@ -22,6 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -38,13 +39,13 @@
      inkscape:window-height="705"
      id="namedview520"
      showgrid="false"
-     inkscape:zoom="1.9740064"
-     inkscape:cx="297.41575"
-     inkscape:cy="79.971761"
+     inkscape:zoom="1.3958333"
+     inkscape:cx="395.31573"
+     inkscape:cy="161.39098"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g360"
+     inkscape:current-layer="g3758"
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:snap-bbox="true"
@@ -1458,24 +1459,24 @@
     </g>
     <g
        transform="matrix(0,-1,1,0,333.97983,490.06189)"
-       style="font-size:13px;font-family:SansSerif;fill:#262626;stroke:#262626"
+       style="font-size:13px;font-family:SansSerif;fill:#ffffff;stroke:#262626;fill-opacity:1"
        id="g278">
       <text
          x="-18.626646"
          xml:space="preserve"
          y="13"
-         style="stroke:none"
+         style="stroke:none;fill:#ffffff;fill-opacity:1"
          id="text280">Exact</text>
     </g>
     <g
        transform="matrix(0,-1,1,0,417.85627,484.62994)"
-       style="font-size:13px;font-family:SansSerif;fill:#262626;stroke:#262626"
+       style="font-size:13px;font-family:SansSerif;fill:#ffffff;stroke:#262626;fill-opacity:1"
        id="g290">
       <text
          x="-23.5"
          xml:space="preserve"
          y="13"
-         style="stroke:none"
+         style="stroke:none;fill:#ffffff;fill-opacity:1"
          id="text292">costDD</text>
     </g>
     <g
@@ -1486,18 +1487,18 @@
          x="-39.5"
          xml:space="preserve"
          y="13"
-         style="stroke:none"
+         style="stroke:none;fill:#ffffff;fill-opacity:1;"
          id="text284">costDD+0.1</text>
     </g>
     <g
        transform="matrix(0,-1,1,0,389.55828,464.62994)"
-       style="font-size:13px;font-family:SansSerif;fill:#262626;stroke:#262626"
+       style="font-size:13px;font-family:SansSerif;fill:#ffffff;stroke:#262626;fill-opacity:1"
        id="g286">
       <text
          x="-43.5"
          xml:space="preserve"
          y="13"
-         style="stroke:none"
+         style="stroke:none;fill:#ffffff;fill-opacity:1"
          id="text288">costDD+0.01</text>
     </g>
     <g
