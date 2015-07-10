@@ -32,16 +32,6 @@
   Timestamp                = {2015.05.19}
 }
 
-@PhdThesis{Diehl2001,
-  Title                    = {Real-Time Optimization for Large Scale Nonlinear Processes},
-  Author                   = {Diehl, Moritz},
-  School                   = {Ruprecht-Karls-Universität Heidelberg},
-  Year                     = {2001},
-
-  Owner                    = {as},
-  Timestamp                = {2015.05.19}
-}
-
 @Article{Diehl2005,
   Title                    = {A Real-Time Iteration Scheme for Nonlinear Optimization in Optimal Feedback Control},
   Author                   = {Diehl, Moritz and Bock, Hans Georg and Schlöder, Johannes P.},
@@ -57,6 +47,16 @@
   Author                   = {Diehl, Moritz and Bock H. Georg and Schlöder, Johannes P. and Findeisen, Rolf and Nagy, Zoltan and Allgöwer, Frank},
   Journal                  = {Journal of Process Control},
   Year                     = {2002},
+
+  Owner                    = {as},
+  Timestamp                = {2015.05.19}
+}
+
+@PhdThesis{Diehl2001,
+  Title                    = {Real-Time Optimization for Large Scale Nonlinear Processes},
+  Author                   = {Diehl, Moritz Mathias},
+  School                   = {Ruprecht-Karls-Universität Heidelberg},
+  Year                     = {2001},
 
   Owner                    = {as},
   Timestamp                = {2015.05.19}
