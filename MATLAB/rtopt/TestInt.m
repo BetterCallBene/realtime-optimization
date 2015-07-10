@@ -146,7 +146,11 @@ classdef TestInt < handle & TestEnv
             
             disp('Numerikvergleich von ode15sM');
             [error, norm_error, rel_error3] = testCase.NumAnaTest(n_intervals, solver3);
+<<<<<<< HEAD
+            testCase.verifyLessThan(max(error), opts3.RelTol * 900);
+=======
             testCase.verifyLessThan(max(error), opts3.RelTol * 150);
+>>>>>>> 90e696c6cf52a9fb75e5186c8df57b2c7d206f52
             testCase.verifyLessThan(max(norm_error), opts3.RelTol);
             
         end
@@ -209,12 +213,12 @@ classdef TestInt < handle & TestEnv
             maxF3F1 = max(res(:, 3));
             
             disp(['Vergleich im Mittel zwischen Euler und Ode45: ', num2str(mittelF1F2)]);
-            disp(['Vergleich im Mittel zwischen Euler und Ode45: ', num2str(mittelF2F3)]);
+            disp(['Vergleich im Mittel zwischen ode15s und Ode45: ', num2str(mittelF2F3)]);
             disp(['Vergleich im Mittel zwischen Euler und Ode45: ', num2str(mittelF3F1)]);
             pause(5)
             disp('');
             disp(['Maximalerunterschied zwischen Euler und Ode45: ', num2str(maxF1F2)]);
-            disp(['Maximalerunterschied zwischen Euler und Ode45: ', num2str(maxF2F3)]);
+            disp(['Maximalerunterschied zwischen ode15s und Ode45: ', num2str(maxF2F3)]);
             disp(['Maximalerunterschied zwischen Euler und Ode45: ', num2str(maxF3F1)]);
             spd = toc;
             solver1.postToDo(old_intervals);
