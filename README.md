@@ -3,11 +3,11 @@ Realtime Optimizaton Ordnerstruktur
 MAPLE: ODE's des Quadrocoptermodells und deren Ableitungen
 PYTHON: Konvertiert den MAPLE Inhalt (Quadrocopter Modell) in die MATLAB Struktur
 MATLAB
+
 	- template_projekt: Template Projektdateien
 	- visualization: 
 		- 3D Animation des Quadrocopters
 		- Beispiele fuer Approximation, Skierfahrer, Horizon und Approximierung
-
 	- tests: Tests fuer den Quadropter  (vor jedem Test das Skript init ausfuehren )
 		- Wind: Simulation des Quadrocopter mit starkem Windeinfluss
 		- realtimevsfmincon: Vergleich zwischen Realtime Ansatz und fmincon
