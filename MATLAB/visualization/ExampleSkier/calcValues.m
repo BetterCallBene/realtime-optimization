@@ -226,7 +226,7 @@ angle = zeros(n_timepoints, 3);
 % Prepare variables
 global visualization
 
-visualization.yout = [ dot_ang , angle , dot_pos , posi, rand(n_timepoints, 3), norm_t'];
+visualization.yout = [ dot_ang , angle , dot_pos , posi, cQExt.WindSav(1:3,:)', norm_t'];
 visualization.tout = ones(n_timepoints,1);
 
 QuadAnim41;
