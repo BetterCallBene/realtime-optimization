@@ -48,7 +48,7 @@ for h = 1:length(horizons)
         %cQExt.hForceExt = @(v) 0.5 * rand_hF + cQ.getF_w(v);
         %cQExt.hMomentExt = @() 0.5 * rand_hM;
         %Neue Windfunktion
-        %env.wind = @(t, s_t, ctr)  cQExt.wind(s_t, ctr);
+%         env.wind = @(t, s_t, ctr)  cQExt.wind(t,s_t, ctr);
         env.wind = @(t, s_t, ctr) s_t + 0.5 * [rand_hF; zeros(10,1)];
         % Initialisierung der Dynamik
         cBQD = BasisQDyn(cQ, env, cIntegrator);
@@ -138,8 +138,8 @@ for h = 1:length(horizons)
         cQExt.hForceExt = @(v) 0.5 * rand_hF + cQ.getF_w(v);
         cQExt.hMomentExt = @() 0.5 * rand_hM;
         %Neue Windfunktion
-        env.wind = @(t, s_t, ctr)  cQExt.wind(s_t, ctr);
-        %env.wind = @(t, s_t ,ctr ) s_t + 0.5 * [rand(3,1); zeros(10,1)];
+%         env.wind = @(t, s_t, ctr)  cQExt.wind(t, s_t, ctr);
+        env.wind = @(t, s_t ,ctr ) s_t + 0.5 * [rand(3,1); zeros(10,1)];
         % Initialisierung der Dynamik
         cBQD = BasisQDyn(cQ, env, cIntegrator);
         
@@ -245,8 +245,9 @@ set(gca,'XTickLabel',names, 'XTick', 1:3 );
 
 b(1).FaceColor = 'red';
 b(2).FaceColor = 'blue';
+legend('Time in s', 'Error in m','Location', 'northwest');
+set(gca, 'FontSize', 12);
              
 relpath = 'visualization/Horizon_Measurement/';
 print([relpath, 'horizonPlot'], '-dsvg');
-legend('Time in s', 'Error in m');
-set(gca, 'FontSize', 12);
+
