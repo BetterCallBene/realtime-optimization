@@ -15,7 +15,11 @@ MATLAB
 		- realtimevsfmincon: Vergleich zwischen Realtime Ansatz und fmincon
 		- GlobalTest: Test aller Komponenten mit Hilfe von dem Skript runtests
 		- BasisKonfiguration: Alle Dateien die benoetigt werden, um einem neuen Test erstellen.
-			Erstellen eines Test im tests Ordner -> Neuen Ordner erstellen -> Ordner BasisKonfigurationen in den Pfad MATLAB integrieren -> Befehl start in die CommandBox eingeben -> MAPLE Input Skripte in den neuen Ordner exportieren 
+			Erstellen eines Test im tests Ordner 
+			-> Neuen Ordner erstellen 
+			-> Ordner BasisKonfigurationen in den Pfad MATLAB integrieren 
+			-> Befehl start in die CommandBox eingeben 
+			-> MAPLE Input Skripte in den neuen Ordner exportieren 
 	- rtopt: Ordner der MATLAB Projektdateien
 		- Realtime Ordner: Projektdateien speziell fuer den Realtime Ansatz.
 			
