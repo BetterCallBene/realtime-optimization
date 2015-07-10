@@ -245,8 +245,9 @@ set(gca,'XTickLabel',names, 'XTick', 1:3 );
 
 b(1).FaceColor = 'red';
 b(2).FaceColor = 'blue';
+legend('Time in s', 'Error in m','Location', 'northwest');
+set(gca, 'FontSize', 12);
              
 relpath = 'visualization/Horizon_Measurement/';
 print([relpath, 'horizonPlot'], '-dsvg');
-legend('Time in s', 'Error in m');
-set(gca, 'FontSize', 12);
+
