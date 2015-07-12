@@ -94,7 +94,8 @@
 %
 %\begin{document}
 
-\definecolor{green}{RGB}{0,190,0}
+\definecolor{green}{RGB}{0,190,45}
+\definecolor{green2}{RGB}{0,150,45}
 \definecolor{red}{RGB}{190,0,0}
 \definecolor{blue}{RGB}{0,0,190}
 
@@ -118,8 +119,8 @@
 %Draw time line
 \draw[ thick, ->] (-2.5,0) -- (2,0) node[anchor=west] {time};
 \foreach  \t in  {-2, -1, +1}
-	\draw[thick]  (\t cm, 1pt)  -- (\t cm, -1pt) node[anchor=north] {$t \t $ };
-\draw[thick]  (0cm , 1pt)  -- (0 cm, -1pt) node[anchor=north] {$t$ };
+	\draw[thick]  (\t cm, 1pt)  -- (\t cm, -1pt) node[anchor=north] {\footnotesize $t \t $ };
+\draw[thick]  (0cm , 1pt)  -- (0 cm, -1pt) node[anchor=north] {\footnotesize $t$ };
 
 %draw known controls
 \draw<2-> (2,1) node[anchor=west] {control};
@@ -129,7 +130,7 @@
 \draw<4->[->,red,thick] (0, 1.1) -- (1,1.1) ;
 
 %Draw actual time
-\draw[dashed] (-.8,3) -- (-.8,-1) node[anchor=north] {$t_{act}$};
+\draw[dashed] (-.65,3) -- (-.65,-1) node[anchor=north] {$t_{act}$};
 
 %Draw exact states
 \draw<2-> (2,2) node[anchor=west] {state};
@@ -140,99 +141,188 @@
 \end{figure}
 \end{frame}
 
-\begin{frame}{Minimization Problem}
+\begin{frame}{Discrete Problem}
 \begin{block}{}
-\small{
-\begin{align*}
-  \min_{\begin{array}{c} s_{t},...,s_{N}\\ q_{t},...,q_{N-1} \end{array}} \sum_{i=t}^{N-1} J_{i}(s_{i},q_{i}) \ \  
-  s.t. \ \left\lbrace \begin{array}{c}
-  x_{t} - s_{t} = 0 \\
-  h_i (s_i ,q_i ) - s_{i+1} = 0 \ \ \forall i = t, ... , N-1 \end{array} \right. 
-\end{align*}}
+%\begin{align*}
+\[  \min_{x, u} \sum_{i=t}^{N} J_{i}(x_{i},u_{i}) \quad  
+  \text{s.t.} \quad 
+  h_i (x_i ,u_i ) = 0 \quad  i = t, ... , N  \]
+%\end{align*}
 \end{block}
-\vspace{1ex}
+\vspace{2em}
 \begin{tabular}{l l}
-  $J_i(s_i, q_i)$ &  discretized goal function 
+  $J_i(x_i, u_i)$ &  discretized goal function 
+%  \vspace{1ex} \\
+%$x_t - s_t = 0$ & expected state $=$ real state
   \vspace{1ex} \\
-$x_t - s_t = 0$ & expected state $=$ real state
-  \vspace{1ex} \\
-$h_i (s_i ,q_i )$ & solution of the ODE at time $i$ \\
+$h_i (x_i ,u_i )$ & equality condition at time $i$ 
 \end{tabular}
 \end{frame}
 
 \begin{frame}{The Lagrangian}
 \begin{block}{ }
-\begin{align*}
-  L^{t}(y) = \sum_{i=t}^{N-1} J_{i}(s_{i},q_{i})
-  + \lambda_{t}^{T}(x_{t} - s_{t})
-  + \sum_{i=t}^{N-1} \lambda_{i+1}^{T} (h_i (s_i ,q_i ) - s_{i+1}) 
-\end{align*}
-\vspace{.1ex}
+%\begin{align*}
+%\begin{array}{c}
+\[  L^{t}(y) =   \sum\limits_{i=t}^{N} J_{i}(x_{i},u_{i})
+%  + \lambda_{t}^{T}(x_{t} - s_{t}) 
+  + \sum\limits_{i=t}^{N} \lambda_{i}^{T} h_i (x_i ,u_i ) \]
+%  \end{array}
+%\end{align*}
+%\vspace{.1ex}
 \end{block}
-\vspace{1ex}
-$$ y := (\lambda_{t},s_{t},q_{t},\lambda_{t+1},s_{t+1},q_{t+1}, ...,\lambda_{N},s_{N}) $$
-\vspace{1ex}
-We are looking for $y^*$ satisfying the KKT conditions: \\
-
-\[ \Rightarrow \nabla_{y} L^{t}(y^*)  = 0 \]
+$$ y := (\lambda,x,u) $$
+\vspace{1em}
+\[ y^* \text{ optimal} \Leftrightarrow \nabla_{y} L^{t}(y^*)  = 0 \]
 
 \end{frame}
+
+%\begin{frame}
+%	\frametitle{SQP-Formulation}
+%	
+%	\begin{block}{}
+%		\centering
+%			\parbox{7cm}{\( \min \limits_{x,u} J(x,u) \qquad \text{s.t.} \qquad h(x,u) = 0 \)	}
+%\end{block}
+%	
+%	\uncover<2>{
+%		\center{
+%		reformulation as SQP-Problem \\
+%		\vspace{1ex}
+%		\(\Downarrow\)
+%		\vspace{1em}
+%		}
+%		
+%		
+%		\begin{block}{}
+%		\centering
+%			\parbox{7cm}{\[ \min \limits_{s} \nabla J(x,u)^T s + \frac{1}{2}s^T \nabla^2 J(x,u)s \]
+%			 \[ \text{s.t.} \quad  h(x,u) + \nabla h(x,u)^Ts = 0 \]	}
+%	\end{block}
+%	}
+%	
+%\end{frame}
 
 \begin{frame}{The SQP Method}
-How to find $y^*$?
+Find $y^*$:
 \begin{block}{ }
-\begin{gather*}
-y_{k+1} = y_{k} + \alpha_{k} \Delta y_{k}  \\ 
-\min_{\Delta y_k}  \frac{1}{2} \Delta y_k^T A_k \Delta y_k + \nabla_{y_k} J(y_k)^T \Delta y_k
-\end{gather*} \vspace{.1ex}
+%\begin{gather*}
+\[ y_{k+1} = y_{k} + s_{k} \] \\ 
+\[\min_{s_k}  \frac{1}{2} s_k^T \nabla^2 L(y_k) s_k + \nabla L(y_k)^T s_k \]
+%\end{gather*} \vspace{.1ex}
 \end{block}
-\onslide<2->
-\vspace{1ex}
-Special case: \\
-\vspace{1ex}
-\begin{tabular}{l l}
-$ A_{k} = H(y_k)$ & approximated Hessian $\nabla^{2}_{y_k} L(y_k)$ \vspace{1ex} \\
-$\alpha_k = 1$ & 
-\end{tabular}
+%\onslide<2->
+%\vspace{1ex}
+%Special case: \\
+%\vspace{1ex}
+%\begin{tabular}{l l}
+%$ A_{k} = H(y_k)$ & approximated Hessian $\nabla^{2}_{y_k} L(y_k)$ \vspace{1ex} \\
+%$\alpha_k = 1$ & 
+%\end{tabular}
 \end{frame}
 
-\begin{frame}{Newton-Raphson}
-Find $\Delta y_k$ with:
+\begin{frame}{Quasi Newton-Method}
+Find $s_k$ with:
 \begin{block}{}
-\begin{gather*}
-\nabla_{y_k} L(y_{k}) + H(y_{k}) \Delta y_{k} = 0
-\end{gather*} \vspace{.1ex}
-\end{block}
-\onslide<2->
-There is only time for 1 SQP step:
-\begin{block}{ }
-\begin{gather*}
-y_{t+1} = y_1 = y_0 + \Delta y_0 \\
-\end{gather*}
-\end{block}
+%\begin{gather*}
+\[ \nabla L(y_{k}) + \nabla^2 L(y_k) s_{k} = 0 \]
+%\end{gather*} \vspace{.1ex}
+\end{block} 
+\vspace{1em}
+Approximate $\nabla^2 L(y_k)$ and solve:
+\begin{block}{}
+%\begin{gather*}
+\[ H(y_k) s_{k} = -\nabla L(y_{k}) \]
+%\end{gather*} \vspace{.1ex}
+\end{block} 
+%1 iteration per timestep:
+%\begin{block}{ }
+%\begin{gather*}
+%y_{t+1} = y_1 = y_0 + \Delta y_0 \\
+%\end{gather*}
+%\end{block}
 \end{frame}
 
 \begin{frame}{Riccati Recursion}
-Approximated Hessian:
-\begin{align*} 
-  \scriptstyle{H^{t}(y^{t})} =
-  \tiny{
-	\begin{pmatrix}
-		& -E  &     &     &     &     &     &     &     &     &     \\ \\
--E  & Q_t^{H} & M_t^{H} & A_t^{T} &  &    &     &     &     &     &     \\ \\
-    & (M_t^{T})^{H} & R_t^{H} & B_t^{T} &   &    &    &    &    &   &     \\ \\
-    & A_t & B_t &     & -E  &     &     &     &     &     &     \\ \\
-    &  &  & -E  & Q_{t+1}^{H} & M_{t+1}^{H} & A_{t+1}^{T} &  &  &  &  \\ \\
-    &  &  &     & (M_{t+1}^{T})^{H} & R_{t+1}^{H} & B_{t+1}^{T} &  &  &  &  \\ \\
-    &  &  &     & A_{t+1} & B_{t+1} &    &    &     &     &     \\ \\
-    &  &  &     &    &    &   & \ddots &     &     &     \\ \\
-    &  &  &   &  &  & \ddots & Q_{N-1}^{H} & M_{N-1}^{H} & A_{N-1}^{T} &  \\ \\
-    &  &  &   &  &  &    & (M_{N-1}^{T})^{H} & R_{N-1}^{H} & B_{N-1}^{T} &  \\ \\
-    &  &  &   &  &  &    & A_{N-1}     & B_{N-1} &    & -E \\ \\
-    &  &  &     &    &    &     &      &     & -E &  Q_N^{H} 
-\end{pmatrix}
-}
-  \end{align*}
+
+\begin{figure}
+\begin{tikzpicture}
+%Draw bounding box
+\draw[black] (-1.5,-4.5) rectangle (3.5,0.5);
+\draw[white,fill=white] (-1.4,0.6) rectangle (3.4,-4.6);
+
+\draw[black] (3.9,0.5) rectangle (4.5,-4.5);
+\draw[white,fill=white] (4,0.6) rectangle (4.4,-4.6);
+
+\draw[black] (5.4,0.5) rectangle (6,-4.5);
+\draw[white,fill=white] (5.5,0.6) rectangle (5.9,-4.6);
+
+\draw[thick, -] (4.7,-1.85) -- (5.2,-1.85);
+\draw[thick, -] (4.7,-2.15) -- (5.2,-2.15);
+
+\draw[blue,fill=blue] (-1,0.4) rectangle (-0.6, 0);
+\draw[blue,fill=blue] (-1.4,0) rectangle (-1, -0.4);
+\draw[blue,fill=blue] (-0.4,-0.6) rectangle (0.4, -1.4);
+\draw[blue,fill=blue] (0.6, -1.6) rectangle (1.4, -2.4);
+\draw[blue,fill=blue] (1.6, -2.6) rectangle (2.4, -3.4);
+\draw[blue,fill=blue] (2.6, -3.6) rectangle (3.4, -4.4);
+
+\draw[blue,fill=blue] (-1,0) rectangle (0, -1);
+\draw[blue,fill=blue] (0,-1) rectangle (1, -2);
+\draw[blue,fill=blue] (1,-2) rectangle (2, -3);
+\draw[blue,fill=blue] (2,-3) rectangle (3, -4);
+\draw[blue,fill=blue] (3,-4) rectangle (3.4, -4.4);
+
+\draw<4->[black!30,fill=black!30] (-0.4,-0.6) rectangle (0.4, -1.4);
+\draw<4->[black!30,fill=black!30] (0.6, -1.6) rectangle (1.4, -2.4);
+\draw<4->[black!30,fill=black!30] (1.6, -2.6) rectangle (2.4, -3.4);
+\draw<3->[black!30,fill=black!30] (2.6, -3.6) rectangle (3.4, -4.4);
+
+\draw<4->[black!30,fill=black!30] (-1,0) rectangle (0, -1);
+\draw<4->[black!30,fill=black!30] (0,-1) rectangle (1, -2);
+\draw<4->[black!30,fill=black!30] (1,-2) rectangle (2, -3);
+\draw<3->[black!30,fill=black!30] (2,-3) rectangle (3, -4);
+\draw<3->[black!30,fill=black!30] (3,-4) rectangle (3.4, -4.4);
+
+\draw[blue,fill=blue] (2,-3) rectangle (2.4, -3.4);
+\draw<4->[black!30,fill=black!30] (2,-3) rectangle (2.4, -3.4);
+\draw[blue,fill=blue] (-1,0) rectangle (-0.6, -0.4);
+
+\draw[green,fill=green] (4,-0.4) rectangle (4.4,-4.4);
+\draw<3->[black!30,fill=black!30] (4,-3.4) rectangle (4.4,-4.4);
+\draw<4->[black!30,fill=black!30] (4,-0.4) rectangle (4.4,-4.4);
+\draw[green,fill=green] (4,0.4) rectangle (4.4,-0.4);
+
+\draw[blue,fill=blue] (5.5,0.4) rectangle (5.9,0);
+\draw<2->[red,fill=red] (5.5,0.4) rectangle (5.9,0);
+\draw[blue,fill=blue] (5.5,-0.4) rectangle (5.9,-4.4);
+\draw<3->[black!30,fill=black!30] (5.5,-3.4) rectangle (5.9,-4.4);
+\draw<4->[black!30,fill=black!30] (5.5,-0.4) rectangle (5.9,-4.4);
+\draw[blue,fill=blue] (5.5,0) rectangle (5.9,-0.4);
+
+
+\end{tikzpicture} 
+\end{figure}
+
+
+%\textit{\begin{align*} 
+%  \scriptstyle{H^{t}(y^{t})} =
+%  \tiny{
+%	\begin{pmatrix}
+%		& -E  &     &     &     &     &     &     &     &     &     \\ \\
+%-E  & Q_t^{H} & M_t^{H} & A_t^{T} &  &    &     &     &     &     &     \\ \\
+%    & (M_t^{T})^{H} & R_t^{H} & B_t^{T} &   &    &    &    &    &   &     \\ \\
+%    & A_t & B_t &     & -E  &     &     &     &     &     &     \\ \\
+%    &  &  & -E  & Q_{t+1}^{H} & M_{t+1}^{H} & A_{t+1}^{T} &  &  &  &  \\ \\
+%    &  &  &     & (M_{t+1}^{T})^{H} & R_{t+1}^{H} & B_{t+1}^{T} &  &  &  &  \\ \\
+%    &  &  &     & A_{t+1} & B_{t+1} &    &    &     &     &     \\ \\
+%    &  &  &     &    &    &   & \ddots &     &     &     \\ \\
+%    &  &  &   &  &  & \ddots & Q_{N-1}^{H} & M_{N-1}^{H} & A_{N-1}^{T} &  \\ \\
+%    &  &  &   &  &  &    & (M_{N-1}^{T})^{H} & R_{N-1}^{H} & B_{N-1}^{T} &  \\ \\
+%    &  &  &   &  &  &    & A_{N-1}     & B_{N-1} &    & -E \\ \\
+%    &  &  &     &    &    &     &      &     & -E &  Q_N^{H} 
+%\end{pmatrix}
+%}
+%  \end{align*}}
 
 \end{frame}
 
@@ -252,16 +342,16 @@ What happens in interval $ [ t-1 , t ] $ ?
 %Solve for control in t_k-1
 \draw<2->[red,fill=red] (0,0) rectangle (0.05, 1);
 % Calculcate start value for t_k
-\draw<3->[green, fill=green] (0.05,0) rectangle (1, 1);
+\draw<3->[blue,fill=blue] (0.05,0) rectangle (1, 1);
 %Prepare for t_k
-\draw<4->[blue,fill=blue] (1,0) rectangle (5,1);
+\draw<4->[green, fill=green] (1,0) rectangle (5,1);
 \end{tikzpicture}
 \end{figure}
 
 \begin{enumerate}
 \item<2-> {\color{red} calculate control $u_{t-1}$ (Riccati Part II)}
-\item<3-> {\color{green} calculate $y$ (Riccati Part II)}
-\item<4-> {\color{blue} prepare $u_t$ (Newton \& Riccati Part I)} 
+\item<3-> {\color{blue} calculate $y$ (Riccati Part II)}
+\item<4-> {\color{green2} prepare $u_t$ (Newton \& Riccati Part I)} 
 \end{enumerate}
 \end{frame}
 
@@ -274,23 +364,50 @@ What happens in interval $ [ t-1 , t ] $ ?
 %\item .
 %\item .
 %\end{itemize}
-\begin{block}{}
-\small{
-\begin{align*}
-  \min_{\begin{array}{c} s_{t},...,s_{N}\\ q_{t},...,q_{N-1} \end{array}} \sum_{i=t}^{N-1} J_{i}(s_{i},q_{i}) \ \  
-  s.t. \ \left\lbrace \begin{array}{c}
-  x_{t} - s_{t} = 0 \\
-  h_i (s_i ,q_i ) - s_{i+1} = 0 \ \ \forall i = t, ... , N-1 \end{array} \right. 
-\end{align*}}
-\end{block}
-\vspace{1ex}
-How to choose $N$? \\
-\vspace{1ex}
-\begin{tabular}{l l}
-$N=t_{end} $ &$ \rightarrow $ problem size decreasing \\ \vspace{1ex}
-\onslide<2->
-$N=t+n $ & $\rightarrow $ problem size constant \\
-\end{tabular}
+%\begin{block}{}
+%\small{
+%\begin{align*}
+%  \min_{s, q} \sum_{i=t}^{N-1} J_{i}(s_{i},q_{i}) \ \  
+%  s.t. \ \left\lbrace \begin{array}{rl}
+%  x_{t} - s_{t} = 0 & \\
+%  h_i (s_i ,q_i ) - s_{i+1} = 0 & \forall i = t, ... , N-1 \\
+%  p_{A_i}(s_i, q_i) = 0 & \end{array} \right. 
+%\end{align*}}
+%\end{block}
+%\vspace{1ex}
+%How to choose $N$? \\
+%\vspace{1ex}
+%\begin{tabular}{l l}
+%$N=t_{end} $ &$ \rightarrow $ problem size decreasing \\ \vspace{1ex}
+%\onslide<2->
+%$N=t+n $ & $\rightarrow $ problem size constant \\
+%\end{tabular}
+\begin{figure}
+\begin{tikzpicture}[decoration={brace,amplitude=6pt}]
+
+%Draw bounding box
+\draw[white] (-1,2) rectangle (8,0);
+
+%Draw time line
+\draw[ thick, ->] (-0.5,1) -- (8,1) node[anchor=west] {time};
+	\draw[thick]  (0, 1.05)  -- (0, 0.95) node[anchor=north] {\footnotesize t };
+	\draw[thick]  (1, 1.05)  -- (1, 0.95) node[anchor=north] {\footnotesize $t+1$ };
+	\draw[thick]  (6, 1.05)  -- (6, 0.95) node[anchor=north] {\footnotesize $t+N$ };
+	\draw[thick]  (7, 1.05)  -- (7, 0.95) ;
+	\draw[thick, decorate] (0,1.3) -- (6,1.3) node[midway, above,yshift=6pt,]{Horizon of t};
+	\draw[thick, decorate] (7,0.4) -- (1,0.4) node[midway, below,yshift=-6pt,]{Horizon of t+1};
+	
+
+\end{tikzpicture}
+\end{figure}
+$
+\begin{array}{l c c}
+		& \text{runtime} & \text{error} \\
+N=20 	&         &       \\
+N=50	&         &       \\
+N=100	&         &       
+\end{array}
+$
 
 \end{frame}
 %\end{document}

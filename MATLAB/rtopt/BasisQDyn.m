@@ -1,8 +1,19 @@
 classdef BasisQDyn < BasisGenQDyn
     
     properties
-        backdoor_vec;
+        backdoor_vec; % Zentrales Speichervektor
+        steadyPoint; % Punkt in dem Kraefte F_1, F_2, F_3 und F_4 im Gleichgewicht sind
+        
+        %dotDpatternflag;
+        %dotDDpatternflag;
+        
+        %dotDCellpattern;
+        %dotDDCellpattern;
+        
+        
     end
+    
+    
     
     properties(Dependent)
         state;
@@ -10,10 +21,47 @@ classdef BasisQDyn < BasisGenQDyn
         vec;
     end
     
+    methods(Static)
+        
+        function res = getsetSteadyPoint(value, getsetflag)
+            %getsetSteadyPoint SteadyPoint sollt nur einmal pro
+            %Programmablauf berechnet werden
+            
+            %Workaround fuer static Variablen %oh... Matlab
+            persistent steadyPoint_;
+            
+            if getsetflag
+                res = steadyPoint_;
+            else
+                steadyPoint_ = value;
+            end
+        end
+    end
+    
+    methods %getter/setter
+        
+        function set.steadyPoint(obj, value)
+            BasisQDyn.getsetSteadyPoint(value, false);
+        end
+    end
+    
     methods
+        
         function bQDyn = BasisQDyn(varargin)
             bQDyn@BasisGenQDyn();
-            if (nargin >= 1)
+            
+            %bQDyn.dotDpatternflag = true;
+            %bQDyn.dotDDpatternflag = true;
+            
+            nargin_tmp = nargin;
+            m = metaclass(bQDyn);
+            
+            if strcmp(m.Name, 'BasisQDyn') == false %Supclass?
+                varargin = varargin{1};
+                nargin_tmp = length(varargin);
+            end
+            
+            if (nargin_tmp >= 1)
                 mc = metaclass(varargin{1});
                 if strcmp(mc.SuperclassList(1).Name, 'Model')
                     bQDyn.robot = varargin{1};
@@ -21,7 +69,7 @@ classdef BasisQDyn < BasisGenQDyn
                     error('First argument must be instance of Model');
                 end
             end
-            if (nargin >= 2)
+            if (nargin_tmp >= 2)
                 if isa(varargin{2}, 'Environment')
                     bQDyn.environment = varargin{2};
                 else
@@ -29,7 +77,7 @@ classdef BasisQDyn < BasisGenQDyn
                 end
             end
             
-            if (nargin >= 3)
+            if (nargin_tmp >= 3)
                 if isa(varargin{3}, 'Solver')
                     bQDyn.solver = varargin{3};
                     bQDyn.solver.dyn = bQDyn;
@@ -44,7 +92,7 @@ classdef BasisQDyn < BasisGenQDyn
             if (isempty(obj.backdoor_vec) || size(obj.backdoor_vec, 1) ~= size(vec, 1) || (norm(obj.backdoor_vec - vec)>1e-10))
                 obj.backdoor_vec = vec;
                 obj.emptyResults();
-            end   
+            end
         end
         
         function res = get.backdoor_vec(obj)
@@ -52,6 +100,8 @@ classdef BasisQDyn < BasisGenQDyn
         end
         
         function set.vec(obj, vec)
+            % vec Mit diesem Getter wird der zentrale Vektor backdoor_vec
+            % initialisiert und die Quartionen normiert
             n_int = obj.environment.n_intervals;
             n_state = obj.robot.n_state;
             n_contr = obj.robot.n_contr;
@@ -59,7 +109,7 @@ classdef BasisQDyn < BasisGenQDyn
                 error('Gitter ist noch nicht initialisiert');
             end
             n_var = (n_state + n_contr);
-            n = (n_int + 1)*n_var;        
+            n = (n_int + 1)*n_var;
             if size(vec, 1) == n
                 for i = 1:(n_int+1)
                     q = vec((i-1)*n_var + 4:(i-1)*n_var + 7);
@@ -74,88 +124,128 @@ classdef BasisQDyn < BasisGenQDyn
         function ret =  get.vec(obj)
             ret = obj.backdoor_vec;
         end
-                
+        
         % getter methods
         function val = get.state(obj)
-           % get the current state values
-           % (if not yet stored, extract them from vec)
-           
-           n_int       = obj.environment.n_intervals;
-           n_state       = obj.robot.n_state;
-           n_contr     = obj.robot.n_contr;
-                
-           val        = zeros(n_state,n_int+1);
-
-           for i = 1:n_int+1
+            % get the current state values
+            % (if not yet stored, extract them from vec)
+            
+            n_int       = obj.environment.n_intervals;
+            n_state       = obj.robot.n_state;
+            n_contr     = obj.robot.n_contr;
+            
+            val        = zeros(n_state,n_int+1);
+            
+            for i = 1:n_int+1
                 val(:,i) = obj.vec((i-1)*(n_state+n_contr)+1:...
-                                (i-1)*(n_state+n_contr)+n_state);
-           end
-           
+                    (i-1)*(n_state+n_contr)+n_state);
+            end
+            
         end
         
         
         function val = get.contr(obj)
-           % get the current control values
-           % (if not yet stored, extract them from vec)            
-           
+            % get the current control values
+            % (if not yet stored, extract them from vec)
+            
             n_int       = obj.environment.n_intervals;
             n_var       = obj.robot.n_state;
             n_contr     = obj.robot.n_contr;
-
+            
             val        = zeros(n_contr,n_int+1);
-
+            
             for i = 1:n_int+1
                 val(:,i) = obj.vec((i-1)*(n_var+n_contr)+n_var + 1:...
-                           i*(n_var+n_contr));
+                    i*(n_var+n_contr));
             end
         end
         
-        %function res = get.state(cq)
-        %    res = cq.backdoor_state;
-        %end
+        function ret = get.steadyPoint(obj)
+            %steadyPoint Eigenschaft gibt den Punkt zurueck in dem die
+            %Kraefte im Gleichgewicht sind
+            steadyPoint_ = BasisQDyn.getsetSteadyPoint([], true);
+            if isempty(steadyPoint_);
+                %[q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = obj.getParams();
+                m = obj.robot.m;
+                kT = obj.robot.kT;
+                g = obj.environment.g;
+                estimator_u = sqrt(1/4 * m * g * 1/kT);
+                estimator = [zeros(3, 1);1;zeros(9, 1);repmat(estimator_u, 4, 1)];
+                options = optimoptions('fsolve', 'Algorithm', 'levenberg-marquardt');
+                n_int_sav = obj.environment.n_intervals;
+                obj.environment.n_intervals = 0;
+                [steadyPoint_,fval,exitflag,output] = fsolve(@obj.helperF, estimator, options);
+                
+                BasisQDyn.getsetSteadyPoint(steadyPoint_, false);
+                obj.environment.n_intervals = n_int_sav ;
+                
+            end
+            ret = steadyPoint_;
+        end
         
+        function res = helperF(obj, y)
+            obj.backdoor_vec = y;
+            res = obj.F(:, 1);
+        end
         
         
         function res = dot(obj,ind) % Rechte Seite der ODE aus (Quadrocoptermodell.pdf: (1.46))
             % compute the right hand side of the ode for a given time
             % instance ind
-            if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
-                res = obj.F(:, ind);
-            else
-                error('wrong state and control lengths wrt index.');
-            end
+            res = obj.F(:, ind);
         end
         
         
         function res = dotD(obj,ind )
             % compute the Jacobian of the right hand side of the ode for
             % a given time instance ind
-            if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
-                J_ = obj.J;
-                res = sparse(J_(:, 1), J_(:, 2), J_(:, ind + 2), 13, 17);
-            else
-                error('wrong state and control lengths wrt index.');
-            end
+            J_ = obj.J;
+            res = sparse(J_(:, 1), J_(:, 2), J_(:, ind + 2), 13, 17);
         end
         
         function res = dotDD(obj,ind)
             % compute the Hessian of the right hand side of the ode for
-            % a given time instance ind
-            if ((size(obj.contr,2)==size(obj.state,2))&&(ind <= size(obj.contr,2)))
-                res = cell(1, 13);
-                H_ = obj.H;
-                for i = 1:size(H_, 1)
-                    if isempty(res{H_(i, 1)})
-                        res{H_(i, 1)} = zeros(17, 17);
-                    end
-                    res{H_(i, 1)}(H_(i, 2), H_(i, 3)) = H_(i, ind + 3);
-                end
+            %           % a given time instance ind
+            res = zeros(13, 17, 17);
+            H_ = obj.H;
+            for i = 1:size(H_, 1)
+                res(H_(i, 1), H_(i, 2), H_(i, 3)) = H_(i, ind + 3);
             end
         end
+    end
+    methods
+%         function pattern =  dotDpattern(obj)
+%             if obj.dotDpatternflag
+%                 J_ = obj.J;
+%                 
+%                 obj.dotDCellpattern = sparse(J_(:, 1), J_(:, 2), ones(size(J_(:, 1), 1), size(J_(:, 1), 2)), 13, 17);
+%                 obj.dotDpatternflag = false;
+%             end
+%             pattern = obj.dotDCellpattern;
+%         end
+%         
+%         function pattern =  dotDDpattern(obj)
+%             if obj.dotDDpatternflag
+%                 n_state       = obj.robot.n_state;
+%                 
+%                 obj.dotDDCellpattern = cell(1, n_state);
+%                 H_ = obj.H;
+%                 for i = 1:size(H_, 1)
+%                     if isempty(obj.dotDDCellpattern{H_(i, 1)})
+%                         obj.dotDDCellpattern{H_(i, 1)} = sparse(17, 17);
+%                     end
+%                     obj.dotDDCellpattern{H_(i, 1)}(H_(i, 2), H_(i, 3)) = 1;
+%                 end
+%                 
+%                 obj.dotDDpatternflag = false;
+%             end
+%             pattern = obj.dotDDCellpattern;
+%         end
         
     end
     methods(Test)
         function testInitBasisQDyn(obj)
+            %testInitBasisQDyn Funktionstest von BasisQDyn
             n_int_ = uint16(50);
             obj.environment = Environment();
             obj.environment.setUniformMesh(n_int_);

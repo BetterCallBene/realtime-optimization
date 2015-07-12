@@ -1,51 +1,84 @@
-n_int = 50;
-% Quadrocopter soll 5 Meter hoch fliegen
-xbc = [         ... Variablenname L�nge   Name
-                ... Anfangsbedingung
-    0, 0, 0.5,  ...     r           3      Ortsvektor
-    1, 0, 0, 0, ...     q           4      Quaternion (Einheitsquaternion)
-    0, 0, 0,    ...     v           3      Translatorische Geschwindigkeit
-    0, 0, 0;    ...     w           3      Winkelgeschwindigkeit
-                ... Endbedingung
-    0, 0, 0,    ...
-    1, 0, 0, 0, ...
-    0, 0, 0,    ...
-    0, 0, 0     ...
-];    
+close all
+%% Define setting
+
+% Quadrocopter soll einen halben Meter nach unten fliegen
+
+%Choose horizon
+horizon = 12;
+pointPerSecond = 1;
 
 env = Environment();
-env.xbc = xbc;
-env.setUniformMesh(uint16(n_int));
+env.horizon = horizon;
+%Die Dynamik wird nur auf dem Horizon betrachtet:
+n_intervals = env.setUniformMesh1(horizon+1,pointPerSecond); 
 
 cQ = Quadrocopter();
 
-% TODO: Irgendwas besser f�r Startl�sung als rand finden
-v0 = rand(cQ.n_var*(n_int+1),1);
-
-% Initialisierung der Dynamik
-%TODO: Klasse
-cBQD = BasisQDyn(cQ, env);
-cBQD.vec = rand(cQ.n_var * (n_int+1), 1);
-
 % Wahl des Integrators
-cFE = ForwEuler(cBQD);
+tol = 1e-2;
+opts = odeset('RelTol',tol,'AbsTol',0.1*tol);
+cIntegrator = ode15sM(opts);
+cIntegratorExt = ode15sM(opts);
+%cIntegrator = ForwEuler();
+
+
+cQExt = QuadrocopterExt(cQ, env, cIntegratorExt);
+cQExt.steadyPoint = [];  %steadyPoint initialisieren: SteadyPoint ist eine globale Variable!!
+cQExt.hForceExt = @(v) 0.1 * rand(3, 1) + cQ.getF_w(v);
+cQExt.hMomentExt = @() 0.1 * rand(3, 1);
+%Neue Windfunktion
+env.wind = @(t, s_t, ctr)  cQExt.wind(s_t, ctr);
+%env.wind = @(t, s_t, ctr) s_t + 0.1 * [rand(3,1); zeros(10,1)];
+% Initialisierung der Dynamik
+cBQD = BasisQDyn(cQ, env, cIntegrator);
+
+% Initialisierung des Multiple Shootings
+cMultShoot = MultiShooting(cBQD);
 
 % Initialisierung der Nebenbedingungen
-%TODO: Klasse
-cC = Constraints(cFE);
+cConst = Constraints(cMultShoot);
 
 % Initialisierung Kostenfunktion
-cCost = Costs(cBQD);
+cCost = CostsComplet(cBQD, 0.1, 2, 1, 1);
 
-%Choose horizon
-horizon = 15;
+n_timepoints = 50 ; %How many timepoints, do we want to calculate.
 
-%Choose starting value 
-y_var = cQ.n_var + size(cC.get_eq_con(),1);
-y = zeros( y_var * horizon, 1);
-y(7:y_var: horizon*y_var) = 1; % Normalize Quaternions
-%%
+%Define Cam Position function
+cCost.cam_pos = @(t) cCost.skierCamPos(t);
+
+%% Choose starting values
+
+s = cell(n_intervals +1,1);
+q = cell(n_intervals,1);
+lambda = cell(n_intervals +1 ,1);
+mu = ones( cConst.n_addConstr * (n_intervals+1),1);
+
+% Setup a initial estimation
+steadyPoint = cBQD.steadyPoint;
+
+% Place Quadrocopter at the desired camera position 
+steadyPoint(1:3) = cCost.cam_pos(1);
+
+for i = 1: n_intervals 
+s{i} = steadyPoint(1:cQ.n_state);
+q{i} = steadyPoint(cQ.n_state + 1 : cQ.n_var); 
+lambda{i} = i *ones(cQ.n_state,1);
+end
+
+s{n_intervals +1} = 2 * steadyPoint(1:cQ.n_state);
+lambda{n_intervals +1} = ones(cQ.n_state,1);
+
+% Initialisierung des Solvers
+cRTSolver = RealtimeSolver(cCost, cConst,lambda, s, q, mu);
+
+%Choose how to calculate the LDD (approximation or not)?
+cLagrange = Lagrange();
+getLD = @(cRTSolver, t) cLagrange.getLD(cRTSolver,t);
+getLDD = @(cRTSolver,t) cLagrange.getLDD_approx_costDDpAlphaI(cRTSolver, t, 0.01 * ones(17,1) ) ;
+
+%% Calculate the solution with fminrt
+
 tic;
 %Use realtime solver
-v = fminrt(cCost, cC, horizon, y);
-toc;
+[res, est_y  ] = cRTSolver.fminrt(getLD, getLDD, n_timepoints);
+ProcessTime = toc;

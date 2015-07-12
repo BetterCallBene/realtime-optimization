@@ -1,0 +1,106 @@
+\documentclass[aspectratio=169,12pt]{beamer} %[aspectratio=169]
+
+\usepackage{pgfpages} %This is needed for notes presentation!
+%\setbeameroption{}
+\usepackage[ngerman, english]{babel}
+\usepackage[latin1]{inputenc} 
+\usepackage{amsmath,amssymb,amsthm,amstext}  
+\usepackage{enumerate}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{plotmarks}
+\usetikzlibrary{arrows, positioning}
+\usepackage{lmodern}
+\usepackage{textpos}
+\usepackage{relsize}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{fancybox}
+\usepackage{float}
+\usepackage{sidecap}
+\usepackage{multimedia}
+% \usepackage{algorithmicx}
+% \usepackage{algpseudocode}
+
+
+\newcommand{\lk}{\left}
+\newcommand{\rk}{\right}
+\newcommand{\rel}{\sqsubseteq}
+\newcommand{\rhn}{\mathds{R}^n}
+ 
+\usetheme{Madrid} % Antibes, Berlin, darmstadt, default, Frankfurt; JuanLesPins
+\usecolortheme{beaver}
+\useinnertheme{rounded}
+\useoutertheme{infolines}
+\usefonttheme{default}
+
+% Seitenzahlen
+\setbeamertemplate{footline}[frame number]
+
+\title{Real Time Control of a Quadcopter}
+\author{Simon Kick, Philipp Fr\"ohlich, Benedikt K\"onig, Annika Stegie}
+\institute{Technische Universit\"at M\"unchen}
+\date{11 July 2015}
+
+\beamertemplatenavigationsymbolsempty
+% kleine Symbole zur Nvigation wegmachen
+
+\setcounter{MaxMatrixCols}{20}
+
+
+\begin{document}
+
+
+\begin{frame}
+\maketitle
+\thispagestyle{empty}
+\end{frame}
+
+% 1.  Folie mit Poster-Bild zur Erklärung was wir überhaupt machen - ok
+% 2.  Mindmap mit den Bausteinen unseres Projekts
+% 3.  Formulierung unseres Optimierungsproblems -> kurz warum SQP
+%     Erklärung wann dikretisierung??? in Folien???
+% 4.  Mindmap mit Haken bei Problem-Formulierung?
+% 5.  Modell -> Bilder schön einzeln und Formeln immer mit passenden Bildern
+% 6.  ?????? Lösung der ODEs mit multiple shooting Ansatz????
+% 7.  Mindmap Modell abgehakt
+% 8.  Realtime, Riccati, ... Zeitenvergleich mit und ohne Riccati
+% 9.  Mindmap Realtime ok
+% 10. Ergebnisse: Wind, verschiedene Flugbahnen, mit und ohne stabilisierung, ...
+
+\input{Sections/Motivation_End}
+\input{Inhalt/Inhalt_alles_grau}
+\input{Sections/SQP-Formulierung_End}
+\input{Sections/Model_End}
+\input{Inhalt/Inhalt_Quaternions}
+\input{Sections/Quaternions_End}
+\input{Inhalt/Inhalt_Discretization}
+\input{Sections/rtSQP}
+\input{Inhalt/Inhalt_Results}
+
+
+%TODO:
+%  1. Zitate, Quellen (welche Auswahl?) - ok
+%  2. Quellen vor oder nach "`Frage"' Seite 
+%  3. Mindmap
+%  4. passt alles zusammen?
+%  5. Quaternionen-Bild - ok
+%  6. PS Setting???? andere Überschrift?
+% 
+
+\nocite{Boyd2009}
+\nocite{Diehl2001}
+\nocite{Diehl2002}
+\nocite{Diehl2005}
+\nocite{Diebel2006}
+\nocite{Garcia2013}
+%\nocite{Richter-Gebert2009}
+%\nocite{Reyes-Valeria2013}
+%\nocite{Hartmann2014}
+%
+\begin{frame}[allowframebreaks] % Literaturverzeichnis über mehrere Frames
+ \frametitle{References}
+	\bibliography{Literaturliste}
+	\bibliographystyle{plain}
+\end{frame}
+\end{document}

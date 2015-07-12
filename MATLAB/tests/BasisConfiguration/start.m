@@ -31,6 +31,11 @@ if exist(path_protokoll, 'file') == 0
     copyfile('../BasisConfiguration/Latex/protokoll.tex', 'html/protokoll.tex')
 end
 
+helper_dir = strcat(currentpath, 'helper/');
+if exist(helper_dir, 'dir') == 0
+    copyfile('../BasisConfiguration/helper/*', 'helper')
+end
+
 run init
 
 

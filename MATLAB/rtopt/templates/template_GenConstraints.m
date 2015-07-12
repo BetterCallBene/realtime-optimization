@@ -24,6 +24,8 @@ classdef(Abstract) GenConstraints < handle
     methods
         function set.vec(obj, vec_)
             obj.dyn.backdoor_vec = vec_;
+            obj.dode.flag_h = false;
+            obj.dode.flag_hDD = false;
         end
     end
     
@@ -52,7 +54,7 @@ classdef(Abstract) GenConstraints < handle
         
         function res = get.InEqCon(obj)
             %if obj.isEmptyF
-            [r, q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int] = getParams(obj);
+            [r, q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr, n_var, umin, umax] = getParams(obj);
                 
             $10$ %inEqCountConstraints
             res = zeros((n_int+ 1) * inEqCountConstraints, 1);
@@ -151,7 +153,7 @@ classdef(Abstract) GenConstraints < handle
             end
         end
         
-        function [r, q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr, n_var] = getParams(obj)
+        function [r, q,v,omega,u,Iges,IM,m,kT,kQ,d,g, n_int, n_state, n_contr, n_var, umin, umax] = getParams(obj)
             
             r   = obj.dyn.state(1:3    , :);
             q   = obj.dyn.state(4:7    , :);
@@ -171,6 +173,9 @@ classdef(Abstract) GenConstraints < handle
             kQ  = obj.dyn.robot.kQ;
             d   = obj.dyn.robot.d;
             g   = obj.dyn.environment.g;
+            
+            umin = obj.dyn.robot.u_min;
+            umax = obj.dyn.robot.u_max;
         end
         
     end

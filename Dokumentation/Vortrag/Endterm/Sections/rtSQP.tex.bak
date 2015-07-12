@@ -1,0 +1,429 @@
+%\documentclass{beamer}
+%
+%\usepackage{pgfpages} %This is needed for notes presentation!
+%%\setbeameroption{}
+%
+%\usepackage{enumerate, amsmath, amssymb,amsthm, amstext,color}
+%\usepackage[ngerman]{babel}
+%\usepackage[utf8]{inputenc}   
+%\usepackage{dsfont}
+%\usepackage{geometry}
+%\usepackage{fancyhdr}
+%\usepackage{tikz}
+%\usetikzlibrary{plotmarks}
+%\usetikzlibrary{arrows, positioning}
+%
+%\usepackage{float}
+%\usepackage{color}
+%\usepackage{hyperref}
+%% \usepackage{algorithmicx}
+%% \usepackage{algpseudocode}
+%\usepackage{fancybox}
+%\usepackage{float}
+%\usepackage{sidecap}
+%\usepackage[ngerman]{babel}
+%
+%
+%\newcommand{\lk}{\left}
+%\newcommand{\rk}{\right}
+%\newcommand{\rel}{\sqsubseteq}
+%\newcommand{\rhn}{\mathds{R}^n}
+% 
+%  \usetheme{Berlin}
+%%\usetheme{
+%%	AnnArbor | Antibes | Bergen |
+%%	Berkeley | Berlin | Boadilla |
+%%	boxes | CambridgeUS | Copenhagen |
+%%	Darmstadt | default | Dresden |
+%%	Frankfurt | Goettingen |Hannover |
+%%	Ilmenau | JuanLesPins | Luebeck |
+%%	Madrid | Malmoe | Marburg |
+%%	Montpellier | PaloAlto | Pittsburgh |
+%%	Rochester | Singapore | Szeged |
+%%	Warsaw
+%%}
+%\usecolortheme{beaver}
+%% \usecolortheme{
+%% 	albatross | beaver | beetle |
+%% 	crane | default | dolphin |
+%% 	dove | fly | lily | orchid |
+%% 	rose |seagull | seahorse |
+%% 	sidebartab | structure |
+%% 	whale | wolverine
+%% }
+%
+%\useinnertheme{rounded}
+%% \useinnertheme{
+%% 	circles | default | inmargin |
+%% 	rectangles | rounded
+%% }
+%
+%\useoutertheme{infolines}
+%% \useoutertheme{
+%% 	default | infolines | miniframes |
+%% 	shadow | sidebar | smoothbars |
+%% 	smoothtree | split | tree
+%% }
+%
+%\usefonttheme{default}
+%% \usefonttheme{
+%% 	default | professionalfonts | serif |
+%% 	structurebold | structureitalicserif |
+%% 	structuresmallcapsserif
+%% }
+%
+%% Seitenzahlen
+%\setbeamertemplate{footline}[frame number]
+%
+%\title{Mid-term presentation}
+%\author{The Quadrocopters}
+%\institute{Technische Universität München}
+%\date{\today}
+%% \titlegraphic{\pgfimage[width=1cm,height=1cm]{MA_Web}}
+%%\logo{\pgfimage[width=1.2cm,height=1.2cm]{MA_Web}}
+%
+%
+%%\AtBeginSection[]{
+%%	\frame{
+%%	\frametitle{\"Ubersicht}
+%%	\tableofcontents[current, currentSection]}
+%%
+%%}
+%
+%\setcounter{MaxMatrixCols}{20}
+%
+%\begin{document}
+
+\definecolor{green}{RGB}{0,190,45}
+\definecolor{green2}{RGB}{0,150,45}
+\definecolor{red}{RGB}{190,0,0}
+\definecolor{blue}{RGB}{0,0,190}
+
+%\begin{frame}
+%\maketitle
+%\end{frame}
+%
+%\begin{frame}
+%\tableofcontents
+%\end{frame}
+
+\section{Realtime Optimization Approach}
+\begin{frame}{Setting}
+
+\begin{figure}
+\begin{tikzpicture}[scale=1.2]
+
+%Draw bounding box
+\draw (-2.75,-1.75) rectangle (3.75,3.25);
+
+%Draw time line
+\draw[ thick, ->] (-2.5,0) -- (2,0) node[anchor=west] {time};
+\foreach  \t in  {-2, -1, +1}
+	\draw[thick]  (\t cm, 1pt)  -- (\t cm, -1pt) node[anchor=north] {\footnotesize $t \t $ };
+\draw[thick]  (0cm , 1pt)  -- (0 cm, -1pt) node[anchor=north] {\footnotesize $t$ };
+
+%draw known controls
+\draw<2-> (2,1) node[anchor=west] {control};
+\draw<2->[->,green2] (-2.5, 0.8) -- (-2,0.8) ;
+\draw<2->[->,green2] (-2, 1.2) -- (-1,1.2) ;
+\draw<2->[->,green2] (-1, 0.9) -- (0,0.9) ;
+\draw<4->[->,red,thick] (0, 1.1) -- (1,1.1) ;
+
+%Draw actual time
+\draw[dashed] (-.65,3) -- (-.65,-1) node[anchor=north] {$t_{act}$};
+
+%Draw exact states
+\draw<2-> (2,2) node[anchor=west] {state};
+\draw<2->[green2, fill=green2] (-2, 2.2) circle (1pt) node[anchor=north]{\footnotesize $x_{t-2}$};
+\draw<2->[green2, fill=green2] (-1, 1.9) circle (1pt) node[anchor=north]{\footnotesize $x_{t-1}$};
+\draw<3->[red, fill=red] (0,2.1) circle (1pt) node[anchor=north]{\footnotesize $x_{t}$};
+\end{tikzpicture}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Discrete Problem}
+\begin{block}{}
+%\begin{align*}
+\[  \min_{x, u} \sum_{i=t}^{t+N} J_{i}(x_{i},u_{i}) \qquad  
+  \text{s.t.} \quad 
+  h_i (x_i ,u_i ) = 0 \quad  i = t, ... , t+N  \]
+%\end{align*}
+\end{block}
+\vspace{2em}
+\begin{tabular}{l l}
+  $J_i(x_i, u_i)$ &  discretized goal function 
+%  \vspace{1ex} \\
+%$x_t - s_t = 0$ & expected state $=$ real state
+  \vspace{1ex} \\
+$h_i (x_i ,u_i )$ & equality constraints at time $i$ 
+\end{tabular}
+\end{frame}
+
+\input{Inhalt/Inhalt_Riccati2}
+
+\begin{frame}{The Lagrangian}
+\begin{block}{ }
+%\begin{align*}
+%\begin{array}{c}
+\[  L(y) =   \sum\limits_{i=t}^{t+N} J_{i}(x_{i},u_{i})
+%  + \lambda_{t}^{T}(x_{t} - s_{t}) 
+  + \sum\limits_{i=t}^{t+N} \lambda_{i}^{T} h_i (x_i ,u_i ) \]
+%  \end{array}
+%\end{align*}
+%\vspace{.1ex}
+\end{block}
+\begin{gather*}
+	y := (\lambda,x,u) \\
+	\vspace{1ex}
+	y^* \text{ optimal} \quad \Leftrightarrow \quad \nabla_{y} L(y^*)  = 0
+\end{gather*}
+
+\end{frame}
+
+%\begin{frame}
+%	\frametitle{SQP-Formulation}
+%	
+%	\begin{block}{}
+%		\centering
+%			\parbox{7cm}{\( \min \limits_{x,u} J(x,u) \qquad \text{s.t.} \qquad h(x,u) = 0 \)	}
+%\end{block}
+%	
+%	\uncover<2>{
+%		\center{
+%		reformulation as SQP-Problem \\
+%		\vspace{1ex}
+%		\(\Downarrow\)
+%		\vspace{1em}
+%		}
+%		
+%		
+%		\begin{block}{}
+%		\centering
+%			\parbox{7cm}{\[ \min \limits_{s} \nabla J(x,u)^T s + \frac{1}{2}s^T \nabla^2 J(x,u)s \]
+%			 \[ \text{s.t.} \quad  h(x,u) + \nabla h(x,u)^Ts = 0 \]	}
+%	\end{block}
+%	}
+%	
+%\end{frame}
+
+\begin{frame}{The SQP Method}
+Find $y^*$:
+\begin{block}{ }
+%\begin{gather*}
+\[ y_{1} = y_{0} + s \]
+\[\min_{s}  \frac{1}{2} s^T \nabla^2 L(y_0) s + \nabla L(y_0)^T s \]
+%\end{gather*} \vspace{.1ex}
+\end{block}
+%\onslide<2->
+%\vspace{1ex}
+%Special case: \\
+%\vspace{1ex}
+%\begin{tabular}{l l}
+%$ A_{k} = H(y_k)$ & approximated Hessian $\nabla^{2}_{y_k} L(y_k)$ \vspace{1ex} \\
+%$\alpha_k = 1$ & 
+%\end{tabular}
+\hfill
+\centering
+\input{images/Formeltest}
+
+\end{frame}
+
+\begin{frame}{Quasi Newton-Method}
+Find $s$ with:
+\begin{block}{}
+%\begin{gather*}
+\[ \nabla L(y_{0}) + \nabla^2 L(y_0) s = 0 \]
+%\end{gather*} \vspace{.1ex}
+\end{block} 
+\vspace{1em}
+Approximate $\nabla^2 L(y_0)$ and solve:
+\begin{block}{}
+%\begin{gather*}
+\[ H(y_0) s = -\nabla L(y_{0}) \]
+%\end{gather*} \vspace{.1ex}
+\end{block} 
+%1 iteration per timestep:
+%\begin{block}{ }
+%\begin{gather*}
+%y_{t+1} = y_1 = y_0 + \Delta y_0 \\
+%\end{gather*}
+%\end{block}
+\end{frame}
+
+\begin{frame}{Riccati Recursion}
+
+\begin{figure}
+\begin{tikzpicture}
+%Draw bounding box
+\draw[black] (-1.5,-4.5) rectangle (3.5,0.5);
+\draw[white,fill=white] (-1.4,0.6) rectangle (3.4,-4.6);
+%Schrift einfügen
+\draw (1,-5.2) node {\large $H(y_0)$}
+		(4.2,-5.2) node {\large $s$}
+		(5.7,-5.2) node {\large $-\nabla L(y_{0})$};
+
+\draw[black] (3.9,0.5) rectangle (4.5,-4.5);
+\draw[white,fill=white] (4,0.6) rectangle (4.4,-4.6);
+
+\draw[black] (5.4,0.5) rectangle (6,-4.5);
+\draw[white,fill=white] (5.5,0.6) rectangle (5.9,-4.6);
+
+\draw[thick, -] (4.7,-1.85) -- (5.2,-1.85);
+\draw[thick, -] (4.7,-2.15) -- (5.2,-2.15);
+
+\draw[blue,fill=blue] (-1,0.4) rectangle (-0.6, 0);
+\draw[blue,fill=blue] (-1.4,0) rectangle (-1, -0.4);
+\draw[blue,fill=blue] (-0.4,-0.6) rectangle (0.4, -1.4);
+\draw[blue,fill=blue] (0.6, -1.6) rectangle (1.4, -2.4);
+\draw[blue,fill=blue] (1.6, -2.6) rectangle (2.4, -3.4);
+\draw[blue,fill=blue] (2.6, -3.6) rectangle (3.4, -4.4);
+
+\draw[blue,fill=blue] (-1,0) rectangle (0, -1);
+\draw[blue,fill=blue] (0,-1) rectangle (1, -2);
+\draw[blue,fill=blue] (1,-2) rectangle (2, -3);
+\draw[blue,fill=blue] (2,-3) rectangle (3, -4);
+\draw[blue,fill=blue] (3,-4) rectangle (3.4, -4.4);
+
+\draw<4->[black!30,fill=black!30] (-0.4,-0.6) rectangle (0.4, -1.4);
+\draw<4->[black!30,fill=black!30] (0.6, -1.6) rectangle (1.4, -2.4);
+\draw<4->[black!30,fill=black!30] (1.6, -2.6) rectangle (2.4, -3.4);
+\draw<3->[black!30,fill=black!30] (2.6, -3.6) rectangle (3.4, -4.4);
+
+\draw<4->[black!30,fill=black!30] (-1,0) rectangle (0, -1);
+\draw<4->[black!30,fill=black!30] (0,-1) rectangle (1, -2);
+\draw<4->[black!30,fill=black!30] (1,-2) rectangle (2, -3);
+\draw<3->[black!30,fill=black!30] (2,-3) rectangle (3, -4);
+\draw<3->[black!30,fill=black!30] (3,-4) rectangle (3.4, -4.4);
+
+\draw<-3>[blue,fill=blue] (2,-3) rectangle (2.4, -3.4);
+\draw<4->[black!30,fill=black!30] (2,-3) rectangle (2.4, -3.4);
+\draw[blue,fill=blue] (-1,0) rectangle (-0.6, -0.4);
+
+\draw[green,fill=green] (4,-0.4) rectangle (4.4,-4.4);
+\draw<3->[black!30,fill=black!30] (4,-3.4) rectangle (4.4,-4.4);
+\draw<4->[black!30,fill=black!30] (4,-0.4) rectangle (4.4,-4.4);
+\draw[green,fill=green] (4,0.4) rectangle (4.4,-0.4);
+
+\draw[blue,fill=blue] (5.5,0.4) rectangle (5.9,0);
+\draw<2->[red,fill=red] (5.5,0.4) rectangle (5.9,0);
+\draw[blue,fill=blue] (5.5,-0.4) rectangle (5.9,-4.4);
+\draw<3->[black!30,fill=black!30] (5.5,-3.4) rectangle (5.9,-4.4);
+\draw<4->[black!30,fill=black!30] (5.5,-0.4) rectangle (5.9,-4.4);
+\draw[blue,fill=blue] (5.5,0) rectangle (5.9,-0.4);
+
+
+\end{tikzpicture} 
+\end{figure}
+
+
+%\textit{\begin{align*} 
+%  \scriptstyle{H^{t}(y^{t})} =
+%  \tiny{
+%	\begin{pmatrix}
+%		& -E  &     &     &     &     &     &     &     &     &     \\ \\
+%-E  & Q_t^{H} & M_t^{H} & A_t^{T} &  &    &     &     &     &     &     \\ \\
+%    & (M_t^{T})^{H} & R_t^{H} & B_t^{T} &   &    &    &    &    &   &     \\ \\
+%    & A_t & B_t &     & -E  &     &     &     &     &     &     \\ \\
+%    &  &  & -E  & Q_{t+1}^{H} & M_{t+1}^{H} & A_{t+1}^{T} &  &  &  &  \\ \\
+%    &  &  &     & (M_{t+1}^{T})^{H} & R_{t+1}^{H} & B_{t+1}^{T} &  &  &  &  \\ \\
+%    &  &  &     & A_{t+1} & B_{t+1} &    &    &     &     &     \\ \\
+%    &  &  &     &    &    &   & \ddots &     &     &     \\ \\
+%    &  &  &   &  &  & \ddots & Q_{N-1}^{H} & M_{N-1}^{H} & A_{N-1}^{T} &  \\ \\
+%    &  &  &   &  &  &    & (M_{N-1}^{T})^{H} & R_{N-1}^{H} & B_{N-1}^{T} &  \\ \\
+%    &  &  &   &  &  &    & A_{N-1}     & B_{N-1} &    & -E \\ \\
+%    &  &  &     &    &    &     &      &     & -E &  Q_N^{H} 
+%\end{pmatrix}
+%}
+%  \end{align*}}
+
+\end{frame}
+
+\begin{frame}{Summary}
+What happens in interval $ [ t-1 , t ] $ ?
+\begin{figure}
+\begin{tikzpicture}
+%Draw bounding box
+\draw[white] (-1,-.5) rectangle (6,1.2);
+
+%Draw time line
+\draw[ thick, ->] (-.5,-2pt) -- (5.5,-2pt);
+
+\draw[thick]  (5 cm, -1pt)  -- (5 cm, -3pt) node[anchor=north] {$t$ };
+\draw[thick]  (0cm , -1pt)  -- (0 cm, -3pt) node[anchor=north] {$t-1$ };
+
+%Solve for control in t_k-1
+\draw<2->[red,fill=red] (0,0) rectangle (0.1, 1);
+% Calculcate start value for t_k
+\draw<3->[blue,fill=blue] (0.1,0) rectangle (0.2, 1);
+%Prepare for t_k
+\draw<4->[green, fill=green] (0.2,0) rectangle (5,1);
+\end{tikzpicture}
+\end{figure}
+
+\begin{enumerate}
+\item<2-> {\color{red} calculate control $u_{t-1}$ (Riccati Part II)}
+\item<3-> {\color{blue} calculate $y$ (Riccati Part II)}
+\item<4-> {\color{green2} prepare $u_t$ (Newton \& Riccati Part I)} 
+\end{enumerate}
+\onslide<5->
+$ \Rightarrow $ with horizon $ 18 $ this is $ 28\% $ faster.
+\end{frame}
+
+\begin{frame}{Finite Horizon}
+
+%\begin{itemize}
+%\item $N=t_{end} \rightarrow $ problem gets smaller every time 
+%\item $N=t+n \rightarrow $ problem size is constant
+%\item .
+%\item .
+%\item .
+%\end{itemize}
+%\begin{block}{}
+%\small{
+%\begin{align*}
+%  \min_{s, q} \sum_{i=t}^{N-1} J_{i}(s_{i},q_{i}) \ \  
+%  s.t. \ \left\lbrace \begin{array}{rl}
+%  x_{t} - s_{t} = 0 & \\
+%  h_i (s_i ,q_i ) - s_{i+1} = 0 & \forall i = t, ... , N-1 \\
+%  p_{A_i}(s_i, q_i) = 0 & \end{array} \right. 
+%\end{align*}}
+%\end{block}
+%\vspace{1ex}
+%How to choose $N$? \\
+%\vspace{1ex}
+%\begin{tabular}{l l}
+%$N=t_{end} $ &$ \rightarrow $ problem size decreasing \\ \vspace{1ex}
+%\onslide<2->
+%$N=t+n $ & $\rightarrow $ problem size constant \\
+%\end{tabular}
+\begin{figure}
+\begin{tikzpicture}[decoration={brace,amplitude=6pt}]
+
+%Draw bounding box
+\draw[white] (-1,2) rectangle (8,0);
+
+%Draw time line
+\draw[ thick, ->] (-0.5,1) -- (8,1) node[anchor=west] {time};
+	\draw[thick]  (0, 1.05)  -- (0, 0.95) node[anchor=north] {\footnotesize t };
+	\draw[thick]  (1, 1.05)  -- (1, 0.95) node[anchor=north] {\footnotesize $t+1$ };
+	\draw[thick]  (6, 1.05)  -- (6, 0.95) node[anchor=north] {\footnotesize $t+N$ };
+	\draw[thick]  (7, 1.05)  -- (7, 0.95) ;
+	\draw[thick, decorate] (0,1.3) -- (6,1.3) node[midway, above,yshift=6pt,]{Horizon of t};
+	\draw[thick, decorate] (7,0.4) -- (1,0.4) node[midway, below,yshift=-6pt,]{Horizon of t+1};
+	
+
+\end{tikzpicture}
+\end{figure}
+
+\includegraphics[width=0.75\columnwidth]{images/horizonPlot}
+%$
+%\begin{array}{l c c}
+%		& \text{runtime} & \text{error} \\
+%N=20 	&         &       \\
+%N=50	&         &       \\
+%N=100	&         &       
+%\end{array}
+%$
+
+\end{frame}
+%\end{document}

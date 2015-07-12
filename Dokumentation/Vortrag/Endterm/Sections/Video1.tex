@@ -1,0 +1,11 @@
+\begin{frame}
+	\centering
+%	\movie[width=6cm,height=6cm,externelviewer]{unsere Video-Unterschrift}{C:/Users/as/Desktop/Beispiel_Skifahrer.webm}
+	\movie[label=shatner,width=4cm,height=4cm,
+start=5s,duration=6s,poster]{}{Videos/TestFilm.avi}
+\hyperlinkmovie[start=12s,duration=6s]{shatner}
+{\beamerbutton{Balls of lightning}}
+\hyperlinkmovie[pause]{shatner}{\beamerbutton{Pause}}
+\hyperlinkmovie[resume]{shatner}{\beamerbutton{Resume}}
+	
+\end{frame}

@@ -70,11 +70,19 @@ classdef(Abstract) BasisGenQDyn < Dyn
             res = obj.H;
         end
         
-        function [q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = getParams(obj)
-            q   = obj.state(4:7    , :);
-            v   = obj.state(8:10   , :);
-            omega   = obj.state(11:13  , :);
-            u   = obj.contr;
+        function [q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = getParams(obj, varargin)
+            
+            if nargin == 3            
+                y = varargin{1};
+                u = varargin{2};
+            else
+                y = obj.state;
+                u   = obj.contr;
+            end
+            q   = y(4:7    , :);
+            v   = y(8:10   , :);
+            omega   = y(11:13  , :);
+            
             
             
             Iges = obj.robot.I;

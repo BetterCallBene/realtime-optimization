@@ -7,11 +7,7 @@ cd(currentpath)
 load Circle.mat
 
 global visualization
-
-%Q = [ omega(3)(1:3), winkel(3)(4:6), v(3) (7:9), position(3) (10:12)];
-%array = [Position(3) (1:3), Quaternionen(4) (4:7), v(3) (8:10), omega(3) (11:13), control (14:17)]
             
-
 Q = zeros(length(t), 12);
 array = reshape(v, [length(v)/length(t), length(t)])'; 
 

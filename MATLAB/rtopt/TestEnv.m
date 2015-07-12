@@ -1,11 +1,13 @@
 classdef TestEnv < matlab.unittest.TestCase
-    %TESTENV Summary of this class goes here
-    %   Detailed explanation goes here
+    %TESTENV Basisklasse der Testumgebung
+    %   Enthaelt verschiedene numerische Ableitungsmethoden und Toleranzen
     
     properties(Constant)
         eps = 1e-2;
-        tol = 1e-10;
-        
+        %tol = 1e-10;
+        %Toleranz auf 1e-3 Heraufgesetzt, da x^3 Terme nur mit O(h^2)
+        %angenaehert werden koennen
+        tol = 1e-3;
         tolRK = 1e-5;
     end
     
@@ -26,7 +28,7 @@ classdef TestEnv < matlab.unittest.TestCase
         end
         
         function numDiff = numDiff_nD_AllT(obj, func)
-            % NUMDIFF_NDALLT This method calculates numericalle the
+            % NUMDIFF_NDALLT This method calculates numerically the
             % derivative of func, but for all timepoints
             
             [vec_old, n, m, n_timepoints, dyn] = obj.setup(func);
@@ -40,7 +42,10 @@ classdef TestEnv < matlab.unittest.TestCase
                     %Central difference
                     numDiff( : , ((timepoint-1) * n) + i) ...
                         = (func_p - func_n)/2/obj.eps;
+                    
+                    
                 end
+                disp(int2str(timepoint));
             end
         end
         
@@ -67,6 +72,7 @@ classdef TestEnv < matlab.unittest.TestCase
             
             numDiff  = zeros( m , n*n_timepoints,n*n_timepoints);
             for timepoint = 1:n_timepoints
+                
                 for i = 1:n
                     func_p = obj.plusEpsShift(i, timepoint, vec_old, func, n, dyn);
                     func_n = obj.minusEpsShift(i, timepoint, vec_old, func, n, dyn);
@@ -79,7 +85,7 @@ classdef TestEnv < matlab.unittest.TestCase
         
         
         %Some help functions (typically overwritten in subclasses)
-        function [vec_old, n, m, n_timepoints, dyn] = setup(obj, func)
+        function [vec_old, n, m, n_timepoints, dyn] = setup(obj, func, timepoint)
             vec_old = obj.vec;
             n_timepoints = obj.environment.n_timepoints;
             dyn = obj;

@@ -1,0 +1,40 @@
+Fragen:
+
+Kostenfunktion 
+	dazu gesagt: viele Einstellungsmöglichkeiten
+	Fragen:	was einstellen?
+		
+Quaternionen
+	dazu gesagt: Korrekturterm
+	Fragen: was genau sind Quaternionen?
+		Wie sieht der Korrekturterm aus?
+	Antwort: Verweis auf Geometriekalküle/ Form (1 0; 0 1), i=(i 0; 0 -i), j=(0 1; -1 0), k=(0 i; i 0)
+		 Korrekturterm: (1-norm(q))*q
+
+Aktives Set/Ungleichungsbedingungen
+	dazu gesagt: vernachlässigen die inaktiven Ungleichungen...
+	Fragen: warum vernachlässigbar?
+		wie arbeiten mit aktivem Set?
+	Antwort: When we start the iteration sufficiently close to a KKT point that satisfies the
+		 second order sufficient conditions
+		 (x* regular point iff there exist multipier vectors lambda* and mu*, such that (lambda*, mu*,x*) is KKT point
+		 and the Hessian is possitive definite), so that we can assume that the active set is known and we can
+		 restrict our attention to equality constrained problems.
+		
+		We check in every step, the inequality conditions, if they are equal or violated we consider it as activ
+		and set it as a new equality constraint
+
+Startpunkten
+	dazu gesagt: ??
+	Fragen: Woher kommen die Startpunkte?
+		wie wichtig sind sie?
+
+Dae/DGL-Löser:
+	dazu gesagt: lösen DGL numerisch
+	Fragen:	Welchen Löser?
+		multiple shooting?
+
+	Antwort: benutzen Multiple shooting, dabei kommen Sensitivitäten rein... -> durch Ableitungen wegen SQP-Formulierung (M,N)
+		 Lösungsversuch mit DAE (ODEs mit Nebenbedningungen) -> damit Norm(q)=1 zu allen Zeitpunken erfüllt
+		 nicht gut in MATLAB (nur Probleme mit ein- Und Ausgabevektor gleich groß könne gelöst werden)
+		 deswegen Korrekturterm ond lösung mi od15s wegen steifemm Problem

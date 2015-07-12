@@ -1,49 +1,20 @@
+
 classdef ode45M < Solver
-    %FORWEULER Summary of this class goes here
-    %   Detailed explanation goes here
-    
+    %ODE45M Integriert den MATLAB Solver ode45 in das Realtimeprojekt 
     
     methods
         
-        function M45 = ode45M()
-            M45@Solver();
+        function M45 = ode45M(varargin)
+            M45@Solver(nargin, varargin); %Bug in Matlab
         end
         
-        
-        
-        
-        function y = integrate(obj, func, meshGrid, y0)
-            y = ode45(func, meshGrid, y0);
+        function y = integrate(obj, func, meshGrid, y0, yp0)
+            opts_ = obj.opts;
+            [t, y] = ode45(func, meshGrid, y0, opts_);
+            y = y(end, :)';
         end
         
         
     end
-    
-    methods(Test)
-        
-        function testOde(testCase)
-            n_intervals = 50;
-            
-            testCase.setupTest(n_intervals);
-            
-            tic;
-            
-            for timepoint = 1:(n_intervals)
-                
-                [F, J, M, N] = testCase.odeTest(timepoint);
-                                        
-                func = @() testCase.odeTest(timepoint);
-                numDiff = testCase.numDiff_nD(timepoint, func);
-                testCase.assertLessThan(max(abs(J - numDiff)), testCase.tolRK);
-            end
-            
-            toc
-        end
-        
-    end
-    
-    
-    
-    
 end
 

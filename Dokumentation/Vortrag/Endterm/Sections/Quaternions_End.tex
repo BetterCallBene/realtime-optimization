@@ -1,0 +1,76 @@
+
+\begin{frame}
+	\frametitle{Copter Rotation}
+		\begin{figure}[p]
+			\centering
+			\includegraphics[width=0.8\textwidth]{images/Koordinatensysteme.pdf}
+			\label{fig:Koordinatensysteme}
+	\end{figure}
+\end{frame}
+
+%\begin{frame}
+	%\frametitle{Quaternions}
+	%\begin{block}{}
+		%\centering
+		%\vspace{1ex}
+		%\( q = a + \textup{i}b+\textup{j}c+\textup{k}d \qquad a, b, c, d \in \mathbb{R} \)
+		%\vspace{1ex}
+	 %\end{block}
+	%\end{frame}
+
+\begin{frame}
+	\frametitle{Quaternions}
+	\begin{block}{}
+		\centering
+		\( q = a + \textup{i}b+\textup{j}c+\textup{k}d \qquad a, b, c, d \in \mathbb{R} \) \\
+		\vspace{.5ex}
+		\(\Leftrightarrow\) \\
+		\vspace{1ex}
+		\( \hspace{1ex} q = \begin{pmatrix} a \\ b \\ c\\ d \end{pmatrix} \in \mathbb{R}^4 \)
+	\end{block}
+	
+	\vspace{1em}
+			\onslide<2-> \centering
+			represent rotation \( \quad \Leftrightarrow \quad \Vert q \Vert = 1 \quad \Leftrightarrow \quad q \in \mathcal{S}^3\) 
+\end{frame}
+
+\begin{frame}
+	\frametitle{Drift Correction}
+		\begin{columns}[T] % align columns
+			\begin{column}{.55\textwidth}
+			\centering
+				\begin{textblock}{0}(-4.4,-5)
+					\input{Sections/q0_to_q1_halb.tex}
+				\end{textblock}
+			\end{column}
+			\hfill
+			\begin{column}{0.45\textwidth}
+				\begin{textblock}{.963\columnwidth}(0,0)
+					\begin{block}{}
+					\centering
+						\( \dot{q}(t) = \tilde{f}(q(t))\only<2->{-\lambda(q(t))} \)
+					\end{block}
+				\end{textblock}
+				\end{column}
+		\end{columns}
+\end{frame}
+
+%\begin{frame}
+	%\frametitle{Drift Correction}
+		%\begin{columns}[T] % align columns
+			%\begin{column}{.55\textwidth}
+				%\begin{textblock}{0}(-4.4,-5)
+					%\input{Sections/norm_q1_halb.tex}
+				%\end{textblock}
+			%\end{column}
+			%\hfill
+			%\begin{column}{0.45\textwidth}
+				%\begin{textblock}{.9\columnwidth}(0,0)
+					%\begin{block}{}
+					%\centering
+					%\( \dot{q}(t) = \tilde{f}(q(t))\only<2->{-\lambda(q(t))} \)
+					%\end{block}
+				%\end{textblock}
+				%\end{column}
+		%\end{columns}
+%\end{frame}

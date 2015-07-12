@@ -13,7 +13,7 @@ def generate(Output, TmpFiles, MplFile, TemplateFile, strings_to_replace):
 	print 'Temporaere loeschen'
 
 	for filename in TmpFiles:
-		path = pathTmp % filename
+		path = pathTmp % filename[0]
 
 		if os.path.exists(path):
 			os.remove(path)
@@ -40,7 +40,7 @@ def generate(Output, TmpFiles, MplFile, TemplateFile, strings_to_replace):
 
 	for filename in TmpFiles:
 
-		path = pathTmp % filename
+		path = pathTmp % filename[0]
 		HFile = open(path, 'r')
 
 		text_rep = u'$%d$' % i 
@@ -48,8 +48,9 @@ def generate(Output, TmpFiles, MplFile, TemplateFile, strings_to_replace):
 		
 		try:
 			text_input = HFile.read()
-			for str_pair in strings_to_replace:
-				text_input = text_input.replace(str_pair[0], str_pair[1])
+			if filename[1] == 1:
+				for str_pair in strings_to_replace:
+					text_input = text_input.replace(str_pair[0], str_pair[1])
 			
 			text = text.replace(text_rep, text_input)
 			
@@ -64,7 +65,7 @@ def generate(Output, TmpFiles, MplFile, TemplateFile, strings_to_replace):
 	print 'Temporaere Dateien loeschen'
 
 	for filename in TmpFiles:
-		path = pathTmp % filename
+		path = pathTmp % filename[0]
 
 		if os.path.exists(path):
 			os.remove(path)

@@ -10,6 +10,7 @@
 \usepackage{geometry}
 \usepackage{fancyhdr}
 \usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
 \usetikzlibrary{plotmarks}
 \usetikzlibrary{arrows, positioning}
 \usepackage{lmodern}
@@ -105,37 +106,76 @@
 \begin{document}
 
 
-\begin{frame}
-\maketitle
-\end{frame}
-
-\begin{frame}{Overview}
-\tableofcontents
-\end{frame}
+%\begin{frame}
+%\maketitle
+%\end{frame}
+%
+%\begin{frame}{Overview}
+%\tableofcontents
+%\end{frame}
 
 %Der Befehl \include{datei} setzt dann hier die Datei datei.tex ,welche im selben Ordner liegt ein. Diese darf keinen Header enthalten
 %\include{datei}
 
-\input{Motivation}
-\begin{frame}{ }
-\begin{block}{ }
-\centering
-\LARGE
- \vspace{1ex}
-Model \\
-\vspace{1ex}
-\end{block}
+%\input{Motivation}
+%\begin{frame}{ }
+%\begin{block}{ }
+%\centering
+%\LARGE
+% \vspace{1ex}
+%Model \\
+%\vspace{1ex}
+%\end{block}
+%\end{frame}
+%\input{Modell}
+%\begin{frame}{ }
+%\begin{block}{ }
+%\centering
+%\LARGE
+% \vspace{1ex}
+%Realtime Optimization Approach\\
+%\vspace{1ex}
+%\end{block}
+%\end{frame}
+\begin{frame}
+\begin{figure}
+\begin{tikzpicture}[node distance=1.3cm, font=\Large,
+					neutral/.style ={
+					%shape
+					rectangle, minimum size=9mm, minimum width=3cm, rounded corners=2mm,
+					%rest
+					very thick, draw=black!50,
+					top color=white, bottom color=black!20},
+					aktiv/.style ={
+					rectangle, minimum size=9mm, minimum width=3cm, rounded corners=2mm,
+					very thick, draw=red,
+					top color=white, bottom color=red!50},
+					fertig/.style ={
+					rectangle, minimum size=9mm, minimum width=3cm, rounded corners=2mm,
+					very thick, draw=green!70,
+					top color=white, bottom color=green!35}]
+
+%\draw (-1,0) rectangle (10,-5);
+\draw  
+	node[neutral, minimum width=10.5cm] (r) {Results}
+	node[aktiv, above=of r.east, anchor=east] (f) {Realtime}
+	node[fertig, above=of f.east, anchor=east] (e) {Riccati}
+	node[neutral, above=of r.west, minimum width=7cm, anchor=west] (d) {Problemformulation}
+	node[neutral, above=of d.west, anchor=west] (b) {Modell} 
+	node[neutral, above=of d.east, anchor=east] (c) {Discretization}
+	node[neutral, above=of b.west, anchor=west] (a) {Quadrionen}
+	;
+	
+	\draw[very thick,->] (a) -- +(0,-0.8);
+	\draw[very thick,->] (b) -- +(0,-0.8);
+	\draw[very thick,->] (c) -- +(0,-0.8);
+	\draw[very thick,->] (d) -- +(0,-0.8);
+	\draw[very thick,->] (e) -- +(0,-0.8);
+	\draw[very thick,->] (f) -- +(0,-0.8);
+\end{tikzpicture}
+\end{figure}
 \end{frame}
-\input{Modell}
-\begin{frame}{ }
-\begin{block}{ }
-\centering
-\LARGE
- \vspace{1ex}
-Realtime Optimization Approach\\
-\vspace{1ex}
-\end{block}
-\end{frame}
+
 \input{rtSQP}
 
 \section{Results}
@@ -149,15 +189,15 @@ Results\\
 \end{block}
 \end{frame}
 
-\begin{frame}{ }
-\begin{block}{ }
-\centering
-\LARGE
- \vspace{1ex}
-Questions? \\
-\vspace{1ex}
-\end{block}
-\end{frame}
+%\begin{frame}{ }
+%\begin{block}{ }
+%\centering
+%\LARGE
+% \vspace{1ex}
+%Questions? \\
+%\vspace{1ex}
+%\end{block}
+%\end{frame}
 
 \nocite{Boyd2009}
 \nocite{Diehl2001}

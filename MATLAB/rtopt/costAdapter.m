@@ -6,5 +6,6 @@ global objectCost;
 % setting new input vector
 objectCost.vec = v;
 
+
 f   = objectCost.get_func();
 fD  = objectCost.get_jac();

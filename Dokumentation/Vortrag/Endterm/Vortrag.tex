@@ -1,0 +1,121 @@
+\documentclass[12pt]{beamer} %[aspectratio=169]
+
+\usepackage{pgfpages} %This is needed for notes presentation!
+%\setbeameroption{}
+\usepackage[ngerman, english]{babel}
+\usepackage[latin1]{inputenc} 
+\usepackage{amsmath,amssymb,amsthm,amstext}  
+\usepackage{enumerate}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{plotmarks}
+\usetikzlibrary{arrows, positioning}
+\usepackage{lmodern}
+\usepackage{textpos}
+\usepackage{relsize}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{fancybox}
+\usepackage{float}
+\usepackage{sidecap}
+\usepackage{multimedia}
+\usepackage{setspace}
+% \usepackage{algorithmicx}
+% \usepackage{algpseudocode}
+
+
+\newcommand{\lk}{\left}
+\newcommand{\rk}{\right}
+\newcommand{\rel}{\sqsubseteq}
+\newcommand{\rhn}{\mathds{R}^n}
+ 
+\usetheme{Madrid} % Antibes, Berlin, darmstadt, default, Frankfurt; JuanLesPins
+\usecolortheme{beaver}
+\useinnertheme{rounded}
+\useoutertheme{infolines}
+\usefonttheme{default}
+
+% Seitenzahlen
+\setbeamertemplate{footline}[frame number]
+
+\title{Real Time Control of a Quadcopter}
+\author{Simon Kick, Philipp Fr\"ohlich, Benedikt K\"onig, Annika Stegie}
+\institute{Technische Universit\"at M\"unchen}
+\date{11 July 2015}
+
+\beamertemplatenavigationsymbolsempty
+% kleine Symbole zur Nvigation wegmachen
+
+\setcounter{MaxMatrixCols}{20}
+
+
+\begin{document}
+
+
+\begin{frame}
+\maketitle
+\thispagestyle{empty}
+\end{frame}
+
+%TODO:
+% 1.  Pfeile in Setting anderes grün?? -> DONE
+% 2.  Mail wegen Videos
+% 3.  Formulierung Fragenkatalog
+% 4.  Copter Bilder höher -> DONE
+% 5.  Plots (Zahlen größer, linien dicker, Pnkte größer)
+% 6.a) Plot (fertiger, copter) Linie statt Punkte
+% 6.b) besserer Kontrast/dunktere Fraben
+% 7.  Inhaltverzeichnis -> DONE
+% 8.  Horizon N->N+t
+% 9.  Kräfte- Drehmomentgleichung neu -> DONE
+% 10. Horizon Tabelle mit Werten füllen
+
+
+\input{Sections/Motivation_End}
+\input{Inhalt/Inhalt_alles_grau2}
+\input{Sections/SQP-Formulierung_End}
+\input{Sections/Model_End}
+\input{Inhalt/Inhalt_Quaternions2}
+\input{Sections/Quaternions_End}
+\input{Inhalt/Inhalt_Discretization2}
+\input{Sections/rtSQP}
+\input{Inhalt/Inhalt_Results2}
+
+\nocite{Boyd2009}
+\nocite{Diehl2001}
+\nocite{Diehl2002}
+\nocite{Diehl2005}
+\nocite{Diebel2006}
+\nocite{Garcia2013}
+\nocite{Richter-Gebert2009}
+\nocite{Reyes-Valeria2013}
+\nocite{Hartmann2014}
+%
+\begin{frame}[allowframebreaks] % Literaturverzeichnis über mehrere Frames
+ \frametitle{References}
+	\bibliography{Literaturliste}
+	\bibliographystyle{plain}
+\end{frame}
+
+\begin{frame}
+	\frametitle{What we learned from the Project:}
+	\begin{doublespace}
+	\begin{itemize}
+		\item you have to know your plan to ignore it
+		\item MATLAB\(^{\text{\textregistered}}\) is special
+		\item tests are helpful - or drive you crazy
+		\item loopings can be cheap, too
+		\item keep your colorscheme
+		\item keep calm and do case studies
+	\end{itemize}
+	\end{doublespace}
+\end{frame}
+
+\begin{frame}
+\frametitle{Any Questions?}
+	\begin{figure}%
+	\includegraphics[width=0.9\columnwidth]{images/Easter_Egg/fairy-penguin}%
+	\end{figure}
+\end{frame}
+
+\end{document}

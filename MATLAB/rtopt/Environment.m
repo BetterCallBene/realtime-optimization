@@ -1,10 +1,12 @@
 classdef Environment < handle
-    % ENVIRONMENT Diese Klasse speichert alle Parameter, die den Quadrocopter nicht intern beschreiben, also Nebenbedingungen, Mesh, Gravitation, Wind (später)
+    % ENVIRONMENT Diese Klasse speichert die Parameter, Mesh, Gravitation,
     properties
-        mesh;            % time mesh (1xn) vector
-        xbc;             % (mx2) matrix with boundary values for states
+        mesh;           % time mesh (1xn) vector
+        xbc;            % (mx2) matrix with boundary values for states
         g = 9.81;		% Gravitation
-        
+
+        horizon;        % Horizon of the realtime approach
+        wind;           % A function handle, which has s_t and t as input and returns the exact measured state
         n_intervals;     % number of intervals in mesh
     end
     
@@ -83,8 +85,24 @@ classdef Environment < handle
             end
         end
         
+        function [n_intervals] = setUniformMesh1(obj,n_tp, points_per_sec)
+            % SETUNIFROMMESH1 function to set a uniform mesh with specified number of
+            % intervals (without providing the actual mesh values)
+            if (n_tp>1)
+                obj.mesh = ones(1, n_tp-1) ./ points_per_sec;
+                obj.n_intervals = n_tp-1;
+                n_intervals = obj.n_intervals;
+            else
+                error('Input is no integer greater 1.');
+            end
+%             if ((isinteger(n_in))&&(n_in>1))
+%                 obj.mesh = ones(1,n_in)*(1.0/(double(n_in)));
+%                 obj.n_intervals = length(obj.mesh);
+%             else
+%                 error('Input is no integer greater 1.');
+%             end
+            
+        end
     end
-    
-    
 end
 
