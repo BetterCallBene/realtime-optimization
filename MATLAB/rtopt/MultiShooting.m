@@ -1,8 +1,8 @@
 classdef MultiShooting < TestEnv
-    %   FORWEULER providing discretized ODE constraint using forward euler
+    %   MultiShooting providing discretized ODE constraint using a special
+    %  solver
     %   Use the multiple shooting approach to rewrite the ode constraint of the
-    %   ocp as a number of equality constraints. This version here is based on
-    %   one step of forward euler for each interval only.
+    %   ocp as a number of equality constraints. 
     
     properties
         dyn;   % handle for the classDyn object providing the right hand side of the ODE

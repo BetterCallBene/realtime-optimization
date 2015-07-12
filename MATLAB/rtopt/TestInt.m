@@ -1,17 +1,19 @@
 classdef TestInt < handle & TestEnv
-    %TESTINT Summary of this class goes here
-    %   Detailed explanation goes here
+    %TESTINT Testklasse bzw. Testumgebung der Integrator
+    %   In dieser Klasse werden die Solver ode45, ode15s und Einschritt
+    %   ForwEuler auf Geschwindigkeit sowie Genauigkeit getestet. Zudem
+    %   werden die Sensitivitaeten getestet
     
     properties
-        dynOde45M;
-        dynForwEuler;
-        dynOde15sM;
+        dynOde45M; %Dynamikklasse, die mit ode45 Verfahren initialisiert wird
+        dynForwEuler; % " ForwEuler "
+        dynOde15sM;  % " ode15s "
     end
     
     properties(Dependent)
-        solver1;
-        solver2;
-        solver3;
+        solver1; % Shortcout fuer ForwEuler
+        solver2; % " ode45
+        solver3; % " ode15s
     end
     
     methods
@@ -86,6 +88,7 @@ classdef TestInt < handle & TestEnv
         end
         
         function [error, norm_error, rel_error] = NumAnaTest(obj, n_intervals, solver)
+            %NumAnaTest Test, die Sensitivitaeten auf Korrektheit
             error = zeros(n_intervals, 1);
             norm_error = zeros(n_intervals, 1);
             rel_error = zeros(n_intervals, 1);
@@ -107,7 +110,7 @@ classdef TestInt < handle & TestEnv
         end
         
         function stressTestIntegrator(testCase, n_intervals)
-            
+            % stressTestIntegrator Stresstest fuer die Integratoren
             
             solver1 =testCase.solver1;
             opts1 = solver1.opts;
@@ -146,13 +149,8 @@ classdef TestInt < handle & TestEnv
             
             disp('Numerikvergleich von ode15sM');
             [error, norm_error, rel_error3] = testCase.NumAnaTest(n_intervals, solver3);
-<<<<<<< HEAD
-            testCase.verifyLessThan(max(error), opts3.RelTol * 900);
-=======
             testCase.verifyLessThan(max(error), opts3.RelTol * 150);
->>>>>>> 90e696c6cf52a9fb75e5186c8df57b2c7d206f52
             testCase.verifyLessThan(max(norm_error), opts3.RelTol);
-            
         end
         
         
@@ -162,6 +160,7 @@ classdef TestInt < handle & TestEnv
     
     methods(Test)
         function testSetup1(testCase)
+            %testSetup1 Test der Integratoren mit Randomwerten
             n_intervals = 50;
             
             %testCase.setupTest(n_intervals);
@@ -173,6 +172,7 @@ classdef TestInt < handle & TestEnv
         end
         
         function testSetup2(testCase)
+            %testSetup2 Test der Integratoren mit dem Punkt [1 0 0 0]
             n_intervals = 50;
             
             %testCase.setupTest(n_intervals);
@@ -183,6 +183,8 @@ classdef TestInt < handle & TestEnv
         end
         
         function testExactness(testCase)
+            %testExactness Vergleichstest der einzelnen Solvers in Bezug zu
+            %ihrer Genauigkeit
             n_intervals = 50;
             testCase.setupTest(n_intervals)
             solver1 = testCase.solver1;
@@ -230,7 +232,7 @@ classdef TestInt < handle & TestEnv
         %timepoint 5
     end
     
-    methods
+    methods % Verschiedene Konfigurationen
         
         function setupTest(obj,n_intervals)
             

@@ -1,15 +1,14 @@
 classdef BasisQDyn < BasisGenQDyn
     
     properties
-        backdoor_vec;
+        backdoor_vec; % Zentrales Speichervektor
+        steadyPoint; % Punkt in dem Kraefte F_1, F_2, F_3 und F_4 im Gleichgewicht sind
         
-        steadyPoint;
+        %dotDpatternflag;
+        %dotDDpatternflag;
         
-        dotDpatternflag;
-        dotDDpatternflag;
-        
-        dotDCellpattern;
-        dotDDCellpattern;
+        %dotDCellpattern;
+        %dotDDCellpattern;
         
         
     end
@@ -23,8 +22,12 @@ classdef BasisQDyn < BasisGenQDyn
     end
     
     methods(Static)
-        %Workaround fuer static Variablen %oh... Matlab
+        
         function res = getsetSteadyPoint(value, getsetflag)
+            %getsetSteadyPoint SteadyPoint sollt nur einmal pro
+            %Programmablauf berechnet werden
+            
+            %Workaround fuer static Variablen %oh... Matlab
             persistent steadyPoint_;
             
             if getsetflag
@@ -47,8 +50,8 @@ classdef BasisQDyn < BasisGenQDyn
         function bQDyn = BasisQDyn(varargin)
             bQDyn@BasisGenQDyn();
             
-            bQDyn.dotDpatternflag = true;
-            bQDyn.dotDDpatternflag = true;
+            %bQDyn.dotDpatternflag = true;
+            %bQDyn.dotDDpatternflag = true;
             
             nargin_tmp = nargin;
             m = metaclass(bQDyn);
@@ -97,6 +100,8 @@ classdef BasisQDyn < BasisGenQDyn
         end
         
         function set.vec(obj, vec)
+            % vec Mit diesem Getter wird der zentrale Vektor backdoor_vec
+            % initialisiert und die Quartionen normiert
             n_int = obj.environment.n_intervals;
             n_state = obj.robot.n_state;
             n_contr = obj.robot.n_contr;
@@ -156,6 +161,8 @@ classdef BasisQDyn < BasisGenQDyn
         end
         
         function ret = get.steadyPoint(obj)
+            %steadyPoint Eigenschaft gibt den Punkt zurueck in dem die
+            %Kraefte im Gleichgewicht sind
             steadyPoint_ = BasisQDyn.getsetSteadyPoint([], true);
             if isempty(steadyPoint_);
                 %[q,v,omega,u,Iges,IM,m,kT,kQ,d,g] = obj.getParams();
@@ -196,20 +203,6 @@ classdef BasisQDyn < BasisGenQDyn
             res = sparse(J_(:, 1), J_(:, 2), J_(:, ind + 2), 13, 17);
         end
         
-        %         function res = dotDD(obj,ind)
-        %             % compute the Hessian of the right hand side of the ode for
-        %             % a given time instance ind
-        %             n_state = obj.robot.n_state;
-        %             res = cell(1, n_state);
-        %             H_ = obj.H;
-        %             for i = 1:size(H_, 1)
-        %                 if isempty(res{H_(i, 1)})
-        %                     res{H_(i, 1)} = sparse(17, 17);
-        %                 end
-        %                 res{H_(i, 1)}(H_(i, 2), H_(i, 3)) = H_(i, ind + 3);
-        %             end
-        %         end
-        
         function res = dotDD(obj,ind)
             % compute the Hessian of the right hand side of the ode for
             %           % a given time instance ind
@@ -221,37 +214,38 @@ classdef BasisQDyn < BasisGenQDyn
         end
     end
     methods
-        function pattern =  dotDpattern(obj)
-            if obj.dotDpatternflag
-                J_ = obj.J;
-                
-                obj.dotDCellpattern = sparse(J_(:, 1), J_(:, 2), ones(size(J_(:, 1), 1), size(J_(:, 1), 2)), 13, 17);
-                obj.dotDpatternflag = false;
-            end
-            pattern = obj.dotDCellpattern;
-        end
-        
-        function pattern =  dotDDpattern(obj)
-            if obj.dotDDpatternflag
-                n_state       = obj.robot.n_state;
-                
-                obj.dotDDCellpattern = cell(1, n_state);
-                H_ = obj.H;
-                for i = 1:size(H_, 1)
-                    if isempty(obj.dotDDCellpattern{H_(i, 1)})
-                        obj.dotDDCellpattern{H_(i, 1)} = sparse(17, 17);
-                    end
-                    obj.dotDDCellpattern{H_(i, 1)}(H_(i, 2), H_(i, 3)) = 1;
-                end
-                
-                obj.dotDDpatternflag = false;
-            end
-            pattern = obj.dotDDCellpattern;
-        end
+%         function pattern =  dotDpattern(obj)
+%             if obj.dotDpatternflag
+%                 J_ = obj.J;
+%                 
+%                 obj.dotDCellpattern = sparse(J_(:, 1), J_(:, 2), ones(size(J_(:, 1), 1), size(J_(:, 1), 2)), 13, 17);
+%                 obj.dotDpatternflag = false;
+%             end
+%             pattern = obj.dotDCellpattern;
+%         end
+%         
+%         function pattern =  dotDDpattern(obj)
+%             if obj.dotDDpatternflag
+%                 n_state       = obj.robot.n_state;
+%                 
+%                 obj.dotDDCellpattern = cell(1, n_state);
+%                 H_ = obj.H;
+%                 for i = 1:size(H_, 1)
+%                     if isempty(obj.dotDDCellpattern{H_(i, 1)})
+%                         obj.dotDDCellpattern{H_(i, 1)} = sparse(17, 17);
+%                     end
+%                     obj.dotDDCellpattern{H_(i, 1)}(H_(i, 2), H_(i, 3)) = 1;
+%                 end
+%                 
+%                 obj.dotDDpatternflag = false;
+%             end
+%             pattern = obj.dotDDCellpattern;
+%         end
         
     end
     methods(Test)
         function testInitBasisQDyn(obj)
+            %testInitBasisQDyn Funktionstest von BasisQDyn
             n_int_ = uint16(50);
             obj.environment = Environment();
             obj.environment.setUniformMesh(n_int_);

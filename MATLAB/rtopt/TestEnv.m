@@ -1,6 +1,6 @@
 classdef TestEnv < matlab.unittest.TestCase
-    %TESTENV Summary of this class goes here
-    %   Detailed explanation goes here
+    %TESTENV Basisklasse der Testumgebung
+    %   Enthaelt verschiedene numerische Ableitungsmethoden und Toleranzen
     
     properties(Constant)
         eps = 1e-2;

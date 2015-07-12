@@ -1,6 +1,6 @@
 close all
 
-load('WindRand.mat', 'Wind');
+%load('WindRand.mat', 'Wind');
 %% Define setting
 
 % Quadrocopter soll einen halben Meter nach unten fliegen

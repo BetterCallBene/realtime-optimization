@@ -276,7 +276,7 @@ classdef Lagrange < TestEnv
             for i = 2:horizon                
                 anaDiff = o.getLD(o.cSolverRT,i);
                 %Perform checks
-              o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30)) / norm(anaDiff), 1e-3);
+              o.assertLessThan(norm(anaDiff + numDiff( (i-1) * 30 + 1 : i *30)) / norm(anaDiff), 1e-2);
             end
             disp('Test testgetLD_ode15sM finished');
         end

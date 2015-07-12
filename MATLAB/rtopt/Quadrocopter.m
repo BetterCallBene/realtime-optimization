@@ -2,11 +2,13 @@ classdef Quadrocopter < Model
     %% QUADROCOPTER repraesentiert einen bestimmten Quadrocopter und seine physikalischen Eigenschaften.
     % * $$I = [0.0093886, 0.0093886, 0.018406]$$
     % 
-    
+   
     properties(Constant, GetAccess=public)
+        
 		n_state = 13;
 		n_contr = 4;
-
+        % Folgende Eigenschaften wurden mit Hilfe unteres GUI_Modeling.fig
+        % erstellt und ist im Ordner KonfigurationQuadrocopter zufinden
         I = [0.0093886, 0.0093886, 0.018406];
         % Tr�gheitsmoment gesamt in kg m^2
         m   = 1.022;                                % Gesamtgewicht des Quadrokopters in kg
@@ -54,6 +56,7 @@ classdef Quadrocopter < Model
         %Jm = ((mRC)*(motor_r)^2)/2; % Jm = mr^2/2
         %
         function IM = get.I_M(cq)
+            %I_M Traegheitsmoment der Motoren
             %if cq.flagI_M
             %    mRC = (cq.motor_m)*(0.527);
             %    cq.I_M = ((mRC)*(cq.motor_r)^2)/2;
@@ -62,6 +65,7 @@ classdef Quadrocopter < Model
             IM = 4.4466e-06; %BB: Performance wgn 
         end
         function ret = get.I_1(cq)
+            %I_1 Gibt die Massenmatrix zurueck
             ret = [
                 [cq.I(1),         0,        0];
                 [0,         cq.I(2),        0];
@@ -75,6 +79,8 @@ classdef Quadrocopter < Model
         end
         
         function res = get.F_w(obj)
+            % F_w diese Eigenschaft gibt Luftwiderstand, Aerodynamik
+            % zurueck
             if obj.flagF_w 
                 obj.F_w = 1/2 * obj.rho * obj.A *  obj.c_w;
                 obj.flagF_w = false;

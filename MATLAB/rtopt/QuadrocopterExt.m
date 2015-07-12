@@ -19,10 +19,8 @@ classdef QuadrocopterExt < BasisQDyn
             end
         end
         function F = wind(obj, t, st, ctr)
+            %wind Erweitert das Modell durch ein externes Moment und Kraft
             solver_ = obj.solver;
-            %old_intervals = solver_.dyn.environment.n_intervals;
-            %solver_.dyn.environment.n_intervals = 0;
-            %vec_sav = solver_.vec;
             
             solver_.vec = [st; ctr];
             [old_intervals1] = solver_.preToDo();
@@ -48,7 +46,8 @@ classdef QuadrocopterExt < BasisQDyn
         end
         
         function res = dot(obj,ind) 
-            
+            %dot Ueberschreibt die dot Funktion der BasisQDyn - Klasse zur
+            %Erweiterung externe Momente und Kraefte
             res = obj.dot@BasisQDyn(ind);
             
             MomentExt_ = obj.MomentExt;
@@ -109,6 +108,7 @@ classdef QuadrocopterExt < BasisQDyn
     methods(Test)
         
         function testWind(testCase)
+            % testWind Testet die Windfunktion
             n_intervals = 20;
             timepoint = 5;
             testCase.setupTest(n_intervals);

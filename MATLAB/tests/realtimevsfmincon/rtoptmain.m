@@ -8,7 +8,7 @@ PUBLISHABLE = true;
 global TEST;
 TEST = false;
 
-load('WindRand.mat', 'Wind');
+%load('WindRand.mat', 'Wind');
 
 %parpool(8);
 

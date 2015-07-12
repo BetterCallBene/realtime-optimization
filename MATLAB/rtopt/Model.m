@@ -1,5 +1,5 @@
 classdef(Abstract) Model < handle
-    % MODEL Abstrakte Klasse, welche das Modell repräsentiert. Im Moment
+    % MODEL Abstrakte Klasse, welche das Modell repraesentiert. Im Moment
     % noch Dummy, da es nur einen einzigen Quadrocopter gibt.
     
     properties( Abstract, ...

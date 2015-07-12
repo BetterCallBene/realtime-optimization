@@ -1,6 +1,6 @@
+
 classdef ode45M < Solver
-    %FORWEULER Summary of this class goes here
-    %   Detailed explanation goes here
+    %ODE45M Integriert den MATLAB Solver ode45 in das Realtimeprojekt 
     
     methods
         
